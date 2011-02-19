@@ -1,0 +1,12 @@
+package vdrm.base.util;
+
+import java.util.logging.Logger;
+
+public class BasicLogger implements ILogger {
+
+	@Override
+	public Logger getLogger() {
+		return Logger.getLogger("BasicLogger");
+	}
+	
+}

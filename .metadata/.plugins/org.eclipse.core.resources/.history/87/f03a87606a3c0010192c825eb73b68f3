@@ -1,0 +1,13 @@
+package vdrm.base.util;
+
+import java.util.logging.Logger;
+
+public class BasicLogger implements ILogger {
+
+	@Override
+	public Logger getLogger() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+}

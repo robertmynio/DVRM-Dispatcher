@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename package &apos;vdrm.pred.predictor1&apos; to &apos;vdrm.pred.pred&apos;&#x0D;&#x0A;- Original project: &apos;Predictor&apos;&#x0D;&#x0A;- Original element: &apos;Predictor/src/vdrm.pred.predictor1&apos;&#x0D;&#x0A;- Renamed element: &apos;Predictor/src/vdrm.pred.pred&apos;&#x0D;&#x0A;- Update references to refactored element&#x0D;&#x0A;- Update textual occurrences in comments and strings" description="Rename package &apos;vdrm.pred.predictor1&apos;" flags="589830" hierarchical="false" id="org.eclipse.jdt.ui.rename.package" input="/src&lt;vdrm.pred.predictor1" name="vdrm.pred.pred" qualified="false" references="true" stamp="1298148412771" textual="false" version="1.0"/>
+</session>

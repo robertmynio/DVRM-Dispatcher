@@ -1,0 +1,5 @@
+package vdrm.base.common;
+
+public interface IAlgorithm {
+
+}

@@ -1,0 +1,7 @@
+package vdrm.base.common;
+
+import vdrm.base.data.IServer;
+
+public interface IAlgorithm {
+	public void initialize(ArrayList<IServer> servers);
+}

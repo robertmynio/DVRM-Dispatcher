@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename package &apos;vdrm.disp.algorithm1&apos; to &apos;vdrm.disp.alg&apos;&#x0D;&#x0A;- Original project: &apos;Dispatcher&apos;&#x0D;&#x0A;- Original element: &apos;Dispatcher/src/vdrm.disp.algorithm1&apos;&#x0D;&#x0A;- Renamed element: &apos;Dispatcher/src/vdrm.disp.alg&apos;&#x0D;&#x0A;- Update references to refactored element&#x0D;&#x0A;- Update textual occurrences in comments and strings" description="Rename package &apos;vdrm.disp.algorithm1&apos;" flags="589830" hierarchical="false" id="org.eclipse.jdt.ui.rename.package" input="/src&lt;vdrm.disp.algorithm1" name="vdrm.disp.alg" qualified="false" references="true" stamp="1298148402171" textual="false" version="1.0"/>
+</session>

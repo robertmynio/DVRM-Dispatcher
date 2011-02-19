@@ -1,0 +1,5 @@
+package vdrm.base.util;
+
+public class BasicLogger implements ILogger {
+	
+}

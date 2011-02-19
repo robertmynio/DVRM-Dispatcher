@@ -1,0 +1,8 @@
+package vdrm.base.common;
+
+import java.util.ArrayList;
+import vdrm.base.data.IServer;
+
+public interface IAlgorithm {
+	public void initialize(ArrayList<IServer> servers);
+}
