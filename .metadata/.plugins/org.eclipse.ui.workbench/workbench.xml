@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<workbench progressCount="32" version="2.0">
+<workbench progressCount="47" version="2.0">
 <workbenchAdvisor/>
 <window height="728" width="1024" x="100" y="0">
 <fastViewData fastViewLocation="1024"/>
@@ -33,46 +33,11 @@
 <folder appearance="1" expanded="2">
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
 <part id="0"/>
-<part id="1"/>
-<part id="2"/>
-<part id="3"/>
-<part id="4"/>
-<part id="5"/>
-<part id="6"/>
-<part id="7"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IPredictor.java" partName="IPredictor.java" path="D:/Licenta2011/Base/src/vdrm/base/common/IPredictor.java" title="IPredictor.java" tooltip="Base/src/vdrm/base/common/IPredictor.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Base/src/vdrm/base/common/IPredictor.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="218" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ITask.java" partName="ITask.java" path="D:/Licenta2011/Base/src/vdrm/base/data/ITask.java" title="ITask.java" tooltip="Base/src/vdrm/base/data/ITask.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Base/src/vdrm/base/data/ITask.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IPrediction.java" partName="IPrediction.java" path="D:/Licenta2011/Base/src/vdrm/base/data/IPrediction.java" title="IPrediction.java" tooltip="Base/src/vdrm/base/data/IPrediction.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Base/src/vdrm/base/data/IPrediction.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IServer.java" partName="IServer.java" path="D:/Licenta2011/Base/src/vdrm/base/data/IServer.java" title="IServer.java" tooltip="Base/src/vdrm/base/data/IServer.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Base/src/vdrm/base/data/IServer.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="56" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Predictor.java" partName="Predictor.java" path="D:/Licenta2011/Predictor/src/vdrm/pred/predictor1/Predictor.java" title="Predictor.java" tooltip="Predictor/src/vdrm/pred/predictor1/Predictor.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Predictor/src/vdrm/pred/predictor1/Predictor.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="300" selectionTopPixel="34"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ILogger.java" partName="ILogger.java" path="D:/Licenta2011/Base/src/vdrm/base/util/ILogger.java" title="ILogger.java" tooltip="Base/src/vdrm/base/util/ILogger.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Base/src/vdrm/base/util/ILogger.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IUniqueIdGenerator.java" partName="IUniqueIdGenerator.java" path="D:/Licenta2011/Base/src/vdrm/base/util/IUniqueIdGenerator.java" title="IUniqueIdGenerator.java" tooltip="Base/src/vdrm/base/util/IUniqueIdGenerator.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Base/src/vdrm/base/util/IUniqueIdGenerator.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
-</editor>
-<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IAlgorithm.java" partName="IAlgorithm.java" path="D:/Licenta2011/Base/src/vdrm/base/common/IAlgorithm.java" title="IAlgorithm.java" tooltip="Base/src/vdrm/base/common/IAlgorithm.java" workbook="DefaultEditorWorkbook">
+<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IAlgorithm.java" partName="IAlgorithm.java" path="D:/DVRM-Dispatcher/Base/src/vdrm/base/common/IAlgorithm.java" title="IAlgorithm.java" tooltip="Base/src/vdrm/base/common/IAlgorithm.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/Base/src/vdrm/base/common/IAlgorithm.java"/>
 <editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="309" selectionTopPixel="0"/>
 </editor>
@@ -83,9 +48,6 @@
 </view>
 <view id="org.eclipse.ui.views.AllMarkersView" partName="Markers">
 <viewState PRIMARY_SORT_FIELD="org.eclipse.ui.ide.allSeverityField" categoryGroup="org.eclipse.ui.ide.type" markerContentGenerator="org.eclipse.ui.ide.allMarkersGenerator" partName="Markers">
-<expanded>
-<category IMemento.internal.id="Java Problems (1 item)"/>
-</expanded>
 <columnWidths org.eclipse.ui.ide.allSeverityField="300" org.eclipse.ui.ide.locationField="64" org.eclipse.ui.ide.markerType="94" org.eclipse.ui.ide.pathField="124" org.eclipse.ui.ide.resourceField="94"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.allSeverityField"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.resourceField"/>
