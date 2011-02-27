@@ -7,5 +7,8 @@ public interface ITask {
 	public int getHdd();
 	public int getCpu();
 	public boolean isPredicted();
-	public UUID serverId();
+	public boolean setPredicted(boolean predicted);
+	public UUID getServerId();
+	public IServer getServer();
+	public boolean equals(ITask task);
 }

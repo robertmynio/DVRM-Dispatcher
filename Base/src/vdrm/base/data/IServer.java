@@ -15,5 +15,6 @@ public interface IServer {
 	public boolean removeTask(UUID taskId);
 	public int getTotalNumberOfTasks();
 	public int getNumberOfPredictedTasks();
+	public boolean isFull();
 	//oare este nevoie de o metoda : removeAllPredictedTasks() ?
 }

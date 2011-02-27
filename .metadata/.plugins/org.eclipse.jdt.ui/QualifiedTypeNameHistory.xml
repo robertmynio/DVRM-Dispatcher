@@ -2,6 +2,7 @@
 <qualifiedTypeNameHistroy>
 <fullyQualifiedTypeName name="vdrm.base.data.IPrediction"/>
 <fullyQualifiedTypeName name="vdrm.base.data.IServer"/>
-<fullyQualifiedTypeName name="java.util.ArrayList"/>
 <fullyQualifiedTypeName name="vdrm.base.data.ITask"/>
+<fullyQualifiedTypeName name="java.util.UUID"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
 </qualifiedTypeNameHistroy>

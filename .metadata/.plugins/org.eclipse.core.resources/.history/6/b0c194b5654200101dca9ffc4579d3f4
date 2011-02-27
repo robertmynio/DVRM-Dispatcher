@@ -1,0 +1,80 @@
+package vdrm.disp.alg;
+
+import java.util.ArrayList;
+import java.util.UUID;
+
+import vdrm.base.common.IAlgorithm;
+import vdrm.base.data.IPrediction;
+import vdrm.base.data.IServer;
+import vdrm.base.data.ITask;
+
+public class Algorithm1 implements IAlgorithm{
+
+	ArrayList<IServer> emptyServers;
+	ArrayList<IServer> inUseServers;
+	ArrayList<IServer> fullServers;
+	ArrayList<ITask> unassignedTasks;
+	ArrayList<ITask> predictdTasks;
+	IPrediction prediction;
+	
+	@Override
+	public void initialize(ArrayList<IServer> servers) {
+		emptyServers = servers;
+		//inUseServers = new ArrayList<Server>();
+		//fullServers = new ArrayList<Server>();
+		//unassignedTasks = new ArrayList<Task>();
+		//predictdTasks = new ArrayList<Task>();
+	}
+
+	@Override
+	public void newTask(ITask task) {
+		if(predictdTasks.size()>0)
+		{
+			if(task.equals(predictdTasks.get(0)))
+				{
+					IServer server = predictdTasks.get(0).getServer();
+					server.addTask(task);
+					task.setPredicted(false);
+					
+					//dispatch(); -- OpenNubula
+					
+					if(server.isFull()) {
+						if(emptyServers.contains(server))
+							emptyServers.remove(server);
+						else
+							inUseServers.remove(server);
+						fullServers.add(server);
+					}
+					else {
+						if(emptyServers.contains(server)) {
+							emptyServers.remove(server);
+							inUseServers.add(server);
+						}
+						reorderServerList();
+					}
+					predictdTasks.remove(0);
+					if(predictdTasks.isEmpty())
+						
+
+					
+					
+					
+				}
+		}
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private void reorderServerList()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void redistributeTasks(IServer server, ITask finishedTask) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}
