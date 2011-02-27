@@ -1,5 +1,6 @@
 package vdrm.base.data;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public interface ITask {
@@ -11,4 +12,12 @@ public interface ITask {
 	public UUID getServerId();
 	public IServer getServer();
 	public boolean equals(ITask task);
+	
+	public ArrayList<Integer> GetRequirements();
+	public void computeRequirementsScore();
+	public String getTaskHandle();
+	public void setTaskHandle(String taskHandle);
+	public double getResourceScore();
+	public boolean isUnsuccessfulPlacement();
+	public void setUnsuccessfulPlacement(boolean unsuccessfulPlacement);
 }
