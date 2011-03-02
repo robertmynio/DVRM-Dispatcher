@@ -8,7 +8,7 @@ import vdrm.base.util.UniqueIdGenerator;
 
 public class Task implements ITask{
 	
-	private String taskHandle;
+	private UUID taskHandle;
 	private int cpuReq;
 	private int memReq;
 	private int hddReq;
@@ -59,12 +59,12 @@ public class Task implements ITask{
 //************************ SETTERS AND GETTERS ***************************
 //************************************************************************	
 	@Override
-	public String getTaskHandle() {
+	public UUID getTaskHandle() {
 		return taskHandle;
 	}
 
 	@Override
-	public void setTaskHandle(String taskHandle) {
+	public void setTaskHandle(UUID taskHandle) {
 		this.taskHandle = taskHandle;
 	}
 
@@ -123,9 +123,4 @@ public class Task implements ITask{
 		isPredicted = predicted;
 		return true;
 	}
-
-
-	
-	
-
 }

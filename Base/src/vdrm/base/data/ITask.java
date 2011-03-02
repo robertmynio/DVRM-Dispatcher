@@ -15,9 +15,9 @@ public interface ITask {
 	
 	public ArrayList<Integer> GetRequirements();
 	public void computeRequirementsScore();
-	public String getTaskHandle();
-	public void setTaskHandle(String taskHandle);
+	public UUID getTaskHandle();
 	public double getResourceScore();
 	public boolean isUnsuccessfulPlacement();
 	public void setUnsuccessfulPlacement(boolean unsuccessfulPlacement);
+	void setTaskHandle(UUID taskHandle);
 }

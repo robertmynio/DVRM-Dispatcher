@@ -5,9 +5,35 @@ import java.util.UUID;
 
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
-
+/***
+ * TODO: Add logger to each catch clause
+ * @author Gygabite
+ *
+ */
 public class Server implements IServer {
-
+	
+	// SERVER CHARACTERISTICS
+	private int cpuFreq;
+	private int memoryAmount;
+	private int hddSize;
+	
+	private int usedCPU;
+	private int usedRAM;
+	private int usedHDD;
+	
+	private boolean isFull;
+	private boolean isEmpty;
+	
+	private UUID serverID;
+	
+	
+	// TASKS REPRESENTATION
+	private ArrayList<ITask> taskList;
+	private int nrOfTasks;
+	private int nrOfPredictedTasks;
+	
+	
+	
 	@Override
 	public ITask GetNextHighestDemandingTask() {
 		// TODO Auto-generated method stub
@@ -22,8 +48,20 @@ public class Server implements IServer {
 
 	@Override
 	public ITask GetTaskWithResources(ArrayList<Integer> resourceDemands) {
-		// TODO Auto-generated method stub
-		return null;
+		try{
+			ITask t = null;
+			for(ITask task : taskList){
+				if( (task.getCpu() == Integer.parseInt(resourceDemands.get(0).toString())) &&
+						(task.getMem() == Integer.parseInt(resourceDemands.get(1).toString())) &&
+						(task.getHdd() == Integer.parseInt(resourceDemands.get(2).toString()))
+				){
+					t = task;
+				}
+			}
+			return t;
+		}catch(Exception ex){
+			return null;
+		}
 	}
 
 	@Override
@@ -40,80 +78,120 @@ public class Server implements IServer {
 
 	@Override
 	public boolean addTask(ITask task) {
-		// TODO Auto-generated method stub
-		return false;
+		try{
+			taskList.add(task);
+			if(task.isPredicted())
+				nrOfPredictedTasks++;
+			nrOfTasks++;
+			usedCPU += task.getCpu();
+			usedRAM += task.getMem();
+			usedHDD += task.getHdd();
+			
+			if( (usedCPU == cpuFreq) || 
+				(usedRAM == memoryAmount)||
+				(usedHDD == hddSize))
+				isFull = true;
+			return true;
+		}catch(Exception ex){
+			return false;
+		}
 	}
 
 	@Override
 	public int getMaxCpu() {
-		// TODO Auto-generated method stub
-		return 0;
+		return cpuFreq;
 	}
 
 	@Override
 	public int getMaxHdd() {
-		// TODO Auto-generated method stub
-		return 0;
+		return hddSize;
 	}
 
 	@Override
 	public int getMaxMem() {
-		// TODO Auto-generated method stub
-		return 0;
+		return memoryAmount;
 	}
 
 	@Override
 	public int getNumberOfPredictedTasks() {
-		// TODO Auto-generated method stub
-		return 0;
+		return nrOfPredictedTasks;
 	}
 
 	@Override
 	public int getTotalNumberOfTasks() {
-		// TODO Auto-generated method stub
-		return 0;
+		return nrOfTasks;
 	}
 
 	@Override
 	public int getUsedCpu() {
-		// TODO Auto-generated method stub
-		return 0;
+		return usedCPU;
 	}
 
 	@Override
 	public int getUsedHdd() {
-		// TODO Auto-generated method stub
-		return 0;
+		return usedHDD;
 	}
 
 	@Override
 	public int getUsedMem() {
-		// TODO Auto-generated method stub
-		return 0;
+		return usedRAM;
 	}
 
 	@Override
 	public boolean isFull() {
-		// TODO Auto-generated method stub
-		return false;
+		return isFull;
 	}
 
 	@Override
 	public boolean removeTask(ITask task) {
-		// TODO Auto-generated method stub
-		return false;
+		try{
+			if(taskList.isEmpty() != true){
+				if(taskList.contains(task)){
+					taskList.remove(task);
+					usedCPU -= task.getCpu();
+					usedRAM -= task.getMem();
+					usedHDD -= task.getHdd();
+					if(task.isPredicted())
+						nrOfPredictedTasks--;
+					nrOfTasks--;
+					if(nrOfTasks==0)
+						isEmpty = true;
+				}
+			}
+			return true;
+		}catch(Exception ex){
+			return false;
+		}
 	}
 
 	@Override
 	public boolean removeTask(UUID taskId) {
-		// TODO Auto-generated method stub
-		return false;
+		try{
+			if(taskList.isEmpty() != true){
+				for(ITask t : taskList){
+					if(t.getTaskHandle() == taskId){
+						taskList.remove(t);
+						usedCPU -= t.getCpu();
+						usedRAM -= t.getMem();
+						usedHDD -= t.getHdd();
+						if(t.isPredicted())
+							nrOfPredictedTasks--;
+						nrOfTasks--;
+						if(nrOfTasks==0)
+							isEmpty = true;
+					}
+						
+				}
+			}
+			return true;
+		}catch(Exception ex){
+			return false;
+		}
 	}
 
 	@Override
 	public UUID getServerID() {
-		// TODO Auto-generated method stub
-		return null;
+		return serverID;
 	}
 
 }
