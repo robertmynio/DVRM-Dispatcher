@@ -128,4 +128,10 @@ public class Task implements ITask{
 	public double getRequirementsScore() {
 		return requirements;
 	}
+
+	@Override
+	public void setServer(IServer server) {
+		// TODO Auto-generated method stub
+		
+	}
 }

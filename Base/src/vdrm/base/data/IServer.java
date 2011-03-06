@@ -19,6 +19,8 @@ public interface IServer {
 	public int getTotalNumberOfTasks();
 	public int getNumberOfPredictedTasks();
 	public boolean isFull();
+	public boolean meetsRequirments(ITask task);
+	public int compareTo(IServer server);
 	//oare este nevoie de o metoda : removeAllPredictedTasks() ?
 	
 	// on/off functionality

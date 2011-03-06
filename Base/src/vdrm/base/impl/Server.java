@@ -216,4 +216,18 @@ public class Server implements IServer {
 		return serverID;
 	}
 
+
+	@Override
+	public boolean meetsRequirments(ITask task) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public int compareTo(IServer server) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }
