@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="vdrm.base.data.IServer"/>
-<fullyQualifiedTypeName name="vdrm.base.data.ITask"/>
-<fullyQualifiedTypeName name="java.util.UUID"/>
-<fullyQualifiedTypeName name="vdrm.base.data.IPrediction"/>
-<fullyQualifiedTypeName name="vdrm.base.common.IPredictor"/>
-<fullyQualifiedTypeName name="java.util.ArrayList"/>
-</qualifiedTypeNameHistroy>

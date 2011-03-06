@@ -1,7 +1,0 @@
-package vdrm.base.util;
-
-import java.util.logging.Logger;
-
-public interface ILogger {
-	public Logger getLogger();
-}

@@ -1,5 +1,0 @@
-package vdrm.pred.predictor1;
-
-public class Predictor implements IPredictor{
-
-}
