@@ -32,18 +32,40 @@ public class Server implements IServer {
 	private int nrOfTasks;
 	private int nrOfPredictedTasks;
 	
+	// Lowest and highest demanding task
+	private ITask lowestDemandingTask;
+	private ITask highestDemandingTask;
 	
 	
+	/***
+	 * Return the next highest demanding task in the server task list
+	 * which has not beed previously tried to be placed. 
+	 */
 	@Override
 	public ITask GetNextHighestDemandingTask() {
-		// TODO Auto-generated method stub
-		return null;
+		for(ITask t : taskList){
+			if(t.getRequirementsScore() > highestDemandingTask.getRequirementsScore() &&
+					t.isUnsuccessfulPlacement() == false){
+				highestDemandingTask = t;
+			}
+		}
+		return highestDemandingTask;
 	}
 
+	
+	/***
+	 * Return the next lowest demanding task in the server task list
+	 * which has not beed previously tried to be placed. 
+	 */
 	@Override
 	public ITask GetNextLowestDemandingTask() {
-		// TODO Auto-generated method stub
-		return null;
+		for(ITask t : taskList){
+			if(t.getRequirementsScore() < lowestDemandingTask.getRequirementsScore() &&
+					t.isUnsuccessfulPlacement() == false){
+				lowestDemandingTask = t;
+			}
+		}
+		return lowestDemandingTask;
 	}
 
 	@Override

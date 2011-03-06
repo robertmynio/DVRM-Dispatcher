@@ -20,4 +20,5 @@ public interface ITask {
 	public boolean isUnsuccessfulPlacement();
 	public void setUnsuccessfulPlacement(boolean unsuccessfulPlacement);
 	void setTaskHandle(UUID taskHandle);
+	public double getRequirementsScore();
 }

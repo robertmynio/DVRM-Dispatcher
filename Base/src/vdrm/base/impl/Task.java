@@ -123,4 +123,9 @@ public class Task implements ITask{
 		isPredicted = predicted;
 		return true;
 	}
+
+	@Override
+	public double getRequirementsScore() {
+		return requirements;
+	}
 }
