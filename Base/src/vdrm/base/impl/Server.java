@@ -219,15 +219,88 @@ public class Server implements IServer {
 
 	@Override
 	public boolean meetsRequirments(ITask task) {
-		// TODO Auto-generated method stub
+		if((this.getMaxCpu() - this.getUsedCpu()) >= task.getCpu()){
+			if( (this.getMaxMem() - this.getUsedMem()) >= task.getMem() ){
+				if((this.getMaxHdd() - this.getUsedHdd()) >= task.getHdd()){
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 
 
 	@Override
 	public int compareTo(IServer server) {
-		// TODO Auto-generated method stub
-		return 0;
+		if(this.getMaxCpu() < server.getMaxCpu()){
+			return -1;
+		}else{
+			if(this.getMaxCpu() > server.getMaxCpu()){
+				return 1;
+			}else{
+				if(this.getMaxMem() < server.getMaxMem()){
+					return -1;
+				}else{
+					if(this.getMaxMem() > server.getMaxMem()){
+						return 1;
+					}else{
+						if(this.getMaxHdd() < server.getMaxHdd()){
+							return -1;
+						}else{
+							if(this.getMaxHdd() > server.getMaxHdd()){
+								return 1;
+							}else{
+								return 0;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+	@Override
+	public int getLoad() {
+		// get the full power of the Server
+		Double fullPower = (cpuFreq*BaseCommon.CPU_WEIGHT) + (memoryAmount*BaseCommon.MEM_WEIGHT) + (hddSize*BaseCommon.HDD_WEIGHT);
+		int full = Integer.getInteger(fullPower.toString());
+		
+		// get the used amount of resources of the Server
+		Double usedAmount = (usedCPU*BaseCommon.CPU_WEIGHT) + (usedRAM*BaseCommon.MEM_WEIGHT) + (usedHDD*BaseCommon.HDD_WEIGHT);
+		int used = Integer.getInteger(usedAmount.toString());
+		
+		
+		return (used*100)/full;
+	}
+
+
+	@Override
+	public boolean isEmpty() {
+		if(nrOfTasks == 0)
+			return true;
+		return false;
+	}
+
+
+	@Override
+	public boolean compareAvailableResources(ITask t) {
+		
+		// TODO maybe consider a small margin (5%) ?
+		if((this.getMaxCpu() - this.getUsedCpu()) == t.getCpu()){
+			if( (this.getMaxMem() - this.getUsedMem()) == t.getMem() ){
+				if((this.getMaxHdd() - this.getUsedHdd()) == t.getHdd()){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+
+	@Override
+	public ArrayList<ITask> getTasks() {
+		return taskList;
 	}
 
 }

@@ -13,6 +13,8 @@ public class BaseCommon {
 	public static final double MEM_WEIGHT = 0.3;
 	public static final double HDD_WEIGHT = 0.1;
 	
+	private int nrOfTasksThreshold;
+	
 	private static BaseCommon instance;
 	
 	public static BaseCommon Instance(){
@@ -23,8 +25,15 @@ public class BaseCommon {
 	}
 	
 	private BaseCommon(){
-		notFullServers = new ArrayList<IServer>();
-		fullServers = new ArrayList<IServer>();
-		emptyServers = new ArrayList<IServer>();
+		//notFullServers = new ArrayList<IServer>();
+		//fullServers = new ArrayList<IServer>();
+		//emptyServers = new ArrayList<IServer>();
+		nrOfTasksThreshold = 10;
 	}
+
+	public int getNrOfTasksThreshold() {
+		return nrOfTasksThreshold;
+	}
+	
+	
 }

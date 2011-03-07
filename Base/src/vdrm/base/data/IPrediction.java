@@ -8,4 +8,6 @@ public interface IPrediction {
 	public int getCredibility();
 	public void increaseCredibility();
 	public void decreaseCredibility();
+	
+	public void addPredictedTask(ITask predictedTask);
 }

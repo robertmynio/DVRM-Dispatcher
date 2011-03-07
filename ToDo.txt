@@ -1,8 +1,8 @@
-1. ask po-po how we deal with a finished task (event raising)
-2. look into hashtables -> VLAD
-3. logger & logger methods -> VLAD
-4. factory method / abstract factory ? -> EU SI VLAD
-5. how do we generate events ? observer/observable ? -> EU SI VLAD
+1. factory method / abstract factory ? -> EU SI VLAD
+2. IPrediction + prediction
+3. Algorithm (ArrayList)
+
+
 6. some user interface for admin or load from config file (alg,servers...)
 7. WEKA ?
 8. GIT?

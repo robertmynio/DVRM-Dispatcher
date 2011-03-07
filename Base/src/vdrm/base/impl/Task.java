@@ -53,6 +53,17 @@ public class Task implements ITask{
 		requirements = (cpuReq*BaseCommon.CPU_WEIGHT) + (memReq*BaseCommon.MEM_WEIGHT) + (hddReq*BaseCommon.HDD_WEIGHT);
 	}
 	
+	@Override
+	public boolean equals(ITask task) {
+		if(this.getCpu() == task.getCpu()){
+			if(this.getMem() == task.getMem()){
+				if(this.getHdd() == task.getHdd()){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 
 //************************************************************************
@@ -83,11 +94,6 @@ public class Task implements ITask{
 		this.unsuccessfulPlacement = unsuccessfulPlacement;
 	}
 	
-	@Override
-	public boolean equals(ITask task) {
-		return this.taskHandle.equals(  ((Task)task).getTaskHandle()  );
-	}
-
 	@Override
 	public int getCpu() {
 		return cpuReq;
@@ -131,7 +137,6 @@ public class Task implements ITask{
 
 	@Override
 	public void setServer(IServer server) {
-		// TODO Auto-generated method stub
-		
+		this.serverHost = server;
 	}
 }

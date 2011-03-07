@@ -10,7 +10,10 @@ public interface IServer {
 	public int getUsedCpu();
 	public int getUsedMem();
 	public int getUsedHdd();
+	public int getLoad();
+	
 	public UUID getServerID();
+	public ArrayList<ITask> getTasks();
 	
 	//avem nevoie de o metoda getThreshhold()? In caz ca fiecare server are un alt threshold la care e optim si sa nu trecem de el ?
 	public boolean addTask(ITask task);
@@ -19,7 +22,9 @@ public interface IServer {
 	public int getTotalNumberOfTasks();
 	public int getNumberOfPredictedTasks();
 	public boolean isFull();
+	public boolean isEmpty();
 	public boolean meetsRequirments(ITask task);
+	public boolean compareAvailableResources(ITask t);
 	public int compareTo(IServer server);
 	//oare este nevoie de o metoda : removeAllPredictedTasks() ?
 	

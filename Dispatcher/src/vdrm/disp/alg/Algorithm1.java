@@ -7,6 +7,7 @@ import vdrm.base.common.IPredictor;
 import vdrm.base.data.IPrediction;
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
+import vdrm.base.impl.BaseCommon;
 
 public class Algorithm1 implements IAlgorithm{
 
@@ -226,4 +227,96 @@ public class Algorithm1 implements IAlgorithm{
 		
 	}
 
+	/***********************************************************/
+	/***********************************************************/
+	/********************* TASKS ENDS **************************/
+	/***********************************************************/
+	/***********************************************************/
+	
+	/*
+	 * Main function which gets called when a task ends.
+	 * It treats 2 cases:
+	 * 
+	 * 1) If the server has a load lower than 50%, 
+	 * 		a) If it has a small number of tasks, try to redistribute them
+	 * 			on other servers and close this server. 
+	 * 		b) If it has a large number of tasks and migration time 
+	 * 			would be large, try to fill the server with tasks from the
+	 * 			last 2 in-use servers (which can make up to a full server).
+	 * 
+	 * 2) If the server became empty because of the ended task, close it.
+	 * 		Else, try to fill the server with tasks from the
+	 * 		last 2 in-use servers (which can make up to a full server).
+	 * 		
+	 */
+	@Override
+	public void endTask(ITask t){
+		IServer server = t.getServer();
+		if(server.getLoad() <= 50){
+			if(server.getTotalNumberOfTasks() < BaseCommon.Instance().getNrOfTasksThreshold()){
+				if(!redistributeTasks(server))
+					reorderServerList();
+			}else{
+				tryToFillServer(server);
+			}
+		}else{
+			if(server.getTotalNumberOfTasks() == 0)
+				server.OrderStandBy();
+			else
+				tryToFillServer(server);
+		}
+	}
+
+	@Override
+	public ITask[] findMaximumUtilizationPlacement(IServer server,
+			ITask secondToLastTask, ITask lastTask) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean redistributeTasks(IServer server) {
+		int noPlaceFound = 0;
+		boolean found = false;
+		
+		while((!server.isEmpty() || emptyServers.size()==0 )&& noPlaceFound < server.getTotalNumberOfTasks()){
+			ITask t = server.GetNextLowestDemandingTask();
+			for(IServer s:inUseServers){
+				if(s.compareAvailableResources(t)){
+					
+					// TODO migrate_to_new_host(s); -- OpenNebula
+					
+					fullServers.add(s);
+					inUseServers.remove(s);
+					found = true;
+					break;
+				}
+			}
+			if(!found){
+				noPlaceFound++;
+				t.setUnsuccessfulPlacement(true);
+			}
+		}
+		
+		if(!server.isEmpty()){
+			for(ITask t:server.getTasks()){
+				t.setUnsuccessfulPlacement(false);
+			}
+			return false;
+		}else{
+			return true;
+		}
+	}
+
+	@Override
+	public void reorderServerList() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void tryToFillServer(IServer server) {
+		// TODO Auto-generated method stub
+		
+	}
 }

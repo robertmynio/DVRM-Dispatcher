@@ -12,5 +12,9 @@ public class UniqueIdGenerator implements IUniqueIdGenerator {
 	public static UUID getUID(){
 		return UUID.randomUUID();
 	}
+	
+	public static String getUIDString(){
+		return UUID.randomUUID().toString();
+	}
 
 }
