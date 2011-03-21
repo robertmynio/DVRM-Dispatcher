@@ -8,7 +8,16 @@ import vdrm.base.data.IPrediction;
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
 import vdrm.base.impl.BaseCommon;
+import vdrm.base.impl.Sorter;
 
+/***
+ * TODO: findNewPosition can use insertSortedServer method! May be the same as
+ * 		reorder server list, but called when adding a new task. Might be able to
+ * 		make a single method out of the 2.
+ * TODO: 
+ * @author Vlad & Robi
+ *
+ */
 public class Algorithm1 implements IAlgorithm{
 
 	ArrayList<IServer> emptyServers;
@@ -18,6 +27,7 @@ public class Algorithm1 implements IAlgorithm{
 	ArrayList<ITask> predictedTasks;
 	IPrediction prediction;
 	IPredictor predictor;
+	Sorter sortingService;
 	
 	@Override
 	public void initialize(ArrayList<IServer> servers) {
@@ -109,8 +119,8 @@ public class Algorithm1 implements IAlgorithm{
 	 * @param list - the list of tasks that must be sorted
 	 */
 	private void sort(ArrayList<ITask> list) {
-		// TODO Auto-generated method stub
-		
+		sortingService = new Sorter();
+		list = sortingService.insertSortTasksAscending(list);
 	}
 	
 	/**
@@ -221,12 +231,6 @@ public class Algorithm1 implements IAlgorithm{
 		}	
 	}
 
-	@Override
-	public void redistributeTasks(IServer server, ITask finishedTask) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	/***********************************************************/
 	/***********************************************************/
 	/********************* TASKS ENDS **************************/
@@ -255,7 +259,7 @@ public class Algorithm1 implements IAlgorithm{
 		if(server.getLoad() <= 50){
 			if(server.getTotalNumberOfTasks() < BaseCommon.Instance().getNrOfTasksThreshold()){
 				if(!redistributeTasks(server))
-					reorderServerList();
+					reorderServerList(server, -1);
 			}else{
 				tryToFillServer(server);
 			}
@@ -269,7 +273,7 @@ public class Algorithm1 implements IAlgorithm{
 
 	@Override
 	public ITask[] findMaximumUtilizationPlacement(IServer server,
-			ITask secondToLastTask, ITask lastTask) {
+			IServer secondToLastServer, IServer lastServer) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -308,15 +312,54 @@ public class Algorithm1 implements IAlgorithm{
 		}
 	}
 
+	/***
+	 * This method reorders the inUseServer list. 
+	 * It is based on the fact that once a task is added/finished on a 
+	 * specific server, only that server needs to be reinserted in the 
+	 * list such that the list remains ordered.
+	 * 
+	 * If direction < 0 , a task has ended and server has to be reordered
+	 * by going right in the list until a server with a smaller utilization is found.
+	 * 
+	 * If direction > 0 , a task has been placed and server has to be
+	 * reorder by going left in the list until a server with a bigger utilization is found.
+	 */
 	@Override
-	public void reorderServerList() {
-		// TODO Auto-generated method stub
-		
+	public void reorderServerList(IServer server, int direction) {
+		sortingService = new Sorter();
+		if(direction < 0){
+			// TODO: Check/Test this method...
+			sortingService.insertSortedServerGoingRightDesc(server, inUseServers,
+					inUseServers.indexOf(server));
+		}else{
+			inUseServers = sortingService.insertSortedServerDesc(server, inUseServers,
+								inUseServers.indexOf(server));
+		}
 	}
 
 	@Override
 	public void tryToFillServer(IServer server) {
-		// TODO Auto-generated method stub
+		IServer lastServer = inUseServers.get(inUseServers.size()-1);
 		
+		ArrayList<Integer> availableResources = server.GetAvailableResources();
+		ITask bingoTask = lastServer.GetTaskWithResources(availableResources);
+		if(bingoTask != null){
+			// TODO migrate_to_new_host(bingoTask); -- OpenNebula
+			fullServers.add(server);
+			inUseServers.remove(server);
+		}else{
+			// TODO: check if there are at least 2 servers in the list
+			ITask[] fittingTasks = findMaximumUtilizationPlacement(server, 
+					inUseServers.get(inUseServers.size()-2), lastServer);
+			if(fittingTasks.length > 0){
+				for(ITask t:fittingTasks){
+					// TODO migrate_to_new_host(t); -- OpenNebula
+				}
+				fullServers.add(server);
+				inUseServers.remove(server);
+			}else{
+				reorderServerList(server, -1);
+			}
+		}
 	}
 }

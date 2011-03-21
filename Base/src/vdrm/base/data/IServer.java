@@ -36,4 +36,5 @@ public interface IServer {
 	public ITask GetNextHighestDemandingTask();
 	public ITask GetNextLowestDemandingTask();
 	public ITask GetTaskWithResources(ArrayList<Integer> resourceDemands);//0->cpu, 1->mem, 2->hdd
+	public ArrayList<Integer> GetAvailableResources();
 }

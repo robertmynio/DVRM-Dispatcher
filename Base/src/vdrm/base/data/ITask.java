@@ -13,6 +13,7 @@ public interface ITask {
 	public IServer getServer();
 	public void setServer(IServer server);
 	public boolean equals(ITask task);
+	public int compareTo(ITask task);
 	
 	public ArrayList<Integer> GetRequirements();
 	public void computeRequirementsScore();

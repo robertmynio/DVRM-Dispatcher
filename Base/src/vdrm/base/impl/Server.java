@@ -303,4 +303,14 @@ public class Server implements IServer {
 		return taskList;
 	}
 
+
+	@Override
+	public ArrayList<Integer> GetAvailableResources() {
+		ArrayList<Integer> resources = new ArrayList<Integer>();
+		resources.add(this.getUsedCpu());
+		resources.add(this.getUsedMem());
+		resources.add(this.getUsedHdd());
+		return resources;
+	}
+
 }

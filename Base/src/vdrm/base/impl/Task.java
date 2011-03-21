@@ -64,6 +64,35 @@ public class Task implements ITask{
 		}
 		return false;
 	}
+	
+	@Override
+	public int compareTo(ITask task) {
+		if(this.getCpu() < task.getCpu()){
+			return -1;
+		}else{
+			if(this.getCpu() > task.getCpu()){
+				return 1;
+			}else{
+				if(this.getMem() < task.getMem()){
+					return -1;
+				}else{
+					if(this.getMem() > task.getMem()){
+						return 1;
+					}else{
+						if(this.getHdd() < task.getHdd()){
+							return -1;
+						}else{
+							if(this.getHdd() > task.getHdd()){
+								return 1;
+							}else{
+								return 0;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
 
 //************************************************************************
@@ -139,4 +168,6 @@ public class Task implements ITask{
 	public void setServer(IServer server) {
 		this.serverHost = server;
 	}
+
+
 }
