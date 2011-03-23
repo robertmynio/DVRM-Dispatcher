@@ -47,4 +47,26 @@ public class Tests {
 		if(servers.size()==1) return true;
 		return false;
 	}
+	
+	public boolean addFiveTasks() {
+		Task task;
+		
+		task = new Task(2600,1000,100);
+		alg.newTask(task);
+		task = new Task(600,4000,100);
+		alg.newTask(task);
+		task = new Task(4000,2000,100);
+		alg.newTask(task);
+		task = new Task(1000,500,100);
+		alg.newTask(task);
+		task = new Task(6000,1600,100);
+		alg.newTask(task);
+		
+		ArrayList<IServer> servers = alg.getInUseServers();
+		System.out.println("Number of in use servers is : " + servers.size());
+		ArrayList<IServer> servers2 = alg.getFullServers();
+		System.out.println("Number of full servers is : " + servers2.size());
+		if(servers.size()>0 || servers2.size()>0) return true;
+		return false;
+	}
 }

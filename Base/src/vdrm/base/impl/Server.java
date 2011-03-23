@@ -122,6 +122,7 @@ public class Server implements IServer {
 	public boolean addTask(ITask task) {
 		try{
 			taskList.add(task);
+			isEmpty = false;
 			if(task.isPredicted())
 				nrOfPredictedTasks++;
 			nrOfTasks++;
@@ -297,9 +298,7 @@ public class Server implements IServer {
 
 	@Override
 	public boolean isEmpty() {
-		if(nrOfTasks == 0)
-			return true;
-		return false;
+		return isEmpty;
 	}
 
 

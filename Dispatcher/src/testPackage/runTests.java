@@ -15,6 +15,9 @@ public class runTests {
 		//this test should be called after an initialization (for example, after hardcoded init test)
 		result = tests.addOneTask();
 		System.out.println("Result for add one task test is : " + result);
+		
+		result = tests.addFiveTasks();
+		System.out.println("Result for add five tasks test is : " + result);
 	}
 
 }
