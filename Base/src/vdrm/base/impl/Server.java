@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
+import vdrm.base.util.UniqueIdGenerator;
 /***
  * TODO: Add logger to each catch clause
  * @author Gygabite
@@ -36,7 +37,26 @@ public class Server implements IServer {
 	private ITask lowestDemandingTask;
 	private ITask highestDemandingTask;
 	
+	public Server() {
+		serverID = UniqueIdGenerator.getUID();
+		usedCPU = 0;
+		usedRAM = 0;
+		usedHDD = 0;
+		isFull = false;
+		isEmpty = true;
+		taskList = new ArrayList<ITask>();
+		nrOfTasks = 0;
+		nrOfPredictedTasks = 0;
+		lowestDemandingTask = null;
+		highestDemandingTask = null;
+	}
 	
+	public Server(int cpu, int mem, int hdd) {
+		this();
+		cpuFreq = cpu;
+		memoryAmount = mem;
+		hddSize = hdd;
+	}
 	/***
 	 * Return the next highest demanding task in the server task list
 	 * which has not beed previously tried to be placed. 

@@ -8,7 +8,9 @@ import vdrm.base.data.IPrediction;
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
 import vdrm.base.impl.BaseCommon;
+import vdrm.base.impl.Server;
 import vdrm.base.impl.Sorter;
+import vdrm.pred.pred.Predictor;
 
 /***
  * TODO: findNewPosition can use insertSortedServer method! May be the same as
@@ -20,23 +22,30 @@ import vdrm.base.impl.Sorter;
  */
 public class Algorithm1 implements IAlgorithm{
 
-	ArrayList<IServer> emptyServers;
-	ArrayList<IServer> inUseServers;
-	ArrayList<IServer> fullServers;
-	ArrayList<ITask> unassignedTasks;
-	ArrayList<ITask> predictedTasks;
-	IPrediction prediction;
-	IPredictor predictor;
-	Sorter sortingService;
+	private ArrayList<IServer> emptyServers;
+	private ArrayList<IServer> inUseServers;
+	private ArrayList<IServer> fullServers;
+	private ArrayList<ITask> unassignedTasks;
+	private ArrayList<ITask> predictedTasks;
+	private IPrediction prediction;
+	private IPredictor predictor;
+	private Sorter sortingService;
 	
 	@Override
 	public void initialize(ArrayList<IServer> servers) {
+		//initialize data structures
 		emptyServers = servers;
-		//inUseServers = new ArrayList<Server>();
-		//fullServers = new ArrayList<Server>();
-		//unassignedTasks = new ArrayList<Task>();
-		//predictedTasks = new ArrayList<Task>();
+		inUseServers = new ArrayList<IServer>();
+		fullServers = new ArrayList<IServer>();
+		unassignedTasks = new ArrayList<ITask>();
+		predictedTasks = new ArrayList<ITask>();
+		
 		//initialize prediction and predictor
+		predictor = new Predictor();
+		prediction = null;
+		
+		//initialize sorting service
+		sortingService = new Sorter();
 	}
 
 	@Override
@@ -83,10 +92,12 @@ public class Algorithm1 implements IAlgorithm{
 			unassignedTasks.add(newTask);
 
 		//run prediction and add predicted tasks to unassignedTasks list
-		prediction = predictor.predict(newTask); 
-		ArrayList<ITask> temp = prediction.getPredictedTasks();
-		for(i=0;i<temp.size();i++)
-			unassignedTasks.add(temp.get(i));
+		prediction = predictor.predict(newTask);
+		if(prediction!=null) {
+			ArrayList<ITask> temp = prediction.getPredictedTasks();
+			for(i=0;i<temp.size();i++)
+				unassignedTasks.add(temp.get(i));
+		}
 		
 		//run consolidation algorithm (distribute tasks from unassignedTasks list to servers
 		//this algorithm assigns to every task a server reference and to every server a task 
@@ -119,7 +130,6 @@ public class Algorithm1 implements IAlgorithm{
 	 * @param list - the list of tasks that must be sorted
 	 */
 	private void sort(ArrayList<ITask> list) {
-		sortingService = new Sorter();
 		list = sortingService.insertSortTasksAscending(list);
 	}
 	
@@ -128,8 +138,8 @@ public class Algorithm1 implements IAlgorithm{
 	 * First, if the server is in the inUseServers list, it is removed 
 	 * and its former position is saved. 
 	 * Then, if the server is full, it is placed in the fullServers list.
-	 * If not, a new position is searched using binary insertion
-	 * (the position is searched starting from the former position) 
+	 * If not, a new position is searched starting from the current 
+	 * position and moving towards the front of the list 
 	 * @param tempServer - the server that needs to be repositioned
 	 */
 	private void findNewPosition(IServer tempServer) {
@@ -140,12 +150,18 @@ public class Algorithm1 implements IAlgorithm{
 			fullServers.add(tempServer);
 		else {
 			boolean ok = false;
-			while(ok==false) {
+			if(inUseServers.isEmpty()) {
+				inUseServers.add(tempServer);
+				ok = true;
+			}
+			if(poz>0) 
 				poz--;
+			while(ok==false) {	
 				if(tempServer.compareTo(inUseServers.get(poz))>0) {
 					inUseServers.add(poz,tempServer);
 					ok = true;
 				}
+				poz--;
 			}	
 		}
 	}
@@ -211,6 +227,9 @@ public class Algorithm1 implements IAlgorithm{
 				
 				if(ok==false) {
 					//we must use a new server
+					if(emptyServers.isEmpty()) {
+						// TODO We don't have empty servers. What do we do ? Wait, sleep, error ?
+					}
 					IServer newServer = emptyServers.get(0);
 					newServers.add(newServer);
 					emptyServers.remove(0);
@@ -233,7 +252,7 @@ public class Algorithm1 implements IAlgorithm{
 
 	/***********************************************************/
 	/***********************************************************/
-	/********************* TASKS ENDS **************************/
+	/********************* TASK ENDS ***************************/
 	/***********************************************************/
 	/***********************************************************/
 	
@@ -361,5 +380,32 @@ public class Algorithm1 implements IAlgorithm{
 				reorderServerList(server, -1);
 			}
 		}
+	}
+	
+	// GETTERS FOR TESTING PURPOSES
+	
+	
+	public ArrayList<IServer> getEmptyServers() {
+		return emptyServers;
+	}
+
+	public ArrayList<IServer> getInUseServers() {
+		return inUseServers;
+	}
+
+	public ArrayList<IServer> getFullServers() {
+		return fullServers;
+	}
+
+	public ArrayList<ITask> getUnassignedTasks() {
+		return unassignedTasks;
+	}
+
+	public ArrayList<ITask> getPredictedTasks() {
+		return predictedTasks;
+	}
+
+	public IPrediction getPrediction() {
+		return prediction;
 	}
 }
