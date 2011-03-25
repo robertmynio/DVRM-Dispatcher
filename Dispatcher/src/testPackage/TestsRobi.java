@@ -7,15 +7,29 @@ import vdrm.base.impl.Server;
 import vdrm.base.impl.Task;
 import vdrm.disp.alg.Algorithm1;
 
-public class Tests {
+public class TestsRobi {
 	
 	private Algorithm1 alg;
 	
-	public Tests() {
+	public TestsRobi() {
 		alg = new Algorithm1();
 	}
 	
-	public boolean hardcodedInitTest() {
+	public void runAllTests() {
+		boolean result;
+		
+		result = hardcodedInitTest();
+		System.out.println("Result for hardcoded init test is : " + result);
+		
+		//this test should be called after an initialization (for example, after hardcoded init test)
+		result = addOneTask();
+		System.out.println("Result for add one task test is : " + result);
+		
+		result = addFiveTasks();
+		System.out.println("Result for add five tasks test is : " + result);
+	}
+	
+	private boolean hardcodedInitTest() {
 		Server s;
 		ArrayList<IServer> servers = new ArrayList<IServer>();
 		
@@ -38,7 +52,7 @@ public class Tests {
 		return false;
 	}
 	
-	public boolean addOneTask() {
+	private boolean addOneTask() {
 		Task task;
 		task = new Task(600,1000,100);
 		alg.newTask(task);
@@ -48,7 +62,7 @@ public class Tests {
 		return false;
 	}
 	
-	public boolean addFiveTasks() {
+	private boolean addFiveTasks() {
 		Task task;
 		
 		task = new Task(2600,1000,100);
