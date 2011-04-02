@@ -3,6 +3,8 @@ package vdrm.base.data;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.opennebula.client.vm.VirtualMachine;
+
 public interface ITask {
 	public int getMem();
 	public int getHdd();
@@ -23,4 +25,7 @@ public interface ITask {
 	public void setUnsuccessfulPlacement(boolean unsuccessfulPlacement);
 	void setTaskHandle(UUID taskHandle);
 	public double getRequirementsScore();
+	
+	public VirtualMachine GetVirtualMachine();
+	public void SerVirtualMachine(VirtualMachine vm);
 }

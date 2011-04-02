@@ -3,6 +3,8 @@ package vdrm.base.impl;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.opennebula.client.vm.VirtualMachine;
+
 import vdrm.base.data.*;
 import vdrm.base.util.UniqueIdGenerator;
 
@@ -18,6 +20,7 @@ public class Task implements ITask{
 	private boolean isPredicted;
 	
 	private IServer serverHost;
+	private VirtualMachine virtualMachine;
 	
 	
 	public Task(){
@@ -167,6 +170,16 @@ public class Task implements ITask{
 	@Override
 	public void setServer(IServer server) {
 		this.serverHost = server;
+	}
+
+	@Override
+	public VirtualMachine GetVirtualMachine() {
+		return this.virtualMachine;
+	}
+
+	@Override
+	public void SerVirtualMachine(VirtualMachine vm) {
+		this.virtualMachine = vm;
 	}
 
 

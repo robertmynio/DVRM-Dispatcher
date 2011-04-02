@@ -12,6 +12,8 @@ import vdrm.base.impl.BaseCommon;
 import vdrm.base.impl.Server;
 import vdrm.base.impl.Sorter;
 import vdrm.disp.util.VDRMLogger;
+import vdrm.onservice.IOpenNebulaService;
+import vdrm.onservice.OpenNebulaService;
 import vdrm.pred.pred.Predictor;
 
 /***
@@ -35,6 +37,8 @@ public class Algorithm1 implements IAlgorithm{
 	
 	private VDRMLogger logger;
 	
+	private IOpenNebulaService onService;
+	
 	@Override
 	public void initialize(ArrayList<IServer> servers) {
 		//initialize data structures
@@ -53,6 +57,9 @@ public class Algorithm1 implements IAlgorithm{
 		
 		//initialize logger
 		logger = new VDRMLogger();
+		
+		//initialize OpenNebula
+		onService = new OpenNebulaService();
 	}
 
 	@Override
@@ -67,6 +74,8 @@ public class Algorithm1 implements IAlgorithm{
 					newTask.setPredicted(false);
 					
 					// TODO dispatch(task); -- OpenNebula (task already knows the server)
+					if(newTask.getServerId() != null)
+						onService.DeployTask(newTask);
 					
 					predictedTasks.remove(0);
 					if(predictedTasks.isEmpty())
@@ -120,7 +129,8 @@ public class Algorithm1 implements IAlgorithm{
 			else {
 				
 				// TODO dispatch(tempTask); -- OpenNubula
-				
+				if(tempTask.getServerId() != null)
+					onService.DeployTask(tempTask);
 			}		
 		}
 		
@@ -313,7 +323,9 @@ public class Algorithm1 implements IAlgorithm{
 		IServer server = t.getServer();
 		
 		// remove task from server (this is the point of this method, DUUUH !)
+		onService.FinishTask(t);
 		server.removeTask(t);
+		//TODO: add SetServer() or ClearServer() to ITask
 		
 		// now make some house cleaning and ordering
 		if(server.getLoad() <= 50){
@@ -362,6 +374,7 @@ public class Algorithm1 implements IAlgorithm{
 				if(s.compareAvailableResources(t)){
 					
 					// TODO migrate_to_new_host(s); -- OpenNebula
+					onService.MigrateTask(t, s);
 					
 					fullServers.add(s);
 					inUseServers.remove(s);
@@ -427,6 +440,7 @@ public class Algorithm1 implements IAlgorithm{
 			if(fittingTasks.length > 0){
 				for(ITask t:fittingTasks){
 					// TODO migrate_to_new_host(t); -- OpenNebula
+					onService.MigrateTask(t, server);
 				}
 				fullServers.add(server);
 				inUseServers.remove(server);
