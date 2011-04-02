@@ -122,6 +122,21 @@ public class Server implements IServer {
 	public boolean addTask(ITask task) {
 		try{
 			taskList.add(task);
+			
+			if(lowestDemandingTask==null){
+				lowestDemandingTask = task;
+			}else{
+				if(task.compareTo(lowestDemandingTask)<=0)
+					lowestDemandingTask = task;
+			}
+			if(highestDemandingTask == null){
+				highestDemandingTask = task;
+			}else{
+				if(task.compareTo(highestDemandingTask)>=0){
+					highestDemandingTask = task;
+				}
+			}						
+			
 			isEmpty = false;
 			if(task.isPredicted())
 				nrOfPredictedTasks++;
@@ -285,14 +300,14 @@ public class Server implements IServer {
 	public int getLoad() {
 		// get the full power of the Server
 		Double fullPower = (cpuFreq*BaseCommon.CPU_WEIGHT) + (memoryAmount*BaseCommon.MEM_WEIGHT) + (hddSize*BaseCommon.HDD_WEIGHT);
-		int full = Integer.getInteger(fullPower.toString());
+		//Double full = Double.valueOf(arg0)(fullPower.toString());
 		
 		// get the used amount of resources of the Server
 		Double usedAmount = (usedCPU*BaseCommon.CPU_WEIGHT) + (usedRAM*BaseCommon.MEM_WEIGHT) + (usedHDD*BaseCommon.HDD_WEIGHT);
-		int used = Integer.getInteger(usedAmount.toString());
+		//int used = Integer.getInteger(usedAmount.toString());
 		
 		
-		return (used*100)/full;
+		return (int)((usedAmount*100)/fullPower);
 	}
 
 

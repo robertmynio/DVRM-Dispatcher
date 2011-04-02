@@ -1,6 +1,7 @@
 package vdrm.disp.alg;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import vdrm.base.common.IAlgorithm;
 import vdrm.base.common.IPredictor;
@@ -10,6 +11,7 @@ import vdrm.base.data.ITask;
 import vdrm.base.impl.BaseCommon;
 import vdrm.base.impl.Server;
 import vdrm.base.impl.Sorter;
+import vdrm.disp.util.VDRMLogger;
 import vdrm.pred.pred.Predictor;
 
 /***
@@ -31,6 +33,8 @@ public class Algorithm1 implements IAlgorithm{
 	private IPredictor predictor;
 	private Sorter sortingService;
 	
+	private VDRMLogger logger;
+	
 	@Override
 	public void initialize(ArrayList<IServer> servers) {
 		//initialize data structures
@@ -46,6 +50,9 @@ public class Algorithm1 implements IAlgorithm{
 		
 		//initialize sorting service
 		sortingService = new Sorter();
+		
+		//initialize logger
+		logger = new VDRMLogger();
 	}
 
 	@Override
@@ -143,26 +150,49 @@ public class Algorithm1 implements IAlgorithm{
 	 * @param tempServer - the server that needs to be repositioned
 	 */
 	private void findNewPosition(IServer tempServer) {
-		int poz = inUseServers.indexOf(tempServer);
-		if(inUseServers.contains(tempServer))
+		int poz = 0;
+
+		if(inUseServers.contains(tempServer)){
+			poz = inUseServers.indexOf(tempServer);
 			inUseServers.remove(tempServer);
+		}
+		
 		if(tempServer.isFull()) 
 			fullServers.add(tempServer);
 		else {
 			boolean ok = false;
-			if(inUseServers.isEmpty()) {
+			if(inUseServers.isEmpty() && inUseServers.contains(tempServer) == false) {
 				inUseServers.add(tempServer);
 				ok = true;
+				return;
 			}
-			if(poz>0) 
+			if(poz>0){ 
 				poz--;
 			while(ok==false) {	
-				if(tempServer.compareTo(inUseServers.get(poz))>0) {
+				if(tempServer.compareTo(inUseServers.get(poz))>0 && inUseServers.contains(tempServer) == false) {
 					inUseServers.add(poz,tempServer);
 					ok = true;
 				}
 				poz--;
 			}	
+			}else if(poz==0){
+				poz = inUseServers.size()-1;
+				if(poz > 0){
+					while(ok==false&&poz>=0){
+						int compareResult = tempServer.compareTo(inUseServers.get(poz));
+						if(compareResult < 0 || compareResult == 0){
+							inUseServers.add(poz,tempServer);
+							ok=true;
+						}
+						poz--;
+					}
+				}else 
+					if(poz == 0)
+						inUseServers.add(poz, tempServer);
+					else
+						inUseServers.add(0,tempServer);
+				
+			}
 		}
 	}
 	
@@ -227,17 +257,23 @@ public class Algorithm1 implements IAlgorithm{
 				
 				if(ok==false) {
 					//we must use a new server
-					if(emptyServers.isEmpty()) {
+					if(emptyServers.size() == 0) {
+						Date d = new Date();
 						// TODO We don't have empty servers. What do we do ? Wait, sleep, error ?
+						// Vlad: WE should Log the event and/or queue the task. Maybe later alligator
+						logger.logSevere("SEVERE: Task " + tempTask.getTaskHandle().toString() + " cannot be deployed at this moment (" +
+								d.toString());
+						return;
+					}else{
+						IServer newServer = emptyServers.get(0);
+						newServers.add(newServer);
+						emptyServers.remove(0);
+						
+						tempTask.setServer(newServer);
+						newServer.addTask(tempTask);
+						tempList.remove(tempListSize);
+						ok = true;
 					}
-					IServer newServer = emptyServers.get(0);
-					newServers.add(newServer);
-					emptyServers.remove(0);
-					
-					tempTask.setServer(newServer);
-					newServer.addTask(tempTask);
-					tempList.remove(tempListSize);
-					ok = true;
 				}
 			}
 			
@@ -275,12 +311,30 @@ public class Algorithm1 implements IAlgorithm{
 	@Override
 	public void endTask(ITask t){
 		IServer server = t.getServer();
+		
+		// remove task from server (this is the point of this method, DUUUH !)
+		server.removeTask(t);
+		
+		// now make some house cleaning and ordering
 		if(server.getLoad() <= 50){
-			if(server.getTotalNumberOfTasks() < BaseCommon.Instance().getNrOfTasksThreshold()){
-				if(!redistributeTasks(server))
-					reorderServerList(server, -1);
+			if(server.getTotalNumberOfTasks() > 0){
+				if(inUseServers.size() > 1){
+					if(server.getTotalNumberOfTasks() < BaseCommon.Instance().getNrOfTasksThreshold()){
+						if(!redistributeTasks(server)){
+							if(inUseServers.size() > 0){
+								reorderServerList(server, -1);
+							}
+						}
+					}else{
+						tryToFillServer(server);
+					}
+				}else{
+					// do nothing, there is only this one server left.
+				}
 			}else{
-				tryToFillServer(server);
+				// the server is now empty, sleep
+				if(server.getTotalNumberOfTasks() == 0)
+					server.OrderStandBy();
 			}
 		}else{
 			if(server.getTotalNumberOfTasks() == 0)
