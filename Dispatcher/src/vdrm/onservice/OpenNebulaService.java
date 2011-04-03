@@ -33,7 +33,7 @@ public class OpenNebulaService implements IOpenNebulaService {
 				logger.logWarning("ONDeployTask: "+rc.getErrorMessage());
 			}else{
 				vmID = Integer.parseInt(rc.getMessage());
-				//TODO: add VirtualMachineID to a task also!
+				//TODO: add VirtualMachineID to a task also! -- not necessary. can be obtained from vm.
 				
 				// Step3: create the VM
 				VirtualMachine vm = new VirtualMachine(vmID, openClient);

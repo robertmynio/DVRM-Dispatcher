@@ -73,9 +73,10 @@ public class Algorithm1 implements IAlgorithm{
 					newTask = predictedTasks.get(0);
 					newTask.setPredicted(false);
 					
-					// TODO dispatch(task); -- OpenNebula (task already knows the server)
-					if(newTask.getServerId() != null)
-						onService.DeployTask(newTask);
+					// OpenNebula
+					if(newTask.getServerId() != null){
+						//onService.DeployTask(newTask);
+					}
 					
 					predictedTasks.remove(0);
 					if(predictedTasks.isEmpty())
@@ -128,9 +129,10 @@ public class Algorithm1 implements IAlgorithm{
 				predictedTasks.add(tempTask);
 			else {
 				
-				// TODO dispatch(tempTask); -- OpenNubula
-				if(tempTask.getServerId() != null)
-					onService.DeployTask(tempTask);
+				// OpenNebula
+				if(tempTask.getServerId() != null){
+					//onService.DeployTask(tempTask);
+				}
 			}		
 		}
 		
@@ -323,9 +325,9 @@ public class Algorithm1 implements IAlgorithm{
 		IServer server = t.getServer();
 		
 		// remove task from server (this is the point of this method, DUUUH !)
-		onService.FinishTask(t);
+		//onService.FinishTask(t);
 		server.removeTask(t);
-		//TODO: add SetServer() or ClearServer() to ITask
+		t.setServer(null);
 		
 		// now make some house cleaning and ordering
 		if(server.getLoad() <= 50){
@@ -356,10 +358,107 @@ public class Algorithm1 implements IAlgorithm{
 		}
 	}
 
+	/***
+	 * Using the last 2 servers in the inUseList, try to fill a server in order to
+	 * maximize the number of full servers
+	 */
 	@Override
 	public ITask[] findMaximumUtilizationPlacement(IServer server,
 			IServer secondToLastServer, IServer lastServer) {
-		// TODO Auto-generated method stub
+		ArrayList<Integer> destinationResources = server.GetAvailableResources();
+		ITask t1, t2;
+		
+		int nrTasks1, nrTasks2;
+		nrTasks1 = lastServer.getTotalNumberOfTasks();
+		nrTasks2 = secondToLastServer.getTotalNumberOfTasks();
+		
+		// try to empty the server with the fewest tasks
+		if(nrTasks1 < nrTasks2){
+			for(ITask t:lastServer.getTasks()){
+				if(server.compareAvailableResources(t) && !server.isFull()){
+					//remove task from current server
+					lastServer.removeTask(t);
+					// set the new server
+					t.setServer(server);
+					
+					// add task to new server
+					server.addTask(t);
+					if(server.isFull()){
+						fullServers.add(server);
+						break;
+					}
+					//onService.MigrateTask(t, server);
+				}
+			}
+			
+			if(lastServer.isEmpty()){
+				inUseServers.remove(inUseServers.indexOf(lastServer));
+				emptyServers.add(lastServer);
+			}
+			
+			// server is not full. start with second to last server
+			if(!server.isFull()){
+				ITask t;
+				while(( t = secondToLastServer.GetNextLowestDemandingTask())!=null && (!server.isFull())){
+					if(server.compareAvailableResources(t) && !server.isFull()){
+						secondToLastServer.removeTask(t);
+						t.setServer(server);
+						server.addTask(t);
+						if(server.isFull()){
+							fullServers.add(server);
+							break;
+						}
+					}
+				}
+			}
+			
+			if(secondToLastServer.isEmpty()){
+				inUseServers.remove(inUseServers.indexOf(secondToLastServer));
+				emptyServers.add(secondToLastServer);
+			}
+		}else{
+			for(ITask t:secondToLastServer.getTasks()){
+				if(server.compareAvailableResources(t) && !server.isFull()){
+					//remove task from current server
+					secondToLastServer.removeTask(t);
+					// set the new server
+					t.setServer(server);
+					
+					// add task to new server
+					server.addTask(t);
+					if(server.isFull()){
+						fullServers.add(server);
+						break;
+					}
+					//onService.MigrateTask(t, server);
+				}
+			}
+			
+			if(secondToLastServer.isEmpty()){
+				inUseServers.remove(inUseServers.indexOf(secondToLastServer));
+				emptyServers.add(secondToLastServer);
+			}
+			
+			// server is not full. start with second to last server
+			if(!server.isFull()){
+				ITask t;
+				while(( t = lastServer.GetNextLowestDemandingTask())!=null && (!server.isFull())){
+					if(server.compareAvailableResources(t) && !server.isFull()){
+						lastServer.removeTask(t);
+						t.setServer(server);
+						server.addTask(t);
+						if(server.isFull()){
+							fullServers.add(server);
+							break;
+						}
+					}
+				}
+			}
+			if(lastServer.isEmpty()){
+				inUseServers.remove(inUseServers.indexOf(lastServer));
+				emptyServers.add(lastServer);
+			}
+		}
 		return null;
 	}
 
@@ -374,7 +473,7 @@ public class Algorithm1 implements IAlgorithm{
 				if(s.compareAvailableResources(t)){
 					
 					// TODO migrate_to_new_host(s); -- OpenNebula
-					onService.MigrateTask(t, s);
+					//onService.MigrateTask(t, s);
 					
 					fullServers.add(s);
 					inUseServers.remove(s);
@@ -430,22 +529,30 @@ public class Algorithm1 implements IAlgorithm{
 		ArrayList<Integer> availableResources = server.GetAvailableResources();
 		ITask bingoTask = lastServer.GetTaskWithResources(availableResources);
 		if(bingoTask != null){
-			// TODO migrate_to_new_host(bingoTask); -- OpenNebula
+			
+			// OPEN NEBULA
+			//onService.MigrateTask(bingoTask, server);
+			
 			fullServers.add(server);
 			inUseServers.remove(server);
 		}else{
 			// TODO: check if there are at least 2 servers in the list
-			ITask[] fittingTasks = findMaximumUtilizationPlacement(server, 
-					inUseServers.get(inUseServers.size()-2), lastServer);
-			if(fittingTasks.length > 0){
-				for(ITask t:fittingTasks){
-					// TODO migrate_to_new_host(t); -- OpenNebula
-					onService.MigrateTask(t, server);
-				}
-				fullServers.add(server);
-				inUseServers.remove(server);
+			if(inUseServers.size() >=2 ){
+				ITask[] fittingTasks = findMaximumUtilizationPlacement(server, 
+						inUseServers.get(inUseServers.size()-2), lastServer);
+//				
+//				if(fittingTasks.length > 0){
+//					for(ITask t:fittingTasks){
+//						// TODO migrate_to_new_host(t); -- OpenNebula
+//						//onService.MigrateTask(t, server);
+//					}
+//					fullServers.add(server);
+//					inUseServers.remove(server);
+//				}else{
+//					reorderServerList(server, -1);
+//				}
 			}else{
-				reorderServerList(server, -1);
+				//
 			}
 		}
 	}
