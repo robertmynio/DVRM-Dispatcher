@@ -22,25 +22,30 @@ public class TestsVlad {
 		result = hardcodedInitTest();
 		System.out.println("Result for hardcoded init test is : " + result);
 		
-		//ar trebui sa adaugi niste task-uri inainte sa faci remove :P
-		//pentru adaugare, vezi testele mele
-		// P.S. : ar trebui sa faci remove si fara sa adaugi vreun task numa ca sa vezi daca da fail sau nu:)
-		// P.S.2. : incearca sa faci cat mai multe teste care ar sparge algoritmu! Spor :)
-		
 		if(result){
 		// task initialization
 		Task task;
 		
-		task = new Task(2600,1000,100);
+		// these 3 should go on server 1
+		task = new Task(4600,1000,400000);
 		alg.newTask(task);
-		task = new Task(600,4000,100);
+		task = new Task(4400,2000,400000);
 		alg.newTask(task);
-		task = new Task(4000,2000,100);
+		task = new Task(1000,2000,200);
 		alg.newTask(task);
-//		task = new Task(1000,500,100);
-//		alg.newTask(task);
-//		task = new Task(6000,1600,100);
-//		alg.newTask(task);
+		
+		// this should go on server 2 and after removal of task 2, on server 1
+		task = new Task(1000,2600,200000);
+		alg.newTask(task);
+		
+		// this should go on server 3 and mark it full
+		task = new Task(11000,5000,1000000);
+		alg.newTask(task);
+		
+		// this should go on server 2, as server 1 doesn't meet the required resources and 3 is full
+		task = new Task(4000,3000,300000);
+		alg.newTask(task);
+
 		
 		ArrayList<IServer> servers = alg.getInUseServers();
 		System.out.println("Number of in use servers is : " + servers.size());
@@ -62,10 +67,10 @@ public class TestsVlad {
 		//simple initialization -> HARDCODED!!!
 		s = new Server(11000,6000,1000000);
 		servers.add(s);
-//		s = new Server(11000,6000,1000000);
-//		servers.add(s);
-//		s = new Server(11000,6000,1000000);
-//		servers.add(s);
+		s = new Server(11000,6000,1000000);
+		servers.add(s);
+		s = new Server(11000,6000,1000000);
+		servers.add(s);
 //		s = new Server(12000,6000,1000000);
 //		servers.add(s);
 //		s = new Server(12000,1800,1000000);
@@ -74,7 +79,7 @@ public class TestsVlad {
 		
 		alg.initialize(servers);
 		servers = alg.getEmptyServers();
-		if(servers.size()==1)
+		if(servers.size()==3)
 			return true;
 
 		return false;
@@ -85,7 +90,7 @@ public class TestsVlad {
 		Task t;
 		
 		ArrayList<ITask> tasks = alg.getInUseServers().get(0).getTasks();
-		t=(Task)tasks.get(0);
+		t=(Task)tasks.get(2);
 		alg.endTask(t);
 		return true;
 	}

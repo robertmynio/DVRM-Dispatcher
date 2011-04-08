@@ -120,6 +120,10 @@ public class Algorithm1 implements IAlgorithm{
 		//this algorithm assigns to every task a server reference and to every server a task 
 		//reference (the task is actually added to the list of a server, but the task is not 
 		//actually deployed to a physical server)
+		
+		
+		
+		
 		consolidateTasks();
 		
 		//dispatch tasks which are not predicted to real servers
@@ -180,13 +184,17 @@ public class Algorithm1 implements IAlgorithm{
 			}
 			if(poz>0){ 
 				poz--;
-			while(ok==false) {	
-				if(tempServer.compareTo(inUseServers.get(poz))>0 && inUseServers.contains(tempServer) == false) {
-					inUseServers.add(poz,tempServer);
-					ok = true;
+				while(ok==false && poz>=0) {	
+					if(tempServer.compareTo(inUseServers.get(poz))<0 && inUseServers.contains(tempServer) == false) {
+						inUseServers.add(poz+1,tempServer);
+						ok = true;
+					}
+					poz--;
+				}	
+				// place it last
+				if(poz==0 && inUseServers.contains(tempServer) == false){
+					inUseServers.add(inUseServers.size()+1,tempServer);
 				}
-				poz--;
-			}	
 			}else if(poz==0){
 				poz = inUseServers.size()-1;
 				if(poz > 0){
@@ -200,7 +208,7 @@ public class Algorithm1 implements IAlgorithm{
 					}
 				}else 
 					if(poz == 0)
-						inUseServers.add(poz, tempServer);
+						inUseServers.add(poz+1, tempServer);
 					else
 						inUseServers.add(0,tempServer);
 				
@@ -373,7 +381,7 @@ public class Algorithm1 implements IAlgorithm{
 		nrTasks2 = secondToLastServer.getTotalNumberOfTasks();
 		
 		// try to empty the server with the fewest tasks
-		if(nrTasks1 < nrTasks2){
+		if(nrTasks1 <= nrTasks2){
 			for(ITask t:lastServer.getTasks()){
 				if(server.compareAvailableResources(t) && !server.isFull()){
 					//remove task from current server

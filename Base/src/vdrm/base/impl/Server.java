@@ -268,22 +268,22 @@ public class Server implements IServer {
 
 	@Override
 	public int compareTo(IServer server) {
-		if(this.getMaxCpu() < server.getMaxCpu()){
+		if(this.getUsedCpu() < server.getUsedCpu()){
 			return -1;
 		}else{
-			if(this.getMaxCpu() > server.getMaxCpu()){
+			if(this.getUsedCpu() > server.getUsedCpu()){
 				return 1;
 			}else{
-				if(this.getMaxMem() < server.getMaxMem()){
+				if(this.getUsedMem() < server.getUsedMem()){
 					return -1;
 				}else{
-					if(this.getMaxMem() > server.getMaxMem()){
+					if(this.getUsedMem() > server.getUsedMem()){
 						return 1;
 					}else{
-						if(this.getMaxHdd() < server.getMaxHdd()){
+						if(this.getUsedHdd() < server.getUsedHdd()){
 							return -1;
 						}else{
-							if(this.getMaxHdd() > server.getMaxHdd()){
+							if(this.getUsedHdd() > server.getUsedHdd()){
 								return 1;
 							}else{
 								return 0;
