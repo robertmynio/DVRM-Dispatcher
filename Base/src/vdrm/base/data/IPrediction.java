@@ -5,9 +5,4 @@ import java.util.ArrayList;
 public interface IPrediction {
 	//we assume for now that the prediction only holds the PREDICTED tasks, and not the task from which they were deduced(predicted)
 	public ArrayList<ITask> getPredictedTasks();
-	public int getCredibility();
-	public void increaseCredibility();
-	public void decreaseCredibility();
-	
-	public void addPredictedTask(ITask predictedTask);
 }
