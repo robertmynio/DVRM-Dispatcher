@@ -5,7 +5,6 @@ import java.util.Date;
 
 import vdrm.base.common.IAlgorithm;
 import vdrm.base.common.IPredictor;
-import vdrm.base.data.IPrediction;
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
 import vdrm.base.impl.BaseCommon;

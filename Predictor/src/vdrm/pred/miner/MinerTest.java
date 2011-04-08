@@ -9,8 +9,7 @@ public class MinerTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		IPatternMiner miner = new TreePatternMiner();
+		//IPatternMiner miner = new TreePatternMiner();
 		/*
 		UUID x = UUID.randomUUID();
 		miner.addElement(x);

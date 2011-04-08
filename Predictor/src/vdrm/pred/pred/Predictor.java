@@ -47,9 +47,9 @@ public class Predictor implements IPredictor{
 		// TODO  DO IT!
 		
 		//add task to tree and dynamically update the tree
-		
-		// TODO  DO IT!
-		
+		UUID taskId = task.getTaskHandle();
+		taskMap.put(taskId,task);
+		miner.addElement(taskId);
 	}
 
 }

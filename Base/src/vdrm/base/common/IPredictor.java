@@ -2,7 +2,6 @@ package vdrm.base.common;
 
 import java.util.ArrayList;
 
-import vdrm.base.data.IPrediction;
 import vdrm.base.data.ITask;
 
 public interface IPredictor {
