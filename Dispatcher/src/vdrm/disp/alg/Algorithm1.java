@@ -31,7 +31,6 @@ public class Algorithm1 implements IAlgorithm{
 	private ArrayList<IServer> fullServers;
 	private ArrayList<ITask> unassignedTasks;
 	private ArrayList<ITask> predictedTasks;
-	private IPrediction prediction;
 	private IPredictor predictor;
 	private Sorter sortingService;
 	
@@ -50,7 +49,6 @@ public class Algorithm1 implements IAlgorithm{
 		
 		//initialize prediction and predictor
 		predictor = new Predictor();
-		prediction = null;
 		
 		//initialize sorting service
 		sortingService = new Sorter();
@@ -79,15 +77,12 @@ public class Algorithm1 implements IAlgorithm{
 					}
 					
 					predictedTasks.remove(0);
-					if(predictedTasks.isEmpty())
-						prediction.increaseCredibility();
 					
 					//since the prediction was correct, we exit algorithm and wait for next task
 					return;					
 				}
 			else { 	
 				//prediction was not correct
-				prediction.decreaseCredibility();
 				
 				//since we used an optimistic approach, we have to remove the tasks from the servers
 				IServer tempServer;
@@ -109,11 +104,12 @@ public class Algorithm1 implements IAlgorithm{
 			unassignedTasks.add(newTask);
 
 		//run prediction and add predicted tasks to unassignedTasks list
+		ArrayList<ITask> prediction;
 		prediction = predictor.predict(newTask);
 		if(prediction!=null) {
-			ArrayList<ITask> temp = prediction.getPredictedTasks();
-			for(i=0;i<temp.size();i++)
-				unassignedTasks.add(temp.get(i));
+			int predSize = prediction.size();
+			for(i=0;i<predSize;i++)
+				unassignedTasks.add(prediction.get(i));
 		}
 		
 		//run consolidation algorithm (distribute tasks from unassignedTasks list to servers
@@ -586,9 +582,5 @@ public class Algorithm1 implements IAlgorithm{
 
 	public ArrayList<ITask> getPredictedTasks() {
 		return predictedTasks;
-	}
-
-	public IPrediction getPrediction() {
-		return prediction;
 	}
 }

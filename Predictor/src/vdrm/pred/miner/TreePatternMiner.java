@@ -2,11 +2,12 @@ package vdrm.pred.miner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class TreePatternMiner implements IPatternMiner{
 
 	private Node root;
-	private ArrayList<Byte> window;
+	private ArrayList<UUID> window;
 	private static final byte WINDOW_SIZE = 3;
 	
 	private int startOccurence;
@@ -15,22 +16,22 @@ public class TreePatternMiner implements IPatternMiner{
 	
 	public TreePatternMiner() {
 		root = new Node();
-		window = new ArrayList<Byte>();
+		window = new ArrayList<UUID>();
 	}
 	
-	public void addElement(byte element) {
+	public void addElement(UUID element) {
 		//add the element to the end of the window
 		window.add(element);
 		if(window.size()>WINDOW_SIZE)
 			window.remove(0);
 		
 		//starting from the end, insert in turns patterns of length 1,2,3...
-		List<Byte> pattern;
+		List<UUID> pattern;
 		Node node = null;
 		int windowSize = window.size();
 		int patternSize;
 		int i,j;
-		byte key;
+		UUID key;
 		for(i=0;i<windowSize;i++) {
 			//tempList is i length long pattern (i = 1,2,3...)
 			pattern = window.subList(windowSize-1-i, windowSize);
@@ -52,7 +53,7 @@ public class TreePatternMiner implements IPatternMiner{
 		}
 	}
 
-	public ArrayList<Byte> getPattern(byte element, double minCredibility) {
+	public ArrayList<UUID> getPattern(UUID element, double minCredibility) {
 		//search for start element amongst the children of the root node
 		Node startNode = root.getChild(element);
 		//if not found -> return null
@@ -62,7 +63,7 @@ public class TreePatternMiner implements IPatternMiner{
 		//initializations
 		ArrayList<Node> temporary = new ArrayList<Node>();
 		solution = new ArrayList<Node>();
-		ArrayList<Byte> pattern = null;
+		ArrayList<UUID> pattern = null;
 		startOccurence = startNode.getOccurence();
 		temporary.add(startNode);
 		
@@ -71,7 +72,7 @@ public class TreePatternMiner implements IPatternMiner{
 		int size = solution.size();
 		//if size>0 -> if there is a solution (if a pattern was found) then it is copied into the byte arraylist
 		if(size>0) {
-			pattern = new ArrayList<Byte>();
+			pattern = new ArrayList<UUID>();
 			for(int i=0;i<size;i++)
 				pattern.add(solution.get(i).getKey());
 		}

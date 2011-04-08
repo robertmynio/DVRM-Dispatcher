@@ -1,6 +1,7 @@
 package vdrm.pred.miner;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class MinerTest {
 
@@ -10,7 +11,8 @@ public class MinerTest {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		IPatternMiner miner = new TreePatternMiner();
-		byte x = 1;
+		/*
+		UUID x = UUID.randomUUID();
 		miner.addElement(x);
 		x = 2;
 		miner.addElement(x);
@@ -67,7 +69,7 @@ public class MinerTest {
 		if(pattern!=null)
 			System.out.println(pattern.toString());
 		else
-			System.out.println("NULL");
+			System.out.println("NULL");*/
 	}
 
 }
