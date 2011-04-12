@@ -58,9 +58,19 @@ public class Task implements ITask{
 	
 	@Override
 	public boolean equals(ITask task) {
-		if(this.getCpu() == task.getCpu()){
-			if(this.getMem() == task.getMem()){
-				if(this.getHdd() == task.getHdd()){
+//		if(this.getCpu() == task.getCpu()){
+//			if(this.getMem() == task.getMem()){
+//				if(this.getHdd() == task.getHdd()){
+//					return true;
+//				}
+//			}
+//		}
+		if(this.getCpu() >= task.getCpu() - task.getCpu()* BaseCommon.PERCENT
+				&& this.getCpu() <= task.getCpu() + task.getCpu() * BaseCommon.PERCENT){
+			if(this.getMem() >= task.getMem() - task.getMem() * BaseCommon.PERCENT
+					&& this.getMem() <= task.getMem() + task.getMem() * BaseCommon.PERCENT){
+				if(this.getHdd() >= task.getHdd() - task.getHdd() * BaseCommon.PERCENT
+						&& this.getHdd() <= task.getHdd() + task.getHdd() * BaseCommon.PERCENT){
 					return true;
 				}
 			}
@@ -70,7 +80,7 @@ public class Task implements ITask{
 	
 	@Override
 	public int compareTo(ITask task) {
-		if(this.getCpu() < task.getCpu()){
+		/*if(this.getCpu() < task.getCpu()){
 			return -1;
 		}else{
 			if(this.getCpu() > task.getCpu()){
@@ -86,6 +96,31 @@ public class Task implements ITask{
 							return -1;
 						}else{
 							if(this.getHdd() > task.getHdd()){
+								return 1;
+							}else{
+								return 0;
+							}
+						}
+					}
+				}
+			}
+		}*/
+		if(this.getCpu() < task.getCpu() + task.getCpu() * BaseCommon.PERCENT){
+			return -1;
+		}else{
+			if(this.getCpu() > task.getCpu() - task.getCpu() * BaseCommon.PERCENT){
+				return 1;
+			}else{
+				if(this.getMem() < task.getMem() + task.getMem() * BaseCommon.PERCENT){
+					return -1;
+				}else{
+					if(this.getMem() > task.getMem() - task.getMem() * BaseCommon.PERCENT){
+						return 1;
+					}else{
+						if(this.getHdd() < task.getHdd() + task.getHdd() * BaseCommon.PERCENT){
+							return -1;
+						}else{
+							if(this.getHdd() > task.getHdd() - task.getHdd() * BaseCommon.PERCENT){
 								return 1;
 							}else{
 								return 0;

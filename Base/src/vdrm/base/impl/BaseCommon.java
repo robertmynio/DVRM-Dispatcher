@@ -13,6 +13,9 @@ public class BaseCommon {
 	public static final double MEM_WEIGHT = 0.3;
 	public static final double HDD_WEIGHT = 0.1;
 	
+	public static final double PERCENT = 0.1;
+	public static final double SERVER_THRESHOLD = 0.8;
+	
 	private int nrOfTasksThreshold;
 	
 	private static BaseCommon instance;

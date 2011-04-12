@@ -89,13 +89,17 @@ public class Server implements IServer {
 	}
 
 	@Override
+	// TODO: add +- 10%
 	public ITask GetTaskWithResources(ArrayList<Integer> resourceDemands) {
 		try{
 			ITask t = null;
 			for(ITask task : taskList){
-				if( (task.getCpu() == Integer.parseInt(resourceDemands.get(0).toString())) &&
-						(task.getMem() == Integer.parseInt(resourceDemands.get(1).toString())) &&
-						(task.getHdd() == Integer.parseInt(resourceDemands.get(2).toString()))
+				int cpu = Integer.parseInt(resourceDemands.get(0).toString());
+				int mem = Integer.parseInt(resourceDemands.get(1).toString());
+				int hdd = Integer.parseInt(resourceDemands.get(2).toString());
+				if( (task.getCpu() >= cpu - cpu * BaseCommon.PERCENT && task.getCpu() <= cpu + cpu * BaseCommon.PERCENT) &&
+						(task.getMem() >= mem - mem * BaseCommon.PERCENT && task.getMem() <= mem + mem * BaseCommon.PERCENT) &&
+						(task.getHdd() >= hdd - hdd * BaseCommon.PERCENT && task.getHdd() <= hdd + hdd * BaseCommon.PERCENT)
 				){
 					t = task;
 				}
@@ -255,9 +259,16 @@ public class Server implements IServer {
 
 	@Override
 	public boolean meetsRequirments(ITask task) {
-		if((this.getMaxCpu() - this.getUsedCpu()) >= task.getCpu()){
-			if( (this.getMaxMem() - this.getUsedMem()) >= task.getMem() ){
-				if((this.getMaxHdd() - this.getUsedHdd()) >= task.getHdd()){
+//		if((this.getMaxCpu() - this.getUsedCpu()) >= task.getCpu()){
+//			if( (this.getMaxMem() - this.getUsedMem()) >= task.getMem() ){
+//				if((this.getMaxHdd() - this.getUsedHdd()) >= task.getHdd()){
+//					return true;
+//				}
+//			}
+//		}
+		if((this.getMaxCpu() - this.getUsedCpu()) >= task.getCpu() - task.getCpu() * BaseCommon.PERCENT){
+			if( (this.getMaxMem() - this.getUsedMem()) >= task.getMem() - task.getMem() * BaseCommon.PERCENT ){
+				if((this.getMaxHdd() - this.getUsedHdd()) >= task.getHdd() - task.getHdd() * BaseCommon.PERCENT){
 					return true;
 				}
 			}
@@ -268,7 +279,7 @@ public class Server implements IServer {
 
 	@Override
 	public int compareTo(IServer server) {
-		if(this.getUsedCpu() < server.getUsedCpu()){
+		/*if(this.getUsedCpu() < server.getUsedCpu()){
 			return -1;
 		}else{
 			if(this.getUsedCpu() > server.getUsedCpu()){
@@ -284,6 +295,31 @@ public class Server implements IServer {
 							return -1;
 						}else{
 							if(this.getUsedHdd() > server.getUsedHdd()){
+								return 1;
+							}else{
+								return 0;
+							}
+						}
+					}
+				}
+			}
+		}*/
+		if(this.getUsedCpu() < server.getUsedCpu() + server.getUsedCpu() * BaseCommon.PERCENT){
+			return -1;
+		}else{
+			if(this.getUsedCpu() > server.getUsedCpu() - server.getUsedCpu() * BaseCommon.PERCENT){
+				return 1;
+			}else{
+				if(this.getUsedMem() < server.getUsedMem() + server.getUsedMem() * BaseCommon.PERCENT){
+					return -1;
+				}else{
+					if(this.getUsedMem() > server.getUsedMem() - server.getUsedMem() * BaseCommon.PERCENT){
+						return 1;
+					}else{
+						if(this.getUsedHdd() < server.getUsedHdd() + server.getUsedHdd() * BaseCommon.PERCENT){
+							return -1;
+						}else{
+							if(this.getUsedHdd() > server.getUsedHdd() - server.getUsedHdd() * BaseCommon.PERCENT){
 								return 1;
 							}else{
 								return 0;
@@ -320,10 +356,12 @@ public class Server implements IServer {
 	@Override
 	public boolean compareAvailableResources(ITask t) {
 		
-		// TODO maybe consider a small margin (5%) ?
-		if((this.getMaxCpu() - this.getUsedCpu()) == t.getCpu()){
-			if( (this.getMaxMem() - this.getUsedMem()) == t.getMem() ){
-				if((this.getMaxHdd() - this.getUsedHdd()) == t.getHdd()){
+		if((this.getMaxCpu() - this.getUsedCpu()) >= t.getCpu() - t.getCpu() * BaseCommon.PERCENT 
+				&& (this.getMaxCpu() - this.getUsedCpu()) <= t.getCpu() + t.getCpu() * BaseCommon.PERCENT){
+			if( (this.getMaxMem() - this.getUsedMem()) >= t.getMem() - t.getMem() * BaseCommon.PERCENT
+					&& (this.getMaxMem() - this.getUsedMem()) <= t.getMem() + t.getMem() * BaseCommon.PERCENT){
+				if((this.getMaxHdd() - this.getUsedHdd()) >= t.getHdd() - t.getHdd() * BaseCommon.PERCENT
+						&& (this.getMaxHdd() - this.getUsedHdd()) <= t.getHdd() + t.getHdd() * BaseCommon.PERCENT){
 					return true;
 				}
 			}
@@ -346,5 +384,19 @@ public class Server implements IServer {
 		resources.add(this.getUsedHdd());
 		return resources;
 	}
+
+	public void setCpuFreq(int cpuFreq) {
+		this.cpuFreq = cpuFreq;
+	}
+
+	public void setMemoryAmount(int memoryAmount) {
+		this.memoryAmount = memoryAmount;
+	}
+
+	public void setHddSize(int hddSize) {
+		this.hddSize = hddSize;
+	}
+	
+	
 
 }
