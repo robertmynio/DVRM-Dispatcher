@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import vdrm.base.impl.BaseCommon;
 import vdrm.base.util.ILogger;
 
 public class VDRMLogger implements ILogger {
@@ -36,17 +38,20 @@ public class VDRMLogger implements ILogger {
 	
 	@Override
 	public void logInfo(String message) {
-		this.log.log(Level.INFO, message);
+		if(BaseCommon.logEnabled)
+			this.log.log(Level.INFO, message);
 	}
 
 	@Override
 	public void logSevere(String message) {
-		this.log.log(Level.WARNING, message);
+		if(BaseCommon.logEnabled)
+			this.log.log(Level.WARNING, message);
 	}
 
 	@Override
 	public void logWarning(String message) {
-		this.log.log(Level.SEVERE, message);
+		if(BaseCommon.logEnabled)
+			this.log.log(Level.SEVERE, message);
 	}
 
 }

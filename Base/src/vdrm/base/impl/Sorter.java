@@ -51,12 +51,15 @@ public class Sorter {
 	
 	public ArrayList<IServer> insertSortedServerGoingRightDesc(IServer s, ArrayList<IServer> source, int index) {
 		int loc = index+1;
-		while( (loc < source.size()) &&
-				(s.compareTo(source.get(loc)) > 0)){
+		while( (loc < source.size()-1) &&
+				(s.compareTo(source.get(loc)) < 0)){
 			source.set(loc+1, source.get(loc));
 			loc++;
 		}
-		source.set(loc+1, s);
+		if(loc > source.size()-1)
+			source.set(loc+1, s);
+		else
+			source.set(loc,s);
 		return source;
 	}
 	

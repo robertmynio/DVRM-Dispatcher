@@ -149,9 +149,9 @@ public class Server implements IServer {
 			usedRAM += task.getMem();
 			usedHDD += task.getHdd();
 			
-			if( (usedCPU == cpuFreq) || 
-				(usedRAM == memoryAmount)||
-				(usedHDD == hddSize))
+			if( (usedCPU >= cpuFreq) || 
+				(usedRAM >= memoryAmount)||
+				(usedHDD >= hddSize))
 				isFull = true;
 			return true;
 		}catch(Exception ex){
@@ -259,27 +259,27 @@ public class Server implements IServer {
 
 	@Override
 	public boolean meetsRequirments(ITask task) {
-//		if((this.getMaxCpu() - this.getUsedCpu()) >= task.getCpu()){
-//			if( (this.getMaxMem() - this.getUsedMem()) >= task.getMem() ){
-//				if((this.getMaxHdd() - this.getUsedHdd()) >= task.getHdd()){
-//					return true;
-//				}
-//			}
-//		}
-		if((this.getMaxCpu() - this.getUsedCpu()) >= task.getCpu() - task.getCpu() * BaseCommon.PERCENT){
-			if( (this.getMaxMem() - this.getUsedMem()) >= task.getMem() - task.getMem() * BaseCommon.PERCENT ){
-				if((this.getMaxHdd() - this.getUsedHdd()) >= task.getHdd() - task.getHdd() * BaseCommon.PERCENT){
+		if((this.getMaxCpu() - this.getUsedCpu()) >= task.getCpu()){
+			if( (this.getMaxMem() - this.getUsedMem()) >= task.getMem() ){
+				if((this.getMaxHdd() - this.getUsedHdd()) >= task.getHdd()){
 					return true;
 				}
 			}
 		}
+//		if( ((this.getMaxCpu() - this.getUsedCpu()) - this.getMaxCpu() * BaseCommon.PERCENT) >= task.getCpu()){
+//			if( ((this.getMaxMem() - this.getUsedMem())- this.getMaxMem() * BaseCommon.PERCENT) >= task.getMem() ){
+//				if( ((this.getMaxHdd() - this.getUsedHdd())- this.getMaxHdd() * BaseCommon.PERCENT) >= task.getHdd()){
+//					return true;
+//				}
+//			}
+//		}
 		return false;
 	}
 
 
 	@Override
 	public int compareTo(IServer server) {
-		/*if(this.getUsedCpu() < server.getUsedCpu()){
+		if(this.getUsedCpu() < server.getUsedCpu()){
 			return -1;
 		}else{
 			if(this.getUsedCpu() > server.getUsedCpu()){
@@ -303,8 +303,8 @@ public class Server implements IServer {
 					}
 				}
 			}
-		}*/
-		if(this.getUsedCpu() < server.getUsedCpu() + server.getUsedCpu() * BaseCommon.PERCENT){
+		}
+		/*if(this.getUsedCpu() < server.getUsedCpu() + server.getUsedCpu() * BaseCommon.PERCENT){
 			return -1;
 		}else{
 			if(this.getUsedCpu() > server.getUsedCpu() - server.getUsedCpu() * BaseCommon.PERCENT){
@@ -328,7 +328,7 @@ public class Server implements IServer {
 					}
 				}
 			}
-		}
+		}*/
 	}
 
 
@@ -395,6 +395,18 @@ public class Server implements IServer {
 
 	public void setHddSize(int hddSize) {
 		this.hddSize = hddSize;
+	}
+
+	public void setUsedCPU(int usedCPU) {
+		this.usedCPU = usedCPU;
+	}
+
+	public void setUsedRAM(int usedRAM) {
+		this.usedRAM = usedRAM;
+	}
+
+	public void setUsedHDD(int usedHDD) {
+		this.usedHDD = usedHDD;
 	}
 	
 	

@@ -241,7 +241,11 @@ public class Algorithm1 implements IAlgorithm{
 				}else 
 					if(poz == 0)
 					{
-						inUseServers.add(poz+1, tempServer);
+						int compareResult = tempServer.compareTo(inUseServers.get(0));
+						if(compareResult <= 0)
+							inUseServers.add(poz+1, tempServer);
+						else
+							inUseServers.add(0, tempServer);
 						logger.logInfo("Server " + tempServer.getServerID() + " added to the 'in use servers' list at position "+ poz+1 + "(only one server was in the list).");
 					}else
 					{
@@ -325,7 +329,7 @@ public class Algorithm1 implements IAlgorithm{
 						logger.logSevere("SEVERE: Task " + tempTask.getTaskHandle().toString() + " cannot be deployed at this moment (" +
 								d.toString());
 						
-						unassignedTasks.add(tempTask);
+						//unassignedTasks.add(tempTask);
 						waitingTasksInQueue = true;
 						
 						return;
@@ -338,6 +342,9 @@ public class Algorithm1 implements IAlgorithm{
 						newServer.addTask(tempTask);
 						tempList.remove(tempListSize);
 						ok = true;
+						
+//						if(newServer.isFull())
+//							fullServers.add(newServer);
 						logger.logInfo("Found a place for task " + tempTask.getTaskHandle() + ", on server "+ newServer.getServerID() +".(3)");
 					}
 				}
@@ -606,9 +613,10 @@ public class Algorithm1 implements IAlgorithm{
 		logger.logInfo(" Started to reorder servers...");
 		sortingService = new Sorter();
 		if(direction < 0){
-			// TODO: Check/Test this method...
-			sortingService.insertSortedServerGoingRightDesc(server, inUseServers,
-					inUseServers.indexOf(server));
+			// TODO: Repair this method
+//			sortingService.insertSortedServerGoingRightDesc(server, inUseServers,
+//					inUseServers.indexOf(server));
+			inUseServers = sortingService.insertSortServersDescending(inUseServers);
 		}else{
 			inUseServers = sortingService.insertSortedServerDesc(server, inUseServers,
 								inUseServers.indexOf(server));
