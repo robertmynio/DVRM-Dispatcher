@@ -18,6 +18,13 @@ public class Predictor implements IPredictor{
 	public Predictor() {
 		miner = new TreePatternMiner();
 		taskMap = new HashMap<UUID,ITask>();
+		
+		//Database Init method call here ?
+	}
+	
+	public Predictor(ArrayList<ITask> tasks) {
+		this();
+		Initialize(tasks);
 	}
 
 	public ArrayList<ITask> predict(ITask task) {
@@ -50,6 +57,15 @@ public class Predictor implements IPredictor{
 		UUID taskId = task.getTaskHandle();
 		taskMap.put(taskId,task);
 		miner.addElement(taskId);
+	}
+	
+	private void Initialize(ArrayList<ITask> tasks) {
+		UUID taskId;
+		for(ITask tsk : tasks) {
+			taskId = tsk.getTaskHandle();
+			taskMap.put(taskId, tsk);
+			miner.addElement(taskId);
+		}
 	}
 
 }
