@@ -25,7 +25,7 @@ public class Server implements IServer {
 	private boolean isFull;
 	private boolean isEmpty;
 	
-	private UUID serverID;
+	private String serverID;
 	
 	
 	// TASKS REPRESENTATION
@@ -38,7 +38,8 @@ public class Server implements IServer {
 	private ITask highestDemandingTask;
 	
 	public Server() {
-		serverID = UniqueIdGenerator.getUID();
+		//serverID = UniqueIdGenerator.getUID();
+		serverID = "";
 		usedCPU = 0;
 		usedRAM = 0;
 		usedHDD = 0;
@@ -252,7 +253,7 @@ public class Server implements IServer {
 	}
 
 	@Override
-	public UUID getServerID() {
+	public String getServerID() {
 		return serverID;
 	}
 
@@ -407,6 +408,10 @@ public class Server implements IServer {
 
 	public void setUsedHDD(int usedHDD) {
 		this.usedHDD = usedHDD;
+	}
+
+	public void setServerID(String serverID) {
+		this.serverID = serverID;
 	}
 	
 	

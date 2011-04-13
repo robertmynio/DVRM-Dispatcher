@@ -88,7 +88,7 @@ public class Algorithm1 implements IAlgorithm{
 					
 					// OpenNebula
 					if(newTask.getServerId() != null){
-						//onService.DeployTask(newTask);
+						onService.DeployTask(newTask);
 						logger.logInfo("Predicted task " + newTask.getTaskHandle() + " deployed on server.");
 					}
 					
@@ -154,7 +154,7 @@ public class Algorithm1 implements IAlgorithm{
 				
 				// OpenNebula
 				if(tempTask.getServerId() != null){
-					//onService.DeployTask(tempTask);
+					onService.DeployTask(tempTask);
 					logger.logInfo("Task " + newTask.getTaskHandle() + " (normal) deployed on server.");
 				}
 			}		
@@ -268,7 +268,10 @@ public class Algorithm1 implements IAlgorithm{
 	{
 		logger.logInfo("\n\n*** Starting to consolidate tasks.");
 		
-		ArrayList<ITask> tempList = unassignedTasks;
+		ArrayList<ITask> tempList = new ArrayList<ITask>();
+		for(ITask tsk : unassignedTasks) {
+			tempList.add(tsk);
+		}
 		
 		//sort the array in an ascending order (according to cpu, then mem, then hdd)
 		sort(tempList);
@@ -388,7 +391,7 @@ public class Algorithm1 implements IAlgorithm{
 		IServer server = t.getServer();
 		
 		// remove task from server (this is the point of this method, DUUUH !)
-		//onService.FinishTask(t);
+		onService.FinishTask(t);
 		server.removeTask(t);
 		t.setServer(null);
 		logger.logInfo("FT: Task " + t.getTaskHandle() + " has finished.");
@@ -474,7 +477,7 @@ public class Algorithm1 implements IAlgorithm{
 						fullServers.add(server);
 						break;
 					}
-					//onService.MigrateTask(t, server);
+					onService.MigrateTask(t, server);
 				}
 			}
 			
@@ -522,7 +525,7 @@ public class Algorithm1 implements IAlgorithm{
 						fullServers.add(server);
 						break;
 					}
-					//onService.MigrateTask(t, server);
+					onService.MigrateTask(t, server);
 				}
 			}
 			
@@ -568,7 +571,7 @@ public class Algorithm1 implements IAlgorithm{
 				if(s.compareAvailableResources(t)){
 					
 					// TODO migrate_to_new_host(s); -- OpenNebula
-					//onService.MigrateTask(t, s);
+					onService.MigrateTask(t, s);
 					
 					fullServers.add(s);
 					inUseServers.remove(s);
@@ -634,7 +637,7 @@ public class Algorithm1 implements IAlgorithm{
 		if(bingoTask != null){
 			logger.logInfo(" Perfect task found. Server will be full.");
 			// OPEN NEBULA
-			//onService.MigrateTask(bingoTask, server);
+			onService.MigrateTask(bingoTask, server);
 			
 			fullServers.add(server);
 			inUseServers.remove(server);

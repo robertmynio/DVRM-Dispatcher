@@ -11,7 +11,7 @@ public interface ITask {
 	public int getCpu();
 	public boolean isPredicted();
 	public boolean setPredicted(boolean predicted);
-	public UUID getServerId();
+	public String getServerId();
 	public IServer getServer();
 	public void setServer(IServer server);
 	public boolean equals(ITask task);

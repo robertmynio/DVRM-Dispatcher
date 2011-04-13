@@ -10,8 +10,11 @@ import vdrm.disp.util.VDRMLogger;
 public class OpenNebulaService implements IOpenNebulaService {
 	private Client openClient;
 	private VDRMLogger logger;
+	private final String NEBULA_RCP_ADDRESS = "http://192.168.1.10:2633/RPC2";
+    private final String NEBULA_CREDENTIALS = "oneadmin:oneadmin";
 	public OpenNebulaService(){
 		logger = new VDRMLogger();
+		Initialize();
 	}
 
 	/***
@@ -85,7 +88,7 @@ public class OpenNebulaService implements IOpenNebulaService {
 	@Override
 	public void Initialize() {
 		try {
-			openClient = new Client();
+			openClient = new Client(NEBULA_CREDENTIALS, NEBULA_RCP_ADDRESS);
 		} catch (Exception e) {
 			logger.logWarning("Cannot create OpenNebula client. "+e.getMessage());
 		}

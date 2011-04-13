@@ -12,7 +12,7 @@ public interface IServer {
 	public int getUsedHdd();
 	public int getLoad();
 	
-	public UUID getServerID();
+	public String getServerID();
 	public ArrayList<ITask> getTasks();
 	
 	//avem nevoie de o metoda getThreshhold()? In caz ca fiecare server are un alt threshold la care e optim si sa nu trecem de el ?

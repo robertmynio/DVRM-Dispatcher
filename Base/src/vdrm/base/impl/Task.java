@@ -182,7 +182,7 @@ public class Task implements ITask{
 	}
 
 	@Override
-	public UUID getServerId() {
+	public String getServerId() {
 		if(serverHost!=null)
 			return serverHost.getServerID();
 		else
