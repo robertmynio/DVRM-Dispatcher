@@ -3,7 +3,6 @@ package vdrm.pred.pred;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
-
 import vdrm.base.common.IPredictor;
 import vdrm.base.data.ITask;
 import vdrm.pred.miner.IPatternMiner;
@@ -14,12 +13,15 @@ public class Predictor implements IPredictor{
 	IPatternMiner miner;
 	HashMap<UUID,ITask> taskMap;
 	private static final double MIN_CREDIBILITY = 0.7;
+	private int counter; //add only a limited (MAX_INT) number of tasks to the tree
 	
 	public Predictor() {
 		miner = new TreePatternMiner();
 		taskMap = new HashMap<UUID,ITask>();
+		counter = 0;
 		
 		//Database Init method call here ?
+		// TODO : DATABASE INIT ?
 	}
 	
 	public Predictor(ArrayList<ITask> tasks) {
@@ -27,13 +29,14 @@ public class Predictor implements IPredictor{
 		Initialize(tasks);
 	}
 
-	public ArrayList<ITask> predict(ITask task) {
+	public synchronized ArrayList<ITask> predict(ITask task) {
 		UUID id = task.getTaskHandle();
 		
 		ArrayList<UUID> pattern;
 		pattern = miner.getPattern(id, MIN_CREDIBILITY);
-		if(pattern==null)
+		if(pattern==null) {
 			return null;
+		}
 		
 		int patternSize = pattern.size();
 		ArrayList<ITask> tasks = new ArrayList<ITask>();
@@ -48,15 +51,18 @@ public class Predictor implements IPredictor{
 	}
 
 	@Override
-	public void addTaskToDatabase(ITask task) {
+	public synchronized void addTaskToDatabase(ITask task) {
 		//add task to relational database
 		
 		// TODO  DO IT!
 		
 		//add task to tree and dynamically update the tree
-		UUID taskId = task.getTaskHandle();
-		taskMap.put(taskId,task);
-		miner.addElement(taskId);
+		counter++;
+		if(counter<Integer.MAX_VALUE) {
+			UUID taskId = task.getTaskHandle();
+			taskMap.put(taskId,task);
+			miner.addElement(taskId);
+		}
 	}
 	
 	private void Initialize(ArrayList<ITask> tasks) {
