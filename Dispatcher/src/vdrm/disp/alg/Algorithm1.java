@@ -74,7 +74,7 @@ public class Algorithm1 implements IAlgorithm{
 	}
 
 	@Override
-	public void newTask(ITask newTask) {
+	public synchronized void newTask(ITask newTask) {
 		logger.logInfo("\n*** Starting one iteration for newTask.");
 		
 		//we use an OPTIMISTIC approach (regarding the prediction)
@@ -386,7 +386,7 @@ public class Algorithm1 implements IAlgorithm{
 	 * 		
 	 */
 	@Override
-	public void endTask(ITask t){
+	public synchronized void endTask(ITask t){
 		logger.logInfo("\n\n*** Starting end tasks.");
 		IServer server = t.getServer();
 		
