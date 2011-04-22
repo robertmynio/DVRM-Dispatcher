@@ -1,6 +1,9 @@
 package vdrm.base.impl;
 
 import java.util.ArrayList;
+import java.util.EventListener;
+import java.util.EventObject;
+import java.util.Observable;
 
 import vdrm.base.data.IServer;
 
@@ -22,6 +25,8 @@ public class BaseCommon {
 	
 	private static BaseCommon instance;
 	
+	public VMStartedEvent VMStarted;
+	
 	public static BaseCommon Instance(){
 		if(instance == null){
 			instance = new BaseCommon();
@@ -34,10 +39,50 @@ public class BaseCommon {
 		//fullServers = new ArrayList<IServer>();
 		//emptyServers = new ArrayList<IServer>();
 		nrOfTasksThreshold = 3;
+		VMStarted = new VMStartedEvent();
 	}
 
 	public int getNrOfTasksThreshold() {
 		return nrOfTasksThreshold;
+	}
+	
+	public VMStartedEvent getVMStarted() {
+		return VMStarted;
+	}
+
+
+
+	/**
+	 * New style event :)
+	 * @author Vlad
+	 *
+	 */
+	public class VMStartedEvent extends Observable{
+		public synchronized void setChanged(){
+			super.setChanged();
+		}
+	}
+	
+	
+	/***
+	 * Event which is fired when the VirtualMachine is deployed and started
+	 * @author Vlad
+	 *
+	 */
+	public class VMDeployedEvent extends EventObject{
+
+		public VMDeployedEvent(Object arg0) {
+			super(arg0);
+		}
+	}
+	
+	/***
+	 * Event Listener for the VirtualMachine deploy event
+	 * @author Vlad
+	 *
+	 */
+	public interface VMDeployedEventListener extends EventListener{
+		public void vmDeployedOccured(VMDeployedEvent ev);
 	}
 	
 	

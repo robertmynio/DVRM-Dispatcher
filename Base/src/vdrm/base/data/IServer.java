@@ -11,6 +11,8 @@ public interface IServer {
 	public int getUsedMem();
 	public int getUsedHdd();
 	public int getLoad();
+	public String getIPAddress();
+	public int getNumberOfCores();
 	
 	public String getServerID();
 	public ArrayList<ITask> getTasks();

@@ -17,6 +17,7 @@ public class Server implements IServer {
 	private int cpuFreq;
 	private int memoryAmount;
 	private int hddSize;
+	private int cores;
 	
 	private int usedCPU;
 	private int usedRAM;
@@ -26,6 +27,8 @@ public class Server implements IServer {
 	private boolean isEmpty;
 	
 	private String serverID;
+	
+	private String ipAddress;
 	
 	
 	// TASKS REPRESENTATION
@@ -50,6 +53,8 @@ public class Server implements IServer {
 		nrOfPredictedTasks = 0;
 		lowestDemandingTask = null;
 		highestDemandingTask = null;
+		cores = 1;
+		ipAddress = "192.168.1.1";
 	}
 	
 	public Server(int cpu, int mem, int hdd) {
@@ -57,6 +62,15 @@ public class Server implements IServer {
 		cpuFreq = cpu;
 		memoryAmount = mem;
 		hddSize = hdd;
+	}
+	
+	public Server(int cpu, int mem, int hdd, int cores, String ip) {
+		this();
+		cpuFreq = cpu;
+		memoryAmount = mem;
+		hddSize = hdd;
+		this.cores = cores;
+		this.ipAddress = ip;
 	}
 	/***
 	 * Return the next highest demanding task in the server task list
@@ -412,6 +426,16 @@ public class Server implements IServer {
 
 	public void setServerID(String serverID) {
 		this.serverID = serverID;
+	}
+
+	@Override
+	public String getIPAddress() {
+		return ipAddress;
+	}
+
+	@Override
+	public int getNumberOfCores() {
+		return cores;
 	}
 	
 	

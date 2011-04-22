@@ -4,7 +4,9 @@ import org.opennebula.client.vm.VirtualMachine;
 import org.opennebula.client.*;
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
+import vdrm.base.impl.BaseCommon;
 import vdrm.base.impl.Task;
+import vdrm.base.impl.BaseCommon.VMStartedEvent;
 import vdrm.disp.util.VDRMLogger;
 
 public class OpenNebulaService implements IOpenNebulaService {
@@ -46,6 +48,10 @@ public class OpenNebulaService implements IOpenNebulaService {
 					
 					// Step4: deploy the VM to the desired server
 					vm.deploy( Integer.parseInt( ((Task)t).getServerId().toString() ) );
+					
+					// Step5: notify that the VM started
+					//BaseCommon.Instance().getVMStarted().setChanged();
+					//BaseCommon.Instance().getVMStarted().notifyObservers(t);
 					
 					return true;
 				}else{
