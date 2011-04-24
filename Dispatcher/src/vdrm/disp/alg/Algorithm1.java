@@ -333,8 +333,11 @@ public class Algorithm1 implements IAlgorithm{
 								d.toString());
 						
 						//unassignedTasks.add(tempTask);
-						waitingTasksInQueue = true;
+						//waitingTasksInQueue = true;
 						
+						// notify that there are no more free resources (stop sending tasks) 
+						BaseCommon.Instance().getResourceAllocateEvent().setChanged();
+						BaseCommon.Instance().getResourceAllocateEvent().notifyObservers();
 						return;
 					}else{
 						IServer newServer = emptyServers.get(0);

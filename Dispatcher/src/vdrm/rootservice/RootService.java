@@ -1,6 +1,10 @@
 package vdrm.rootservice;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.SortedMap;
@@ -13,21 +17,41 @@ import vdrm.base.impl.BaseCommon;
 import vdrm.base.impl.BaseCommon.VMStartedEvent;
 import vdrm.disp.alg.Algorithm1;
 
+/***
+ * Root Service class.
+ * 
+ * The way it works: 
+ * 1) A new task arrives (under the form of a web service call, which results in a 
+ * call to TaskArrived.
+ * 2) The task is added to a 'ready' queue, where it remains until the VM associated to it
+ * is started. The Root Service calls the algorithm NewTask method.
+ * 3) When the OpenNebula service starts the VM and the task is dispatched successfully,
+ * the VMStartedEvent is fired and is handled by the RootService
+ * 4) When the VMStartedEvent occured, the task is moved in the 'current' working tasks. This
+ * is done in the StartTask method. This method removes the task from the 'ready' list,
+ * adds it to the 'current' deployed tasks and starts its associated timer.
+ * 5) When the timer associated to a task finishes, it calls the TaskIsDone method, which in turn
+ * signals the algorithm with a call to 'EndTask' method.
+ * @author Vlad & Robi
+ *
+ */
 public class RootService {
-	private SortedMap currentDeployedTasks;
+	private Map<Timer, TimedTaskWrapper> currentDeployedTasks;
 	
 	// maybe put a tree map <task.uuid,task> to speed up search :)
-	private ArrayList<TimedTaskWrapper> readyTasks;
+	private List<TimedTaskWrapper> readyTasks;
 	private IAlgorithm worker;
-	
+	private boolean ResourcesAvailable;
 	private static RootService instance;
 	
 	private RootService(){
-		currentDeployedTasks = new TreeMap<Timer, TimedTaskWrapper>();
-		readyTasks = new ArrayList<TimedTaskWrapper>();
+		currentDeployedTasks = Collections.synchronizedMap(new TreeMap<Timer, TimedTaskWrapper>());
+		readyTasks = Collections.synchronizedList(new ArrayList<TimedTaskWrapper>());
 		worker = new Algorithm1();
 		
-		// register the in line event handler
+		ResourcesAvailable = true;
+		
+		// register the in line event handlers
 		BaseCommon.Instance().getVMStarted().addObserver(
 				new Observer(){
 
@@ -40,6 +64,18 @@ public class RootService {
 					
 				}
 				);
+		
+		
+		BaseCommon.Instance().getResourceAllocateEvent().addObserver(
+				new Observer(){
+
+					@Override
+					public void update(Observable arg0, Object arg1) {
+						ResourcesAvailable = false;
+					}
+					
+				}
+		);
 	}
 	
 	public static RootService Instance(){
@@ -53,36 +89,80 @@ public class RootService {
 	 * This calls the EndTask method.
 	 * @param t
 	 */
-	public void TaskIsDone(TimedTaskWrapper t){
+	public synchronized void TaskIsDone(TimedTaskWrapper t){
 		worker.endTask(t.getTask());
-		
+
 		// remove the timedTaskWrapper
-		currentDeployedTasks.remove(t);
+		synchronized (currentDeployedTasks) {
+			currentDeployedTasks.remove(t);
+		}
+
+		if(!ResourcesAvailable){
+			// TODO: Step1:iterate through the list of readyTasks and send them all to the worker
+			while(!readyTasks.isEmpty() && ResourcesAvailable == false){
+				StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
+			}
+			// Step2: make it true!
+			ResourcesAvailable = true;
+			
+		}
 	}
 	/***
 	 * New Task just arrived (probably from WS). Store it in the DB (maybe)
+	 * and pass it to the algorithm.
 	 * @param t
 	 */
-	public void TaskArrived(ITask t, int duration){
+	public synchronized void TaskArrived(ITask t, int duration){
 		TimedTaskWrapper tt = new TimedTaskWrapper(t,duration);
-		readyTasks.add(tt);
+		
+		synchronized (readyTasks) {
+			readyTasks.add(tt);	
+		}
+		
+		if(ResourcesAvailable){
+				StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
+		}
 	}
+	
+	
 	
 	/***
 	 * Start deployment of task, by calling Algorithm NewTask
 	 * @param t
 	 */
-	public void StartTask(ITask t){
+	public synchronized void StartTask(ITask t){
 		Timer timer = new Timer();
+		
 		// Step1: get the timedTaskWrapper from readyTasks
+		int index = 0;
+		for (TimedTaskWrapper item:readyTasks){
+			
+			if(item.getTask().getTaskHandle().toString().compareTo(t.getTaskHandle().toString()) == 0){
+				index =  readyTasks.indexOf(item);
+				break;
+			}
+		}
+		TimedTaskWrapper tt =  readyTasks.get(index);
 		
-		// Step2: add timedtaskwrapper to currentDeployedTasks
+		synchronized (readyTasks) {
+			readyTasks.remove(tt);
+		}
+
+
+		// Step2: schedule the task to run until it expires 
+		timer.schedule(tt, tt.getEstimatedDuration());
 		
-		// Step3: schedule the task to run until it expires
-		//currentDeployedTasks.put(arg0, arg1)
+		
+		// Step3: add timedtaskwrapper to currentDeployedTasks
+		synchronized (currentDeployedTasks) {
+			currentDeployedTasks.put(timer, tt);
+		}
+		
 		
 		// have fun :)
 	}
 	
-	
+	public void SendTaskCommand(ITask t){
+		worker.newTask(t);
+	}
 }

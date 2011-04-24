@@ -19,6 +19,8 @@ public class BaseCommon {
 	public static final double PERCENT = 0.1;
 	public static final double SERVER_THRESHOLD = 0.2;
 	
+	
+	
 	private int nrOfTasksThreshold;
 	
 	public static Boolean logEnabled = false;
@@ -26,6 +28,7 @@ public class BaseCommon {
 	private static BaseCommon instance;
 	
 	public VMStartedEvent VMStarted;
+	public ResourceAllocationEvent ResourceAllocateEvent;
 	
 	public static BaseCommon Instance(){
 		if(instance == null){
@@ -40,6 +43,7 @@ public class BaseCommon {
 		//emptyServers = new ArrayList<IServer>();
 		nrOfTasksThreshold = 3;
 		VMStarted = new VMStartedEvent();
+		ResourceAllocateEvent = new ResourceAllocationEvent();
 	}
 
 	public int getNrOfTasksThreshold() {
@@ -49,15 +53,32 @@ public class BaseCommon {
 	public VMStartedEvent getVMStarted() {
 		return VMStarted;
 	}
+	
+	public ResourceAllocationEvent getResourceAllocateEvent() {
+		return ResourceAllocateEvent;
+	}
 
+	
 
 
 	/**
 	 * New style event :)
+	 * Event Listener for the VirtualMachine deploy event
 	 * @author Vlad
 	 *
 	 */
 	public class VMStartedEvent extends Observable{
+		public synchronized void setChanged(){
+			super.setChanged();
+		}
+	}
+	
+	/***
+	 * Event which gets fired when there are no more hardware resources available
+	 * @author Vlad
+	 *
+	 */
+	public class ResourceAllocationEvent extends Observable{
 		public synchronized void setChanged(){
 			super.setChanged();
 		}
@@ -75,6 +96,8 @@ public class BaseCommon {
 			super(arg0);
 		}
 	}
+	
+	
 	
 	/***
 	 * Event Listener for the VirtualMachine deploy event
