@@ -20,7 +20,7 @@ public class TimedTaskWrapper extends TimerTask {
 	 */
 	@Override
 	public void run() {
-			RootService.Instance().TaskIsDone(this);
+		RootService.Instance().TaskIsDone(this);
 	}
 
 	///////////////////////////////////////////////////////////////////////

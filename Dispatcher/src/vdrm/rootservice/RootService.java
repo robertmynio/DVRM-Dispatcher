@@ -3,10 +3,12 @@ package vdrm.rootservice;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.Timer;
 import java.util.TreeMap;
@@ -40,12 +42,12 @@ public class RootService {
 	
 	// maybe put a tree map <task.uuid,task> to speed up search :)
 	private List<TimedTaskWrapper> readyTasks;
-	private IAlgorithm worker;
+	public IAlgorithm worker;
 	private boolean ResourcesAvailable;
 	private static RootService instance;
 	
 	private RootService(){
-		currentDeployedTasks = Collections.synchronizedMap(new TreeMap<Timer, TimedTaskWrapper>());
+		currentDeployedTasks = Collections.synchronizedMap(new HashMap<Timer, TimedTaskWrapper>());
 		readyTasks = Collections.synchronizedList(new ArrayList<TimedTaskWrapper>());
 		worker = new Algorithm1();
 		
@@ -94,6 +96,18 @@ public class RootService {
 
 		// remove the timedTaskWrapper
 		synchronized (currentDeployedTasks) {
+			// stop the timer thread
+			Set set = currentDeployedTasks.entrySet();
+		    Iterator i = set.iterator();
+		    
+		    while(i.hasNext()){
+		        Map.Entry me = (Map.Entry)i.next();
+		        if(me.getValue().equals(t)){
+		        	Timer time = (Timer)me.getKey();
+		        	time.cancel();
+		        	break;
+		        }
+		    }
 			currentDeployedTasks.remove(t);
 		}
 
@@ -120,14 +134,15 @@ public class RootService {
 		}
 		
 		if(ResourcesAvailable){
-				StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
+				//StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
+			SendTaskCommand(t);
 		}
 	}
 	
 	
 	
 	/***
-	 * Start deployment of task, by calling Algorithm NewTask
+	 * Start timer of task
 	 * @param t
 	 */
 	public synchronized void StartTask(ITask t){
@@ -160,6 +175,7 @@ public class RootService {
 		
 		
 		// have fun :)
+		//SendTaskCommand(t);
 	}
 	
 	public void SendTaskCommand(ITask t){

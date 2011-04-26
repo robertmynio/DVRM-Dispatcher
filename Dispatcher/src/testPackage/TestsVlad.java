@@ -8,12 +8,15 @@ import vdrm.base.impl.Server;
 import vdrm.base.impl.Sorter;
 import vdrm.base.impl.Task;
 import vdrm.disp.alg.Algorithm1;
+import vdrm.rootservice.RootService;
 
 public class TestsVlad {
 	private Algorithm1 alg;
+	private RootService rs;
 	
 	public TestsVlad() {
 		alg = new Algorithm1();
+		rs = RootService.Instance();
 	}
 	
 	public void runAllTests() {
@@ -29,26 +32,32 @@ public class TestsVlad {
 		
 		// these 3 should go on server 1
 		task = new Task(4600,1000,400000);
-		alg.newTask(task);
-		task = new Task(600,1000,10000);
-		alg.newTask(task);
-		task = new Task(600,1000,10000);
-		alg.newTask(task);
+		//alg.newTask(task);
+		rs.TaskArrived(task, 3000);
 		
+		task = new Task(600,1000,10000);
+		//alg.newTask(task);
+		rs.TaskArrived(task, 4000);
+		
+		task = new Task(600,1000,10000);
+		//alg.newTask(task);
+		rs.TaskArrived(task, 2500);
 		// server 2
 		task = new Task(4800,2000,400000);
 //		task = new Task(4000,2000,300000);
-		alg.newTask(task);
-		task = new Task(1000,2000,200);
-		alg.newTask(task);
+		//alg.newTask(task);
+		rs.TaskArrived(task, 6000);
 		
-		// this should go on server 3 
-		task = new Task(1000,2600,200000);
-		alg.newTask(task);
+//		task = new Task(1000,2000,200);
+//		//alg.newTask(task);
+//		rs.TaskArrived(task, 3000);
+//		// this should go on server 3 
+//		task = new Task(1000,2600,200000);
+//		//alg.newTask(task);
 		
 		// this should go on server 4 and mark it full
-		task = new Task(11000,5000,1000000);
-		alg.newTask(task);
+		//task = new Task(11000,5000,1000000);
+		//alg.newTask(task);
 		
 		// this should go on server 2, as server 1 doesn't meet the required resources and 3 is full
 		//task = new Task(4000,3000,300000);
@@ -63,8 +72,9 @@ public class TestsVlad {
 //			// good
 //		}
 		//THIS IS AN EXAMPLE
-		result = exampleTest();
+		//result = exampleTest();
 //		System.out.println("Result for example test is : " + result);
+		System.out.println("DONE ");
 		}
 	}
 	
@@ -87,8 +97,10 @@ public class TestsVlad {
 //		servers.add(s);
 		
 		
-		alg.initialize(servers);
-		servers = alg.getEmptyServers();
+		//alg.initialize(servers);
+		RootService.Instance().worker.initialize(servers);
+		//servers = alg.getEmptyServers();
+		servers = ((Algorithm1)RootService.Instance().worker).getEmptyServers();
 		if(servers.size()==3)
 			return true;
 

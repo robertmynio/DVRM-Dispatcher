@@ -17,10 +17,11 @@ public class runTests {
 		//TestsRobi testsRobi = new TestsRobi();
 		//testsRobi.runAllTests();
 		
-//		TestsVlad testsVlad = new TestsVlad();
-//		testsVlad.runAllTests();	
-		runTests r = new runTests();
-		r.Go();
+		TestsVlad testsVlad = new TestsVlad();
+		testsVlad.runAllTests();
+		
+		//runTests r = new runTests();
+		//r.Go();
 		
 	}
 	

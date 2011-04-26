@@ -19,7 +19,7 @@ public class BaseCommon {
 	public static final double PERCENT = 0.1;
 	public static final double SERVER_THRESHOLD = 0.2;
 	
-	
+	public static final boolean ONEnabled = false;
 	
 	private int nrOfTasksThreshold;
 	
