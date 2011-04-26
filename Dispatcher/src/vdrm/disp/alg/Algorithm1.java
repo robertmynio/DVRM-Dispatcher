@@ -399,6 +399,12 @@ public class Algorithm1 implements IAlgorithm{
 		t.setServer(null);
 		logger.logInfo("FT: Task " + t.getTaskHandle() + " has finished.");
 		
+		// if server was full, add it to the "in use"
+		if(!server.isFull() && !inUseServers.contains(server) && fullServers.contains(server)){
+			fullServers.remove(server);
+			inUseServers.add(server);
+		}
+		
 		// now make some house cleaning and ordering
 		if(server.getLoad() <= 50){
 			if(server.getTotalNumberOfTasks() > 0){
@@ -415,6 +421,7 @@ public class Algorithm1 implements IAlgorithm{
 					}else{
 						logger.logInfo("FT: Server has many tasks, so try to fill it.(1)");
 						tryToFillServer(server);
+						reorderServerList(server, -1);
 					}
 				}else{
 					// do nothing, there is only this one server left.
@@ -423,18 +430,24 @@ public class Algorithm1 implements IAlgorithm{
 			}else{
 				// the server is now empty, sleep
 				logger.logInfo("FT: Server is now empty. Order it to sleep.(1)");
-				if(server.getTotalNumberOfTasks() == 0)
+				if(server.getTotalNumberOfTasks() == 0){
 					server.OrderStandBy();
+					inUseServers.remove(server);
+					emptyServers.add(server);
+				}
 			}
 		}else{
 			
 			if(server.getTotalNumberOfTasks() == 0){
 				logger.logInfo("FT: Server is now empty. Order it to sleep. (2)");
 				server.OrderStandBy();
+				inUseServers.remove(server);
+				emptyServers.add(server);
 			}
 			else{
 				logger.logInfo("FT: Server has great load, so try to fill it.(2)");
 				tryToFillServer(server);
+				reorderServerList(server, -1);
 			}
 		}
 		logger.logInfo("*** Finished endTasks.");
@@ -569,18 +582,29 @@ public class Algorithm1 implements IAlgorithm{
 		logger.logInfo("\n\n*** Starting findMaximumUtilizationPlacement.");
 		
 		while((!server.isEmpty() || emptyServers.size()==0 )&& noPlaceFound < server.getTotalNumberOfTasks()){
+			found = false;
 			ITask t = server.GetNextLowestDemandingTask();
 			for(IServer s:inUseServers){
-				if(s.compareAvailableResources(t)){
-					
-					// TODO migrate_to_new_host(s); -- OpenNebula
-					onService.MigrateTask(t, s);
-					
-					fullServers.add(s);
-					inUseServers.remove(s);
-					found = true;
-					logger.logInfo("FT: Found a place to redistribute the task and make a server full");
-					break;
+				if(s != server){
+					if(s.compareAvailableResources(t)){
+						
+						// TODO migrate_to_new_host(s); -- OpenNebula
+						onService.MigrateTask(t, s);
+						
+						// move the task to the new server
+						server.removeTask(t);
+						s.addTask(t);
+						t.setServer(s);
+						
+						// if server is full, add it to the full servers list
+						if(s.isFull()){
+							fullServers.add(s);
+							inUseServers.remove(s);
+						}
+						found = true;
+						logger.logInfo("FT: Found a place to redistribute the task and make a server full");
+						break;
+					}
 				}
 			}
 			if(!found){
@@ -598,6 +622,10 @@ public class Algorithm1 implements IAlgorithm{
 			return false;
 		}else{
 			logger.logInfo("*** Finished redistributing tasks (with true).");
+			if(server.isEmpty()){
+				inUseServers.remove(server);
+				emptyServers.add(server);
+			}
 			return true;
 		}
 	}
@@ -649,6 +677,7 @@ public class Algorithm1 implements IAlgorithm{
 				logger.logInfo(" Perfect task not found.");
 				findMaximumUtilizationPlacement(server, 
 						inUseServers.get(inUseServers.size()-2), lastServer);
+				
 //				
 //				if(fittingTasks.length > 0){
 //					for(ITask t:fittingTasks){

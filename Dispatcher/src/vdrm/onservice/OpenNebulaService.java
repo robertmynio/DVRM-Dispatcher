@@ -29,7 +29,12 @@ public class OpenNebulaService implements IOpenNebulaService {
 		if(BaseCommon.ONEnabled){
 			//TODO: make sure hdd path is integrated into ITask (maybe put linux/windows image paths")
 			// Step1: create the VM template
-			String vmTemplate = ONConfigurationService.GetConfiguration(t.getCpu(), t.getMem(), t.getHdd(), "hddPath");
+			int nrCores = t.getServer().getNumberOfCores();
+			int serverCPUFreq = t.getServer().getMaxCpu();
+			
+			int taskFreq = (t.getCpu()*100)/serverCPUFreq;
+//			String vmTemplate = ONConfigurationService.GetConfiguration(t.getCpu(), t.getMem(), t.getHdd(), "hddPath");
+			String vmTemplate = ONConfigurationService.GetConfiguration(taskFreq, t.getMem(), t.getHdd(), "hddPath");
 			OneResponse rc;
 			int vmID;
 			try{

@@ -31,30 +31,54 @@ public class TestsVlad {
 		Task task;
 		
 		// these 3 should go on server 1
-		task = new Task(4600,1000,400000);
+		//task = new Task(4600,1000,400000);
 		//alg.newTask(task);
-		rs.TaskArrived(task, 3000);
+		//rs.TaskArrived(task, 10000);
 		
-		task = new Task(600,1000,10000);
-		//alg.newTask(task);
-		rs.TaskArrived(task, 4000);
-		
-		task = new Task(600,1000,10000);
-		//alg.newTask(task);
-		rs.TaskArrived(task, 2500);
-		// server 2
-		task = new Task(4800,2000,400000);
-//		task = new Task(4000,2000,300000);
-		//alg.newTask(task);
-		rs.TaskArrived(task, 6000);
-		
-//		task = new Task(1000,2000,200);
+//		task = new Task(600,700,10000);
 //		//alg.newTask(task);
-//		rs.TaskArrived(task, 3000);
+//		rs.TaskArrived(task, 9000);
+//		
+//		task = new Task(600,800,10000);
+//		//alg.newTask(task);
+//		rs.TaskArrived(task, 8500);
+//		
+//		// server 2
+//		task = new Task(7800,4000,400000);
+////		task = new Task(4000,2000,300000);
+//		//alg.newTask(task);
+//		rs.TaskArrived(task, 9000);
+//		
+//		// server 3
+//		task = new Task(7000,3500,200);
+////		//alg.newTask(task);
+//		rs.TaskArrived(task, 8000);
 //		// this should go on server 3 
 //		task = new Task(1000,2600,200000);
 //		//alg.newTask(task);
 		
+		// SERVER 1
+		task = new Task(2000,1500,200000);
+		//alg.newTask(task);
+		rs.TaskArrived(task, 7000);
+		task = new Task(2000,1500,200000);
+		//alg.newTask(task);
+		rs.TaskArrived(task, 9000);
+		
+		task = new Task(600,600,10000);
+		//alg.newTask(task);
+		rs.TaskArrived(task, 9000);
+		task = new Task(600,600,10000);
+		//alg.newTask(task);
+		rs.TaskArrived(task, 9000);
+		task = new Task(600,600,10000);
+		//alg.newTask(task);
+		rs.TaskArrived(task, 9000);
+		
+		// SERVER 2
+		task = new Task(2000,1500,15000);
+		//alg.newTask(task);
+		rs.TaskArrived(task, 12000);
 		// this should go on server 4 and mark it full
 		//task = new Task(11000,5000,1000000);
 		//alg.newTask(task);
@@ -74,7 +98,7 @@ public class TestsVlad {
 		//THIS IS AN EXAMPLE
 		//result = exampleTest();
 //		System.out.println("Result for example test is : " + result);
-		System.out.println("DONE ");
+		//System.out.println("DONE ");
 		}
 	}
 	

@@ -22,7 +22,7 @@ public class Predictor implements IPredictor{
 		taskMap = new HashMap<UUID,ITask>();
 		counter = 0;
 		
-		databaseInit(); //COMENTEAZA LINIA ASTA daca nu vrei init din baza de date :D
+		//databaseInit(); //COMENTEAZA LINIA ASTA daca nu vrei init din baza de date :D
 	}
 
 	public synchronized ArrayList<ITask> predict(ITask task) {

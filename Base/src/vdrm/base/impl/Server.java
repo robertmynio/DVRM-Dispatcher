@@ -164,9 +164,9 @@ public class Server implements IServer {
 			usedRAM += task.getMem();
 			usedHDD += task.getHdd();
 			
-			if( (usedCPU >= cpuFreq) || 
-				(usedRAM >= memoryAmount)||
-				(usedHDD >= hddSize))
+			if( (usedCPU >= cpuFreq - cpuFreq * BaseCommon.PERCENT) || 
+				(usedRAM >= memoryAmount - memoryAmount * BaseCommon.PERCENT)||
+				(usedHDD >= hddSize - hddSize * BaseCommon.PERCENT))
 				isFull = true;
 			return true;
 		}catch(Exception ex){
@@ -233,6 +233,14 @@ public class Server implements IServer {
 					nrOfTasks--;
 					if(nrOfTasks==0)
 						isEmpty = true;
+					
+					if( (usedCPU >= cpuFreq - cpuFreq * BaseCommon.PERCENT) || 
+							(usedRAM >= memoryAmount - memoryAmount * BaseCommon.PERCENT)||
+							(usedHDD >= hddSize - hddSize * BaseCommon.PERCENT)){
+							isFull = true;
+					}else{
+						isFull = false;
+					}
 				}
 			}
 			return true;
@@ -372,11 +380,14 @@ public class Server implements IServer {
 	public boolean compareAvailableResources(ITask t) {
 		
 		if((this.getMaxCpu() - this.getUsedCpu()) >= t.getCpu() - t.getCpu() * BaseCommon.PERCENT 
-				&& (this.getMaxCpu() - this.getUsedCpu()) <= t.getCpu() + t.getCpu() * BaseCommon.PERCENT){
+				//&& (this.getMaxCpu() - this.getUsedCpu()) <= t.getCpu() + t.getCpu() * BaseCommon.PERCENT){
+				){
 			if( (this.getMaxMem() - this.getUsedMem()) >= t.getMem() - t.getMem() * BaseCommon.PERCENT
-					&& (this.getMaxMem() - this.getUsedMem()) <= t.getMem() + t.getMem() * BaseCommon.PERCENT){
+					//&& (this.getMaxMem() - this.getUsedMem()) <= t.getMem() + t.getMem() * BaseCommon.PERCENT){
+					){
 				if((this.getMaxHdd() - this.getUsedHdd()) >= t.getHdd() - t.getHdd() * BaseCommon.PERCENT
-						&& (this.getMaxHdd() - this.getUsedHdd()) <= t.getHdd() + t.getHdd() * BaseCommon.PERCENT){
+						//&& (this.getMaxHdd() - this.getUsedHdd()) <= t.getHdd() + t.getHdd() * BaseCommon.PERCENT){
+						){
 					return true;
 				}
 			}
