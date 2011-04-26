@@ -65,7 +65,7 @@ public class Node {
 		Node node= null;
 		int size = children.size();
 		for(int i=0;i<size;i++) {
-			if(children.get(i).getKey()==key)
+			if(children.get(i).getKey().equals(key))
 				node = children.get(i);
 		}
 		return node;

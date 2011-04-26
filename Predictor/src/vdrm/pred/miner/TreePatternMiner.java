@@ -8,7 +8,7 @@ public class TreePatternMiner implements IPatternMiner{
 
 	private Node root;
 	private ArrayList<UUID> window;
-	private static final byte WINDOW_SIZE = 3;
+	private static final byte WINDOW_SIZE = 5;
 	
 	private int startOccurence;
 	private ArrayList<Node> solution;

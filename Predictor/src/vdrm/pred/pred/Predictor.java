@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.UUID;
 import vdrm.base.common.IPredictor;
 import vdrm.base.data.ITask;
+import vdrm.pred.dao.ITaskDao;
+import vdrm.pred.dao.TaskDao;
 import vdrm.pred.miner.IPatternMiner;
 import vdrm.pred.miner.TreePatternMiner;
 
@@ -12,7 +14,7 @@ public class Predictor implements IPredictor{
 
 	IPatternMiner miner;
 	HashMap<UUID,ITask> taskMap;
-	private static final double MIN_CREDIBILITY = 0.7;
+	private static final double MIN_CREDIBILITY = 0.8;
 	private int counter; //add only a limited (MAX_INT) number of tasks to the tree
 	
 	public Predictor() {
@@ -20,13 +22,7 @@ public class Predictor implements IPredictor{
 		taskMap = new HashMap<UUID,ITask>();
 		counter = 0;
 		
-		//Database Init method call here ?
-		// TODO : DATABASE INIT ?
-	}
-	
-	public Predictor(ArrayList<ITask> tasks) {
-		this();
-		Initialize(tasks);
+		databaseInit(); //COMENTEAZA LINIA ASTA daca nu vrei init din baza de date :D
 	}
 
 	public synchronized ArrayList<ITask> predict(ITask task) {
@@ -52,9 +48,6 @@ public class Predictor implements IPredictor{
 
 	@Override
 	public synchronized void addTaskToDatabase(ITask task) {
-		//add task to relational database
-		
-		// TODO  DO IT!
 		
 		//add task to tree and dynamically update the tree
 		counter++;
@@ -65,13 +58,11 @@ public class Predictor implements IPredictor{
 		}
 	}
 	
-	private void Initialize(ArrayList<ITask> tasks) {
-		UUID taskId;
-		for(ITask tsk : tasks) {
-			taskId = tsk.getTaskHandle();
-			taskMap.put(taskId, tsk);
-			miner.addElement(taskId);
+	private void databaseInit() {
+		ITaskDao dao = new TaskDao();
+		ArrayList<ITask> history = dao.getTaskHistory();
+		for(ITask tsk : history) {
+			addTaskToDatabase(tsk);
 		}
 	}
-
 }
