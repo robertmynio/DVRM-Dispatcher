@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.UUID;
 import vdrm.base.common.IPredictor;
 import vdrm.base.data.ITask;
+import vdrm.base.impl.Task;
 import vdrm.pred.dao.ITaskDao;
 import vdrm.pred.dao.TaskDao;
 import vdrm.pred.miner.IPatternMiner;
@@ -36,13 +37,15 @@ public class Predictor implements IPredictor{
 		
 		int patternSize = pattern.size();
 		ArrayList<ITask> tasks = new ArrayList<ITask>();
-		ITask temp;
+		ITask temp,aux;
 		//we do not include the first task in the prediction, because the first 
 		//task is the real task (it is not predicted)
 		for(int i=1;i<patternSize;i++) {
 			temp = taskMap.get(pattern.get(i));
-			temp.setPredicted(true);
-			tasks.add(temp);
+			aux = new Task(temp.getCpu(),temp.getMem(),temp.getHdd());
+			aux.setTaskHandle(temp.getTaskHandle());
+			aux.setPredicted(true);
+			tasks.add(aux);
 		}
 		return tasks;
 	}
