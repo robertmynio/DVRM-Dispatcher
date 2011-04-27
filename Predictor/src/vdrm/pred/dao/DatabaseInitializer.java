@@ -10,7 +10,7 @@ public class DatabaseInitializer {
 	private static ITaskDao dao = new TaskDao();
 	
 	public static void main(String[] args) {
-		//initTasks();
+		initTasks();
 		initHistory();
 	}
 	

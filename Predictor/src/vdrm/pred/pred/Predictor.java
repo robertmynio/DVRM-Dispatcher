@@ -41,6 +41,7 @@ public class Predictor implements IPredictor{
 		//task is the real task (it is not predicted)
 		for(int i=1;i<patternSize;i++) {
 			temp = taskMap.get(pattern.get(i));
+			temp.setPredicted(true);
 			tasks.add(temp);
 		}
 		return tasks;
