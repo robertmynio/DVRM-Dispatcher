@@ -24,6 +24,8 @@ public class BaseCommon {
 	private int nrOfTasksThreshold;
 	
 	public static Boolean logEnabled = false;
+
+    public boolean ResourcesAvailable;
 	
 	private static BaseCommon instance;
 	
@@ -44,6 +46,7 @@ public class BaseCommon {
 		nrOfTasksThreshold = 3;
 		VMStarted = new VMStartedEvent();
 		ResourceAllocateEvent = new ResourceAllocationEvent();
+		ResourcesAvailable = true;
 	}
 
 	public int getNrOfTasksThreshold() {

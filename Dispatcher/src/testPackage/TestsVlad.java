@@ -8,6 +8,7 @@ import vdrm.base.impl.Server;
 import vdrm.base.impl.Sorter;
 import vdrm.base.impl.Task;
 import vdrm.disp.alg.Algorithm1;
+import vdrm.pred.dao.TaskDao;
 import vdrm.rootservice.RootService;
 
 public class TestsVlad {
@@ -23,83 +24,49 @@ public class TestsVlad {
 		boolean result;
 		
 		//inits the datastructures of the algorithm with five servers
-		result = hardcodedInitTest();
+		//result = hardcodedInitTest();
 		//System.out.println("Result for hardcoded init test is : " + result);
 		
-		if(result){
+		
 		// task initialization
 		Task task;
 		
-		// these 3 should go on server 1
-		//task = new Task(4600,1000,400000);
-		//alg.newTask(task);
-		//rs.TaskArrived(task, 10000);
+		Server s;
+		ArrayList<IServer> servers = new ArrayList<IServer>();
 		
-//		task = new Task(600,700,10000);
-//		//alg.newTask(task);
-//		rs.TaskArrived(task, 9000);
-//		
-//		task = new Task(600,800,10000);
-//		//alg.newTask(task);
-//		rs.TaskArrived(task, 8500);
-//		
-//		// server 2
-//		task = new Task(7800,4000,400000);
-////		task = new Task(4000,2000,300000);
-//		//alg.newTask(task);
-//		rs.TaskArrived(task, 9000);
-//		
-//		// server 3
-//		task = new Task(7000,3500,200);
-////		//alg.newTask(task);
-//		rs.TaskArrived(task, 8000);
-//		// this should go on server 3 
-//		task = new Task(1000,2600,200000);
-//		//alg.newTask(task);
-		
-		// SERVER 1
-		task = new Task(2000,1500,200000);
-		//alg.newTask(task);
-		rs.TaskArrived(task, 7000);
-		task = new Task(2000,1500,200000);
-		//alg.newTask(task);
-		rs.TaskArrived(task, 9000);
-		
-		task = new Task(600,600,10000);
-		//alg.newTask(task);
-		rs.TaskArrived(task, 9000);
-		task = new Task(600,600,10000);
-		//alg.newTask(task);
-		rs.TaskArrived(task, 9000);
-		task = new Task(600,600,10000);
-		//alg.newTask(task);
-		rs.TaskArrived(task, 9000);
-		
-		// SERVER 2
-		task = new Task(2000,1500,15000);
-		//alg.newTask(task);
-		rs.TaskArrived(task, 12000);
-		// this should go on server 4 and mark it full
-		//task = new Task(11000,5000,1000000);
-		//alg.newTask(task);
-		
-		// this should go on server 2, as server 1 doesn't meet the required resources and 3 is full
-		//task = new Task(4000,3000,300000);
-		//alg.newTask(task);
+		//simple initialization -> HARDCODED!!!
+		s = new Server(12000,2000,1000000);
+		s.setServerID("1");
+		s.setCoreFreq(3000);
+		servers.add(s);
+		s = new Server(24000,6000,1000000);
+		s.setServerID("2");
+		s.setCoreFreq(3000);
+		servers.add(s);
+		s = new Server(24000,6000,1000000);
+		s.setServerID("3");
+		s.setCoreFreq(3000);
+		servers.add(s);
 
+		//alg.initialize(servers);
 		
-//		ArrayList<IServer> servers = alg.getInUseServers();
-//		System.out.println("Number of in use servers is : " + servers.size());
-//		ArrayList<IServer> servers2 = alg.getFullServers();
-//		System.out.println("Number of full servers is : " + servers2.size());
-//		if(servers.size()>0 || servers2.size()>0){
-//			// good
-//		}
-		//THIS IS AN EXAMPLE
-		//result = exampleTest();
-//		System.out.println("Result for example test is : " + result);
-		//System.out.println("DONE ");
-		}
+		
+		TaskDao dao = new TaskDao();
+		ArrayList<ITask> tasks = dao.getAllTasks();
+		ArrayList<ITask> taskHistory = dao.getTaskHistory();
+		RootService.Instance().worker.initialize(servers, tasks, taskHistory);
+		rs.TaskArrived(tasks.get(5),1800);
+		rs.TaskArrived(tasks.get(4),1800);
+		rs.TaskArrived(tasks.get(2),2800);
+		rs.TaskArrived(tasks.get(3),1800);
+		rs.TaskArrived(tasks.get(2),2800);
+		rs.TaskArrived(tasks.get(3),1800);
+		rs.TaskArrived(tasks.get(2),2800);
+		rs.TaskArrived(tasks.get(1),1800);
+		//rs.TaskArrived(tasks.get(1),1800);
+
+//		System.out.println("DONE ");
+		
 	}
 	
 	private boolean hardcodedInitTest() {
@@ -107,11 +74,17 @@ public class TestsVlad {
 		ArrayList<IServer> servers = new ArrayList<IServer>();
 		
 		//simple initialization -> HARDCODED!!!
-		s = new Server(11000,6000,1000000);
+		s = new Server(12000,2000,1000000);
+		s.setServerID("1");
+		s.setCoreFreq(3000);
 		servers.add(s);
-		s = new Server(11000,6000,1000000);
+		s = new Server(24000,6000,1000000);
+		s.setServerID("2");
+		s.setCoreFreq(3000);
 		servers.add(s);
-		s = new Server(11000,6000,1000000);
+		s = new Server(24000,6000,1000000);
+		s.setServerID("3");
+		s.setCoreFreq(3000);
 		servers.add(s);
 		
 

@@ -18,6 +18,7 @@ public class Server implements IServer {
 	private int memoryAmount;
 	private int hddSize;
 	private int cores;
+	public int coreFreq;
 	
 	private int usedCPU;
 	private int usedRAM;
@@ -447,6 +448,14 @@ public class Server implements IServer {
 	@Override
 	public int getNumberOfCores() {
 		return cores;
+	}
+	
+	public void setCoreFreq(int am){
+		coreFreq = am;
+	}
+
+	public int getCoreFreq() {
+		return coreFreq;
 	}
 	
 	

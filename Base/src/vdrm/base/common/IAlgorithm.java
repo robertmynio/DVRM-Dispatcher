@@ -15,4 +15,6 @@ public interface IAlgorithm {
 	public void tryToFillServer(IServer server);
 	public ITask[] findMaximumUtilizationPlacement(IServer server,
 			IServer secondToLastServer, IServer lastServer);
+	public void initialize(ArrayList<IServer> servers, ArrayList<ITask> tasks,
+			ArrayList<ITask> taskHistory);
 }

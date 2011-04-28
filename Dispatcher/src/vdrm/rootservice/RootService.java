@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.Timer;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import vdrm.base.common.IAlgorithm;
 import vdrm.base.data.ITask;
@@ -43,27 +44,24 @@ public class RootService {
 	// maybe put a tree map <task.uuid,task> to speed up search :)
 	private List<TimedTaskWrapper> readyTasks;
 	public IAlgorithm worker;
-	private boolean ResourcesAvailable;
+//	private boolean ResourcesAvailable;
 	private static RootService instance;
 	
 	private RootService(){
 		currentDeployedTasks = Collections.synchronizedMap(new HashMap<Timer, TimedTaskWrapper>());
-		readyTasks = Collections.synchronizedList(new ArrayList<TimedTaskWrapper>());
+		readyTasks = new Vector<TimedTaskWrapper>();
 		worker = new Algorithm1();
 		
-		ResourcesAvailable = true;
+		BaseCommon.Instance().ResourcesAvailable = true;
 		
 		// register the in line event handlers
 		BaseCommon.Instance().getVMStarted().addObserver(
 				new Observer(){
-
-					@Override
 					public void update(Observable o, Object arg) {
 						if(arg != null){
 							StartTask((ITask)arg);
 						}
 					}
-					
 				}
 				);
 		
@@ -71,9 +69,9 @@ public class RootService {
 		BaseCommon.Instance().getResourceAllocateEvent().addObserver(
 				new Observer(){
 
-					@Override
+
 					public void update(Observable arg0, Object arg1) {
-						ResourcesAvailable = false;
+						BaseCommon.Instance().ResourcesAvailable = false;
 					}
 					
 				}
@@ -94,6 +92,9 @@ public class RootService {
 	public synchronized void TaskIsDone(TimedTaskWrapper t){
 		worker.endTask(t.getTask());
 
+        if(!BaseCommon.Instance().ResourcesAvailable){
+            BaseCommon.Instance().ResourcesAvailable = true;
+        }
 		// remove the timedTaskWrapper
 		synchronized (currentDeployedTasks) {
 			// stop the timer thread
@@ -111,13 +112,13 @@ public class RootService {
 			currentDeployedTasks.remove(t);
 		}
 
-		if(!ResourcesAvailable){
+		if(!BaseCommon.Instance().ResourcesAvailable){
 			// TODO: Step1:iterate through the list of readyTasks and send them all to the worker
-			while(!readyTasks.isEmpty() && ResourcesAvailable == false){
+			while(!readyTasks.isEmpty() && BaseCommon.Instance().ResourcesAvailable == false){
 				StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
 			}
 			// Step2: make it true!
-			ResourcesAvailable = true;
+			BaseCommon.Instance().ResourcesAvailable = true;
 			
 		}
 	}
@@ -133,7 +134,7 @@ public class RootService {
 			readyTasks.add(tt);	
 		}
 		
-		if(ResourcesAvailable){
+		if(BaseCommon.Instance().ResourcesAvailable){
 				//StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
 			SendTaskCommand(t);
 		}
@@ -147,33 +148,43 @@ public class RootService {
 	 */
 	public synchronized void StartTask(ITask t){
 		Timer timer = new Timer();
-		
+		boolean found = false;
 		// Step1: get the timedTaskWrapper from readyTasks
 		int index = 0;
 		for (TimedTaskWrapper item:readyTasks){
 			
-			if(item.getTask().getTaskHandle().toString().compareTo(t.getTaskHandle().toString()) == 0){
+//			if(item.getTask().getTaskHandle().toString().compareTo(t.getTaskHandle().toString()) == 0){
+//				index =  readyTasks.indexOf(item);
+//                found = true;
+//				break;
+//			}
+			if( item.getTask().equals(t) ){
 				index =  readyTasks.indexOf(item);
+                found = true;
 				break;
 			}
 		}
-		TimedTaskWrapper tt =  readyTasks.get(index);
 		
-		synchronized (readyTasks) {
-			readyTasks.remove(tt);
-		}
+		TimedTaskWrapper tt = null;
+        if(found){
+            if(readyTasks.size()>0){
+                synchronized (readyTasks) {
+                    tt =  readyTasks.get(index);
+                    readyTasks.remove(tt);
+                 }
+                // Step2: schedule the task to run until it expires
+                timer.schedule(tt, tt.getEstimatedDuration());
 
 
-		// Step2: schedule the task to run until it expires 
-		timer.schedule(tt, tt.getEstimatedDuration());
-		
-		
-		// Step3: add timedtaskwrapper to currentDeployedTasks
-		synchronized (currentDeployedTasks) {
-			currentDeployedTasks.put(timer, tt);
-		}
-		
-		
+                // Step3: add timedtaskwrapper to currentDeployedTasks
+                synchronized (currentDeployedTasks) {
+                    currentDeployedTasks.put(timer, tt);
+                }
+            }else{
+                return;
+            }
+        }
+
 		// have fun :)
 		//SendTaskCommand(t);
 	}

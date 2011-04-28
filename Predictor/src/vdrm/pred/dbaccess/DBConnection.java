@@ -19,7 +19,7 @@ public class DBConnection {
 		
 		try {
 		    conn = 
-		       DriverManager.getConnection("jdbc:mysql://localhost:3306/dvrm","user","pass");
+		       DriverManager.getConnection("jdbc:mysql://localhost:3306/vdrm","root","");
 
 		    // Do something with the Connection
 

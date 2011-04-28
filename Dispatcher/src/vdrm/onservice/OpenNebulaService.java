@@ -5,6 +5,7 @@ import org.opennebula.client.*;
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
 import vdrm.base.impl.BaseCommon;
+import vdrm.base.impl.Server;
 import vdrm.base.impl.Task;
 import vdrm.base.impl.BaseCommon.VMStartedEvent;
 import vdrm.disp.util.VDRMLogger;
@@ -30,7 +31,7 @@ public class OpenNebulaService implements IOpenNebulaService {
 			//TODO: make sure hdd path is integrated into ITask (maybe put linux/windows image paths")
 			// Step1: create the VM template
 			int nrCores = t.getServer().getNumberOfCores();
-			int serverCPUFreq = t.getServer().getMaxCpu();
+			int serverCPUFreq = ((Server)t.getServer()).getCoreFreq();
 			
 			int taskFreq = (t.getCpu()*100)/serverCPUFreq;
 //			String vmTemplate = ONConfigurationService.GetConfiguration(t.getCpu(), t.getMem(), t.getHdd(), "hddPath");

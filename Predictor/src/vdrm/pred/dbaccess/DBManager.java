@@ -8,7 +8,7 @@ public class DBManager {
 	private static DBManager dbM;
 	private DBManager(){
 		databaseConnection = DBConnection.getInstance();
-		openDataBase("dvrm");
+		openDataBase("vdrm");
 	}
 	
 	public static DBManager getInstance(){
