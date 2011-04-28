@@ -1,29 +1,28 @@
 package vdrm.pred.miner;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class Node {
 	private Node parent;
 	ArrayList<Node> children;
-	private UUID key;
+	private int key;
 	private int occurence;
 	
 	//Constructors
 	public Node() { //constructor for root 
 		parent = null;
 		children = new ArrayList<Node>();
-		this.key = UUID.randomUUID();
+		this.key = 0;
 		this.occurence = 0;
 	}
-	public Node(UUID key) {
+	public Node(int key) {
 		parent = null;
 		children = new ArrayList<Node>();
 		this.key = key;
 		occurence = 1;
 	}
 	
-	public Node(UUID key, Node parent) {
+	public Node(int key, Node parent) {
 		this(key);
 		this.parent = parent;
 	}
@@ -35,10 +34,10 @@ public class Node {
 	public void setParent(Node parent) {
 		this.parent = parent;
 	}
-	public UUID getKey() {
+	public int getKey() {
 		return key;
 	}
-	public void setKey(UUID key) {
+	public void setKey(int key) {
 		this.key = key;
 	}
 	public int getOccurence() {
@@ -58,20 +57,20 @@ public class Node {
 		child.setParent(this);
 		child.setOccurence(1);
 	}
-	public void addChild(UUID key) {
+	public void addChild(int key) {
 		children.add(new Node(key,this));
 	}
-	public Node getChild(UUID key) {
+	public Node getChild(int key) {
 		Node node= null;
 		int size = children.size();
 		for(int i=0;i<size;i++) {
-			if(children.get(i).getKey().equals(key))
+			if(children.get(i).getKey() == key)
 				node = children.get(i);
 		}
 		return node;
 	}
 	//use this method to add child to a parent; if child exists, occurence is incremented, otherwise it is added with occurence=1
-	public void insertKey(UUID key) {
+	public void insertKey(int key) {
 		Node node = this.getChild(key);
 		if(node!=null)
 			node.incrementOccurence();

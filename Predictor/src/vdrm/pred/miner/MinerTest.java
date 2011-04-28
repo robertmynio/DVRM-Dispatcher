@@ -16,6 +16,10 @@ public class MinerTest {
 		Predictor pred = new Predictor();
 		TaskDao dao = new TaskDao();
 		ArrayList<ITask> tasks = dao.getAllTasks();
+		pred.initialize(tasks);
+		
+		ArrayList<ITask> history = dao.getTaskHistory();
+		pred.setHistory(history);
 		
 		ArrayList<ITask> prediction = null;
 		
