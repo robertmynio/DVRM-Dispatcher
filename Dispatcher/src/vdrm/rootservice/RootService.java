@@ -111,16 +111,18 @@ public class RootService {
 		    }
 			currentDeployedTasks.remove(t);
 		}
+		
+		
 
-		if(!BaseCommon.Instance().ResourcesAvailable){
-			// TODO: Step1:iterate through the list of readyTasks and send them all to the worker
-			while(!readyTasks.isEmpty() && BaseCommon.Instance().ResourcesAvailable == false){
-				StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
-			}
-			// Step2: make it true!
-			BaseCommon.Instance().ResourcesAvailable = true;
-			
-		}
+//		if(!BaseCommon.Instance().ResourcesAvailable){
+//			// TODO: Step1:iterate through the list of readyTasks and send them all to the worker
+//			while(!readyTasks.isEmpty() && BaseCommon.Instance().ResourcesAvailable == false){
+//				StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
+//			}
+//			// Step2: make it true!
+//			BaseCommon.Instance().ResourcesAvailable = true;
+//			
+//		}
 	}
 	/***
 	 * New Task just arrived (probably from WS). Store it in the DB (maybe)

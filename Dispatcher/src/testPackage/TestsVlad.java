@@ -1,6 +1,7 @@
 package testPackage;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
@@ -55,14 +56,30 @@ public class TestsVlad {
 		ArrayList<ITask> tasks = dao.getAllTasks();
 		ArrayList<ITask> taskHistory = dao.getTaskHistory();
 		RootService.Instance().worker.initialize(servers, tasks, taskHistory);
-		rs.TaskArrived(tasks.get(5),1800);
-		rs.TaskArrived(tasks.get(4),1800);
-		rs.TaskArrived(tasks.get(2),2800);
-		rs.TaskArrived(tasks.get(3),1800);
-		rs.TaskArrived(tasks.get(2),2800);
-		rs.TaskArrived(tasks.get(3),1800);
-		rs.TaskArrived(tasks.get(2),2800);
-		rs.TaskArrived(tasks.get(1),1800);
+		task = (Task) tasks.get(5);
+		task.setTaskHandle(UUID.randomUUID());
+		rs.TaskArrived(task,1800);
+		task = (Task) tasks.get(4);
+		task.setTaskHandle(UUID.randomUUID());
+		rs.TaskArrived(task,1800);
+		task = (Task) tasks.get(2);
+		task.setTaskHandle(UUID.randomUUID());
+		rs.TaskArrived(task,2800);
+		task = (Task) tasks.get(3);
+		task.setTaskHandle(UUID.randomUUID());
+		rs.TaskArrived(task,1800);
+		task = (Task) tasks.get(2);
+		task.setTaskHandle(UUID.randomUUID());
+		rs.TaskArrived(task,2800);
+		task = (Task) tasks.get(3);
+		task.setTaskHandle(UUID.randomUUID());
+		rs.TaskArrived(task,1800);
+		task = (Task) tasks.get(2);
+		task.setTaskHandle(UUID.randomUUID());
+		rs.TaskArrived(task,2800);
+		task = (Task) tasks.get(1);
+		task.setTaskHandle(UUID.randomUUID());
+		rs.TaskArrived(task,1800);
 		//rs.TaskArrived(tasks.get(1),1800);
 
 //		System.out.println("DONE ");

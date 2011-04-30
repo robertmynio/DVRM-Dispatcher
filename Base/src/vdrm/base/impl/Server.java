@@ -97,7 +97,7 @@ public class Server implements IServer {
 	public ITask GetNextLowestDemandingTask() {
 		for(ITask t : taskList){
 			if(t.getRequirementsScore() < lowestDemandingTask.getRequirementsScore() &&
-					t.isUnsuccessfulPlacement() == false){
+					t.isUnsuccessfulPlacement() == false && t.isPredicted() == false ){
 				lowestDemandingTask = t;
 			}
 		}
@@ -197,7 +197,7 @@ public class Server implements IServer {
 
 	@Override
 	public int getTotalNumberOfTasks() {
-		return nrOfTasks;
+		return nrOfTasks - nrOfPredictedTasks;
 	}
 
 	@Override
