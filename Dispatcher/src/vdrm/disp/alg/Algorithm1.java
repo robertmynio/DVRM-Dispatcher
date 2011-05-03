@@ -2,6 +2,7 @@ package vdrm.disp.alg;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TreeSet;
 
 import vdrm.base.common.IAlgorithm;
 import vdrm.base.common.IPredictor;
@@ -138,11 +139,40 @@ public class Algorithm1 implements IAlgorithm{
 				//since we used an optimistic approach, we have to remove the tasks from the servers
 				IServer tempServer;
 				ITask tempTask;
-				for(i=0;i<predictedTasks.size();i++) {
+				int size = predictedTasks.size();
+				
+				//we add all servers that have predicted tasks to a set (set => no duplicates)
+				TreeSet<IServer> modifiedServers = new TreeSet<IServer>();
+				for(i=0;i<size;i++) {
 					tempTask = predictedTasks.get(i);
 					tempServer = tempTask.getServer();
 					tempServer.removeTask(tempTask);
+					modifiedServers.add(tempServer);
 				}
+				
+				//we iterate over the set and move the servers into the correct list
+				for(IServer tempServ : modifiedServers) {
+					//if it was in full, it moves either to empty or to inUse (depends on isEmpty)
+					if(fullServers.contains(tempServ)) {
+						if(!tempServ.isFull()) {
+							fullServers.remove(tempServ);
+							if(tempServ.isEmpty()) 
+								emptyServers.add(tempServ);
+							else
+								inUseServers.add(tempServ);
+						}
+					}
+					//if it was in inUse, it either remains there or it moves to empty (depends on isEmpty)
+					else if(inUseServers.contains(tempServ)) {
+						if(tempServ.isEmpty()) {
+							inUseServers.remove(tempServ);
+							emptyServers.add(tempServ);
+						}
+					}
+				}
+				
+				//now we reorder the inUseServer list
+				inUseServers = sortingService.insertSortServersDescending(inUseServers);
 				
 				//clear list of predicted tasks
 				predictedTasks = new ArrayList<ITask>();
@@ -153,8 +183,7 @@ public class Algorithm1 implements IAlgorithm{
 				logger.logInfo("Prediction was not correct.");
 			}
 		}
-		else
-		{
+		else {
 			unassignedTasks.add(newTask);
 			logger.logInfo("Task " + newTask.getTaskHandle() + " (normal) added to unassigned tasks list.");
 		}
@@ -187,7 +216,7 @@ public class Algorithm1 implements IAlgorithm{
 			else {
 				
 				// OpenNebula
-				if(tempTask.getServerId() != null){
+				if(tempTask.getServerId() != null) {
 					onService.DeployTask(tempTask);
 					logger.logInfo("Task " + newTask.getTaskHandle() + " (normal) deployed on server.");
 				}
