@@ -68,8 +68,6 @@ public class Algorithm1 implements IAlgorithm{
 		//initialize OpenNebula
 		onService = new OpenNebulaService();
 		
-		waitingTasksInQueue = false;
-		
 		logger.logInfo("System initialized successfully, waiting for tasks.\n\n");
 	}
 	
@@ -104,8 +102,6 @@ public class Algorithm1 implements IAlgorithm{
 		//initialize OpenNebula
 		onService = new OpenNebulaService();
 		
-		waitingTasksInQueue = false;
-		
 		logger.logInfo("System initialized successfully, waiting for tasks.\n\n");
 		
 	}
@@ -130,6 +126,8 @@ public class Algorithm1 implements IAlgorithm{
 					}
 					
 					predictedTasks.remove(0);
+					
+					predictor.addEntry(newTask);
 					
 					//since the prediction was correct, we exit algorithm and wait for next task
 					return;					
@@ -164,6 +162,8 @@ public class Algorithm1 implements IAlgorithm{
 		//run prediction and add predicted tasks to unassignedTasks list
 		ArrayList<ITask> prediction;
 		prediction = predictor.predict(newTask);
+		predictor.addEntry(newTask);
+		
 		if(prediction!=null) {
 			logger.logInfo("Prediction made on future task following task " + newTask.getTaskHandle() + ".");
 			int predSize = prediction.size();
@@ -175,10 +175,7 @@ public class Algorithm1 implements IAlgorithm{
 		//this algorithm assigns to every task a server reference and to every server a task 
 		//reference (the task is actually added to the list of a server, but the task is not 
 		//actually deployed to a physical server)
-		
-		
-		
-		
+			
 		consolidateTasks();
 		logger.logInfo("Consolidation algorithm ran.");
 		
@@ -198,8 +195,7 @@ public class Algorithm1 implements IAlgorithm{
 		}
 		
 		//clear unassigned tasks list if there are no previously unassigned tasks
-		if(!waitingTasksInQueue)
-			unassignedTasks = new ArrayList<ITask>();
+		unassignedTasks = new ArrayList<ITask>();
 		
 		logger.logInfo("*** Finished one iteration for newTask.");
 	}
