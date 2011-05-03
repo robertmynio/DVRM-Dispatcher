@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<WorkloadSchedule>
+    <ApplicationList>
+        <startDelay>20</startDelay>
+        <application>
+            <name>/Task_0Application</name>
+            <ActivityDescription>
+                <duration>453</duration>
+                <name>/Task_0Activity</name>
+                <ActivityServiceDescription>
+                    <serviceName>CpuIntensive</serviceName>
+                    <cpuWeight>0.8</cpuWeight>
+                    <memWeight>0.2</memWeight>
+                    <storageWeight>0.8</storageWeight>
+                    <requestedCoresCount>8</requestedCoresCount>
+                    <requestedCPUMax>2000</requestedCPUMax>
+                    <requestedCPUMin>1500</requestedCPUMin>
+                    <requestedMemoryMax>600</requestedMemoryMax>
+                    <requestedMemoryMin>100</requestedMemoryMin>
+                    <requestedStorageMax>0</requestedStorageMax>
+                    <requestedStorageMin>0</requestedStorageMin>
+                    <StorageDevice>
+                        <type>disk</type>
+                        <size>1024</size>
+                        <format>ext3</format>
+                        <target>ext3</target>
+                        <source>/home/oneadmin/Desktop/cuContextualizare/disk.0</source>
+                    </StorageDevice>
+                    <ip>192.168.1.100</ip>
+                    <vncPort>0</vncPort>
+                </ActivityServiceDescription>
+            </ActivityDescription>
+        </application>
+    </ApplicationList>
+</WorkloadSchedule>

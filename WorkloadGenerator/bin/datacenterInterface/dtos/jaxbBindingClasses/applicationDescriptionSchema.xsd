@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="ActivityDescription" type="ActivityDescription"/>
+
+    <xs:element name="ActivityService" type="ActivityService"/>
+
+    <xs:element name="ApplicationDescription" type="ApplicationDescription"/>
+
+    <xs:element name="VirtualDiskDescription" type="VirtualDiskDescription"/>
+
+    <xs:complexType name="ApplicationDescription">
+        <xs:complexContent>
+            <xs:extension base="basicJAXBEntity">
+                <xs:sequence>
+                    <xs:element name="name" type="xs:string"/>
+                    <xs:element ref="ActivityDescription" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="basicJAXBEntity">
+        <xs:sequence/>
+    </xs:complexType>
+
+    <xs:complexType name="ActivityDescription">
+        <xs:complexContent>
+            <xs:extension base="basicJAXBEntity">
+                <xs:sequence>
+                    <xs:element name="duration" type="xs:int"/>
+                    <xs:element name="name" type="xs:string"/>
+                    <xs:element name="ActivityServiceDescription" type="ActivityService" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ActivityService">
+        <xs:complexContent>
+            <xs:extension base="basicJAXBEntity">
+                <xs:sequence>
+                    <xs:element name="serviceName" type="xs:string"/>
+                    <xs:element name="cpuWeight" type="xs:float"/>
+                    <xs:element name="memWeight" type="xs:float"/>
+                    <xs:element name="storageWeight" type="xs:float"/>
+                    <xs:element name="requestedCoresCount" type="xs:int"/>
+                    <xs:element name="requestedCPUMax" type="xs:int"/>
+                    <xs:element name="requestedCPUMin" type="xs:int"/>
+                    <xs:element name="requestedMemoryMax" type="xs:int"/>
+                    <xs:element name="requestedMemoryMin" type="xs:int"/>
+                    <xs:element name="requestedStorageMax" type="xs:int"/>
+                    <xs:element name="requestedStorageMin" type="xs:int"/>
+                    <xs:element name="rootDisk" type="xs:string" minOccurs="0"/>
+                    <xs:element name="StorageDevice" type="VirtualDiskDescription" maxOccurs="unbounded"/>
+                    <xs:element name="ip" type="xs:string"/>
+                    <xs:element name="vncPort" type="xs:int"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="VirtualDiskDescription">
+        <xs:complexContent>
+            <xs:extension base="basicJAXBEntity">
+                <xs:sequence>
+                    <xs:element name="type" type="xs:string"/>
+                    <xs:element name="size" type="xs:int"/>
+                    <xs:element name="format" type="xs:string" minOccurs="0"/>
+                    <xs:element name="target" type="xs:string"/>
+                    <xs:element name="source" type="xs:string"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>
+

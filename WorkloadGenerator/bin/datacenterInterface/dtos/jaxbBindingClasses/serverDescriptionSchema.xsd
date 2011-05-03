@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="serverDescription" type="serverDescription"/>
+
+    <xs:element name="serverDiskDescription" type="serverDiskDescription"/>
+
+    <xs:complexType name="serverDescription">
+        <xs:complexContent>
+            <xs:extension base="basicJAXBEntity">
+                <xs:sequence>
+                    <xs:element name="coreCount" type="xs:int"/>
+                    <xs:element name="maximumCpu" type="xs:int"/>
+                    <xs:element name="optimumCpu" type="xs:int"/>
+                    <xs:element name="maximumMem" type="xs:int"/>
+                    <xs:element name="optimumMem" type="xs:int"/>
+                    <xs:element name="ip" type="xs:string"/>
+                    <xs:element name="hostname" type="xs:string" minOccurs="0"/>
+                    <xs:element name="mac" type="xs:string" minOccurs="0"/>
+                    <xs:element name="im" type="xs:string"/>
+                    <xs:element name="vmm" type="xs:string"/>
+                    <xs:element name="tm" type="xs:string"/>
+                    <xs:element ref="serverDiskDescription" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="basicJAXBEntity">
+        <xs:sequence/>
+    </xs:complexType>
+
+    <xs:complexType name="serverDiskDescription">
+        <xs:complexContent>
+            <xs:extension base="basicJAXBEntity">
+                <xs:sequence>
+                    <xs:element name="type" type="xs:string" minOccurs="0"/>
+                    <xs:element name="maximumStorage" type="xs:int"/>
+                    <xs:element name="optimumStorage" type="xs:int"/>
+                    <xs:element name="format" type="xs:string" minOccurs="0"/>
+                    <xs:element name="target" type="xs:string"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>
+
