@@ -62,6 +62,7 @@ public class Algorithm1 implements IAlgorithm{
 		
 		//initialize sorting service
 		sortingService = new Sorter();
+		emptyServers = sortingService.insertSortServersDescending(emptyServers);
 		
 		//initialize logger
 		logger = new VDRMLogger();
@@ -96,6 +97,7 @@ public class Algorithm1 implements IAlgorithm{
 		
 		//initialize sorting service
 		sortingService = new Sorter();
+		emptyServers = sortingService.insertSortServersDescending(emptyServers);
 		
 		//initialize logger
 		logger = new VDRMLogger();
@@ -378,6 +380,12 @@ public class Algorithm1 implements IAlgorithm{
 					inUseServers.remove(auxServer);
 					fullServers.add(auxServer);
 				}
+			}
+			else {
+				if(auxServer.isFull())
+					fullServers.add(auxServer);
+				else
+					inUseServers.add(auxServer);
 			}
 		}
 		

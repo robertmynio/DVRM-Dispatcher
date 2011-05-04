@@ -28,8 +28,7 @@ public class TestsVlad {
 		//inits the datastructures of the algorithm with five servers
 		//result = hardcodedInitTest();
 		//System.out.println("Result for hardcoded init test is : " + result);
-		
-		
+	
 		// task initialization
 		Task task;
 		
