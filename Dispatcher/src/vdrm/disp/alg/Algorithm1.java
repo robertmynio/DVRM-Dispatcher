@@ -171,8 +171,9 @@ public class Algorithm1 implements IAlgorithm{
 					}
 				}
 				
-				//now we reorder the inUseServer list
+				//now we reorder the inUseServer list and the emptyServer list
 				inUseServers = sortingService.insertSortServersDescending(inUseServers);
+				emptyServers = sortingService.insertSortServersDescending(emptyServers);
 				
 				//clear list of predicted tasks
 				predictedTasks = new ArrayList<ITask>();
@@ -207,28 +208,30 @@ public class Algorithm1 implements IAlgorithm{
 		
 		boolean success;
 		success = consolidateTasks();
+		
 		if(!success) {
 			logger.logInfo("Consolidation algorithm failed -> not enough resources.");
-			unassignedTasks = new ArrayList<ITask>();
 		}
-		logger.logInfo("Consolidation algorithm ran.");
-		
-		//dispatch tasks which are not predicted to real servers
-		for(i=0;i<unassignedTasks.size();i++) {
-			ITask tempTask = unassignedTasks.get(i);
-			if(tempTask.isPredicted())
-				predictedTasks.add(tempTask);
-			else {
-				
-				// OpenNebula
-				if(tempTask.getServerId() != null) {
-					onService.DeployTask(tempTask);
-					logger.logInfo("Task " + newTask.getTaskHandle() + " (normal) deployed on server.");
-				}
-			}		
+		else {
+			logger.logInfo("Consolidation algorithm ran.");
+			
+			//dispatch tasks which are not predicted to real servers
+			for(i=0;i<unassignedTasks.size();i++) {
+				ITask tempTask = unassignedTasks.get(i);
+				if(tempTask.isPredicted())
+					predictedTasks.add(tempTask);
+				else {
+					
+					// OpenNebula
+					if(tempTask.getServerId() != null) {
+						onService.DeployTask(tempTask);
+						logger.logInfo("Task " + newTask.getTaskHandle() + " (normal) deployed on server.");
+					}
+				}		
+			}
 		}
 		
-		//clear unassigned tasks list if there are no previously unassigned tasks
+		//clear unassigned tasks list
 		unassignedTasks = new ArrayList<ITask>();
 		
 		logger.logInfo("*** Finished one iteration for newTask.");
@@ -248,85 +251,6 @@ public class Algorithm1 implements IAlgorithm{
 	}
 	
 	/**
-	 * This method deals with placing a server in the correct list
-	 * First, if the server is in the inUseServers list, it is removed 
-	 * and its former position is saved. 
-	 * Then, if the server is full, it is placed in the fullServers list.
-	 * If not, a new position is searched starting from the current 
-	 * position and moving towards the front of the list 
-	 * @param tempServer - the server that needs to be repositioned
-	 */
-	private void findNewPosition(IServer tempServer) {
-		int poz = 0;
-		logger.logInfo("\n\n*** Starting to find new position for server "+ tempServer.getServerID() +".");
-		
-		if(inUseServers.contains(tempServer)){
-			logger.logInfo("Server " + tempServer.getServerID() + " found in 'in use list'. removing and resorting...");
-			poz = inUseServers.indexOf(tempServer);
-			inUseServers.remove(tempServer);
-		}
-		
-		if(tempServer.isFull()){ 
-			fullServers.add(tempServer);
-			logger.logInfo("Server " + tempServer.getServerID() + " is full. Adding it to the full servers list.");
-		}
-		else {
-			boolean ok = false;
-			if(inUseServers.isEmpty() && inUseServers.contains(tempServer) == false) {
-				inUseServers.add(tempServer);
-				ok = true;
-				logger.logInfo("Server " + tempServer.getServerID() + " added to the empty 'in use servers' list.");
-				return;
-			}
-			if(poz>0){ 
-				poz--;
-				while(ok==false && poz>=0) {	
-					if(tempServer.compareTo(inUseServers.get(poz))<0 && inUseServers.contains(tempServer) == false) {
-						inUseServers.add(poz,tempServer);
-						ok = true;
-						logger.logInfo("Server " + tempServer.getServerID() + " added to the 'in use servers' list at position "+ poz + ".");
-					}
-					poz--;
-				}	
-				// place it last
-//				if(poz==0 && inUseServers.contains(tempServer) == false){
-//					inUseServers.add(inUseServers.size()+1,tempServer);
-//					logger.logInfo("Server " + tempServer.getServerID() + " added last to the 'in use servers' list.");
-//				}
-			}else if(poz==0){
-				poz = inUseServers.size()-1;
-				if(poz > 0){
-					while(ok==false&&poz>=0){
-						int compareResult = tempServer.compareTo(inUseServers.get(poz));
-						if(compareResult < 0 || compareResult == 0){
-							inUseServers.add(poz,tempServer);
-							ok=true;
-							logger.logInfo("Server " + tempServer.getServerID() + " added to the 'in use servers' list at position "+ poz+1 + ".");
-						}
-						poz--;
-					}
-				}else 
-					if(poz == 0)
-					{
-						int compareResult = tempServer.compareTo(inUseServers.get(0));
-						if(compareResult <= 0)
-							inUseServers.add(poz+1, tempServer);
-						else
-							inUseServers.add(0, tempServer);
-						logger.logInfo("Server " + tempServer.getServerID() + " added to the 'in use servers' list at position "+ poz+1 + "(only one server was in the list).");
-					}else
-					{
-						inUseServers.add(0,tempServer);
-						logger.logWarning("* Server " + tempServer.getServerID() + " added to the 'in use servers' list at position 0.");
-					}
-				
-			}
-		}
-		
-		logger.logInfo("*** Finished findNewPosition for server "+ tempServer.getServerID() +".");
-	}
-	
-	/**
 	 * There are a number of tasks in the unassignedTasks list
 	 * This method assigns each task to a server (and also a server to a task)
 	 * OPTIMISTIC approach!
@@ -339,6 +263,8 @@ public class Algorithm1 implements IAlgorithm{
 		for(ITask tsk : unassignedTasks) {
 			tempList.add(tsk);
 		}
+		
+		HashSet<IServer> modifiedServers = new HashSet<IServer>();
 		
 		//sort the array in an ascending order (according to cpu, then mem, then hdd)
 		sort(tempList);
@@ -356,8 +282,8 @@ public class Algorithm1 implements IAlgorithm{
 				tempServer.addTask(tempTask);
 				logger.logInfo("Found a place for task " + tempTask.getTaskHandle() + ", on server "+ tempServer.getServerID() +".(1)");
 				
-				//we must move this server to its new position in the lists
-				findNewPosition(tempServer);
+				//modified -> added a new task to this server
+				modifiedServers.add(tempServer);
 				
 				tempList.remove(0);
 				if(!tempList.isEmpty())
@@ -393,18 +319,26 @@ public class Algorithm1 implements IAlgorithm{
 				}
 				
 				if(ok==false) {
-					//we must use a new server
+					//we must use a new server (the remaining tasks do not fit on the inUseServers list)
 					if(emptyServers.size() == 0) {
 						Date d = new Date();
 						logger.logSevere("SEVERE: Task " + tempTask.getTaskHandle().toString() + " cannot be deployed at this moment (" +
 								d.toString());
 						
-						//unassignedTasks.add(tempTask);
-						//waitingTasksInQueue = true;
+						//the consolidation failed ->not enough resources
+						//we must undo the consolidation done so far
+						for(ITask auxTask : unassignedTasks) {
+							tempServer = auxTask.getServer();
+							if(tempServer != null) {
+								tempServer.removeTask(auxTask);
+							}
+						}
+						logger.logSevere("Not enough resources -> consolidation has been undone");
 						
 						// notify that there are no more free resources (stop sending tasks) 
 						BaseCommon.Instance().getResourceAllocateEvent().setChanged();
 						BaseCommon.Instance().getResourceAllocateEvent().notifyObservers();
+						
 						return false;
 					}else{
 						IServer newServer = emptyServers.get(0);
@@ -416,21 +350,41 @@ public class Algorithm1 implements IAlgorithm{
 						tempList.remove(tempListSize);
 						ok = true;
 						
-//						if(newServer.isFull())
-//							fullServers.add(newServer);
+						//modified -> removed from empty servers list (added a new task to it)
+						modifiedServers.add(newServer);
+						
 						logger.logInfo("Found a place for task " + tempTask.getTaskHandle() + ", on server "+ newServer.getServerID() +".(3)");
 					}
 				}
-			}
-			
-			//all tasks have been deployed
-			if(newServers.size()>0) {
-				for(i=0;i<newServers.size();i++)
-					//we must move the servers to their new position in the lists
-					findNewPosition(newServers.get(i));
-			}
-			
+			}			
 		}	
+		//if we get here, consolidation is a success
+		//we must move the servers that have been modified to the appropriate lists
+		
+		logger.logInfo("Consolidation was a success -> now reordering server lists");
+		
+		for(IServer auxServer : modifiedServers) {
+			if(emptyServers.contains(auxServer)) {
+				if(!auxServer.isEmpty()) {
+					emptyServers.remove(auxServer);
+					if(auxServer.isFull())
+						fullServers.add(auxServer);
+					else
+						inUseServers.add(auxServer);
+				}
+			}
+			else if(inUseServers.contains(auxServer)) {
+				if(auxServer.isFull()) {
+					inUseServers.remove(auxServer);
+					fullServers.add(auxServer);
+				}
+			}
+		}
+		
+		//now we sort the lists
+		inUseServers = sortingService.insertSortServersDescending(inUseServers);
+		emptyServers = sortingService.insertSortServersDescending(emptyServers);
+		
 		logger.logInfo("*** Finished consolidateTask.");
 		return true;
 	}
@@ -522,6 +476,7 @@ public class Algorithm1 implements IAlgorithm{
 		}else{
 			// this is not right...why is the server null?
 		}
+		emptyServers = sortingService.insertSortServersDescending(emptyServers);
 		logger.logInfo("*** Finished endTasks.");
 	}
 
@@ -738,7 +693,6 @@ public class Algorithm1 implements IAlgorithm{
 	@Override
 	public synchronized void reorderServerList(IServer server, int direction) {
 		logger.logInfo(" Started to reorder servers...");
-		sortingService = new Sorter();
 		if(direction < 0){
 			// TODO: Repair this method
 //			sortingService.insertSortedServerGoingRightDesc(server, inUseServers,

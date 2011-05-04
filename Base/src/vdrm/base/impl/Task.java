@@ -27,6 +27,7 @@ public class Task implements ITask{
 		taskHandle = UniqueIdGenerator.getUID();
 		unsuccessfulPlacement = false;
 		isPredicted = false;
+		serverHost = null;
 	}
 	
 	public Task(int cpu, int mem, int hdd){
