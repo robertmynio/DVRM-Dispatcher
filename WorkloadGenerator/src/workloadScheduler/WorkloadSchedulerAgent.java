@@ -29,12 +29,12 @@ public class WorkloadSchedulerAgent extends Agent {
     protected ArrayList<ExtendedTaskDto> possibleTaskPool;
     private static int BEGINNING_ARRIVAL = 20;
     //interval at which new tasks are generated in seconds
-    private static int WORKLOAD_GENERATION_INTERVAL_MAX = 30;
-    private static int WORKLOAD_GENERATION_INTERVAL_MIN = 20;
+    private static int WORKLOAD_GENERATION_INTERVAL_MAX = 20;
+    private static int WORKLOAD_GENERATION_INTERVAL_MIN = 10;
 
     //the minimum and maximum value for the workload duration( task running time until the task terminates ) in seconds
-    private static int TASK_DURATION_INTERVAL_MAX = 600;
-    private static int TASK_DURATION_INTERVAL_MIN = 320;
+    private static int TASK_DURATION_INTERVAL_MAX = 400;
+    private static int TASK_DURATION_INTERVAL_MIN = 220;
 
     //number of tasks to be generated at one time        
     private static int NUMBER_OF_GENERATED_TASKS_MAX = 5;

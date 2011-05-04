@@ -120,7 +120,7 @@ public class RootService {
 				taskDescription = appDescription.getActivities()[0].getServices()[0];
 				
 				// set task duration
-				duration = appDescription.getActivities()[0].getDuration() * 10;
+				duration = appDescription.getActivities()[0].getDuration() * 1000;
 				
 				// set task requirements
 				int cpu, mem, hdd;
@@ -183,7 +183,7 @@ public class RootService {
 		
 		if(BaseCommon.Instance().ResourcesAvailable){
 				//StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
-			SendTaskCommand(t);
+			SendTaskCommand(readyTasks.get(0).getTask());
 		}
 	}
 	

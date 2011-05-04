@@ -38,6 +38,14 @@ public class TestsVlad {
 		
 		//simple initialization -> HARDCODED!!!
 		s = new Server(12000,2000,1000000);
+		s.setServerID("3");
+		s.setCoreFreq(3000);
+		servers.add(s);
+		s = new Server(24000,6000,1000000);
+		s.setServerID("0");
+		s.setCoreFreq(3000);
+		servers.add(s);
+		s = new Server(24000,6000,1000000);
 		s.setServerID("1");
 		s.setCoreFreq(3000);
 		servers.add(s);
@@ -45,15 +53,11 @@ public class TestsVlad {
 		s.setServerID("2");
 		s.setCoreFreq(3000);
 		servers.add(s);
-		s = new Server(24000,6000,1000000);
-		s.setServerID("3");
-		s.setCoreFreq(3000);
-		servers.add(s);
 
 		//alg.initialize(servers);
 		
 		
-		TaskDao dao = new TaskDao();
+		//TaskDao dao = new TaskDao();
 		ArrayList<ITask> tasks = new ArrayList<ITask>();
 		task = new Task(500,2500,25000);
 		tasks.add(task);

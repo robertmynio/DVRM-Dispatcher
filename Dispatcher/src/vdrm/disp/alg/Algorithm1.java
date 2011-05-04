@@ -2,7 +2,7 @@ package vdrm.disp.alg;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.TreeSet;
+import java.util.HashSet;
 
 import vdrm.base.common.IAlgorithm;
 import vdrm.base.common.IPredictor;
@@ -142,7 +142,7 @@ public class Algorithm1 implements IAlgorithm{
 				int size = predictedTasks.size();
 				
 				//we add all servers that have predicted tasks to a set (set => no duplicates)
-				TreeSet<IServer> modifiedServers = new TreeSet<IServer>();
+				HashSet<IServer> modifiedServers = new HashSet<IServer>();
 				for(i=0;i<size;i++) {
 					tempTask = predictedTasks.get(i);
 					tempServer = tempTask.getServer();
@@ -204,8 +204,13 @@ public class Algorithm1 implements IAlgorithm{
 		//this algorithm assigns to every task a server reference and to every server a task 
 		//reference (the task is actually added to the list of a server, but the task is not 
 		//actually deployed to a physical server)
-			
-		consolidateTasks();
+		
+		boolean success;
+		success = consolidateTasks();
+		if(!success) {
+			logger.logInfo("Consolidation algorithm failed -> not enough resources.");
+			unassignedTasks = new ArrayList<ITask>();
+		}
 		logger.logInfo("Consolidation algorithm ran.");
 		
 		//dispatch tasks which are not predicted to real servers
@@ -277,17 +282,17 @@ public class Algorithm1 implements IAlgorithm{
 				poz--;
 				while(ok==false && poz>=0) {	
 					if(tempServer.compareTo(inUseServers.get(poz))<0 && inUseServers.contains(tempServer) == false) {
-						inUseServers.add(poz+1,tempServer);
+						inUseServers.add(poz,tempServer);
 						ok = true;
-						logger.logInfo("Server " + tempServer.getServerID() + " added to the 'in use servers' list at position "+ poz+1 + ".");
+						logger.logInfo("Server " + tempServer.getServerID() + " added to the 'in use servers' list at position "+ poz + ".");
 					}
 					poz--;
 				}	
 				// place it last
-				if(poz==0 && inUseServers.contains(tempServer) == false){
-					inUseServers.add(inUseServers.size()+1,tempServer);
-					logger.logInfo("Server " + tempServer.getServerID() + " added last to the 'in use servers' list.");
-				}
+//				if(poz==0 && inUseServers.contains(tempServer) == false){
+//					inUseServers.add(inUseServers.size()+1,tempServer);
+//					logger.logInfo("Server " + tempServer.getServerID() + " added last to the 'in use servers' list.");
+//				}
 			}else if(poz==0){
 				poz = inUseServers.size()-1;
 				if(poz > 0){
@@ -326,7 +331,7 @@ public class Algorithm1 implements IAlgorithm{
 	 * This method assigns each task to a server (and also a server to a task)
 	 * OPTIMISTIC approach!
 	 */
-	private void consolidateTasks()
+	private boolean consolidateTasks()
 	{
 		logger.logInfo("\n\n*** Starting to consolidate tasks.");
 		
@@ -400,7 +405,7 @@ public class Algorithm1 implements IAlgorithm{
 						// notify that there are no more free resources (stop sending tasks) 
 						BaseCommon.Instance().getResourceAllocateEvent().setChanged();
 						BaseCommon.Instance().getResourceAllocateEvent().notifyObservers();
-						return;
+						return false;
 					}else{
 						IServer newServer = emptyServers.get(0);
 						newServers.add(newServer);
@@ -424,8 +429,10 @@ public class Algorithm1 implements IAlgorithm{
 					//we must move the servers to their new position in the lists
 					findNewPosition(newServers.get(i));
 			}
-			logger.logInfo("*** Finished consolidateTask.");
+			
 		}	
+		logger.logInfo("*** Finished consolidateTask.");
+		return true;
 	}
 
 	/***********************************************************/
