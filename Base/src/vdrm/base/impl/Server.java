@@ -30,6 +30,7 @@ public class Server implements IServer {
 	private String serverID;
 	
 	private String ipAddress;
+	private String macAddress;
 	
 	
 	// TASKS REPRESENTATION
@@ -72,6 +73,10 @@ public class Server implements IServer {
 		hddSize = hdd;
 		this.cores = cores;
 		this.ipAddress = ip;
+	}
+	public Server(int cpu, int mem, int hdd, int cores, String ip, String mac) {
+		this(cpu,mem, hdd, cores, ip);
+		this.macAddress = mac;
 	}
 	/***
 	 * Return the next highest demanding task in the server task list
@@ -456,6 +461,14 @@ public class Server implements IServer {
 
 	public int getCoreFreq() {
 		return coreFreq;
+	}
+
+	public String getMacAddress() {
+		return macAddress;
+	}
+
+	public void setMacAddress(String macAddress) {
+		this.macAddress = macAddress;
 	}
 	
 	

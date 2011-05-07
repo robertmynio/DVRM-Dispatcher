@@ -12,6 +12,7 @@ public interface IServer {
 	public int getUsedHdd();
 	public int getLoad();
 	public String getIPAddress();
+	public String getMacAddress();
 	public int getNumberOfCores();
 	
 	public String getServerID();
@@ -39,4 +40,5 @@ public interface IServer {
 	public ITask GetNextLowestDemandingTask();
 	public ITask GetTaskWithResources(ArrayList<Integer> resourceDemands);//0->cpu, 1->mem, 2->hdd
 	public ArrayList<Integer> GetAvailableResources();
+
 }
