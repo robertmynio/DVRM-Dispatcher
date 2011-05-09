@@ -1,18 +1,6 @@
-In PRIMUL rand :
-	- in tabelul "tasks" din baza de date exista cele 6 taskuri. In varianta finala le vom folosi doar pe astea.
-	!!!! cand vine un request pentru un task (web service), request-ul trebuie sa fie neaparat pentru unul din aceste task-uri !!!!
+Prediction is :
 
-Set up the database:
-	- instaleaza wamp
-	- porneste clientu de mysql (consola)
-	- introdu in client: 
-		CREATE USER 'user'@'localhost' IDENTIFIED BY 'pass';
-		GRANT ALL PRIVILEGES ON *.* TO 'user'@'localhost' WITH GRANT OPTION;
-	- in proiectu de Predictor adaugi libraria de mysql (care e in lib alaturi de celelalte)
-	- in folderu de DVRM, exista un folder SQL. In folderu sql este un fisier care contine comenzile pentru crearea tabelelor. Copiezi tot ce-i in fisier si dai paste in clientu de mysql.
-	- in proiectu de Predictor, package-ul de DAO, exista o clasa DATABASEINITIALIZER. O rulezi o singura data pentru a-ti popula baza de date.
-	
-In caz ca nu vrei sa ai de-a face cu baza de date:
-	- in proiectu de Predictor, in constructorul clase Predictor comentezi linia cu InitDatabase();
-	
-Enjoy :)
+0 1 2 3 -> 100%
+1 2 3 -> 80%
+2 3 -> 100%
+5 4 -> 83,33%

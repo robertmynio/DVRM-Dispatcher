@@ -91,6 +91,16 @@ public class TestsVlad {
 		taskHistory.add(tasks.get(3));
 		taskHistory.add(tasks.get(5));
 		taskHistory.add(tasks.get(4));
+		
+		taskHistory.add(tasks.get(5));	//remove this line and the following 5 to make (5,4) and (1,2,3) credibility 100%
+		taskHistory.add(tasks.get(4));
+		taskHistory.add(tasks.get(5));
+		taskHistory.add(tasks.get(4));
+		taskHistory.add(tasks.get(5));
+		taskHistory.add(tasks.get(4));
+		taskHistory.add(tasks.get(5));
+		taskHistory.add(tasks.get(1));
+		
 //		ArrayList<ITask> tasks = dao.getAllTasks();
 //		ArrayList<ITask> taskHistory = dao.getTaskHistory();
 		rs.worker.initialize(servers, tasks, taskHistory);
