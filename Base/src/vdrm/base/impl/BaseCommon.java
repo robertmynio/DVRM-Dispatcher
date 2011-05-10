@@ -20,6 +20,7 @@ public class BaseCommon {
 	public static final double SERVER_THRESHOLD = 0.2;
 	
 	public static final boolean ONEnabled = false;
+	public static final boolean PSEnabled = false;
 	
 	private int nrOfTasksThreshold;
 	
@@ -32,6 +33,8 @@ public class BaseCommon {
 	public VMStartedEvent VMStarted;
 	public ResourceAllocationEvent ResourceAllocateEvent;
 	public TaskGeneratedEvent TaskGenerated;
+	public TaskStartedMigrationEvent TaskStartedMigrating;
+	public TaskEndedMigrationEvent TaskEndedMigrating;
 	
 	public static BaseCommon Instance(){
 		if(instance == null){
@@ -48,6 +51,9 @@ public class BaseCommon {
 		VMStarted = new VMStartedEvent();
 		ResourceAllocateEvent = new ResourceAllocationEvent();
 		TaskGenerated = new TaskGeneratedEvent();
+		TaskStartedMigrating = new TaskStartedMigrationEvent();
+		TaskEndedMigrating = new TaskEndedMigrationEvent();
+		
 		ResourcesAvailable = true;
 	}
 
@@ -66,6 +72,16 @@ public class BaseCommon {
 	public TaskGeneratedEvent getTaskGeneratedEvent() {
 		return TaskGenerated;
 	}
+	
+	public TaskStartedMigrationEvent getTaskStartedMigrating() {
+		return TaskStartedMigrating;
+	}
+
+	public TaskEndedMigrationEvent getTaskEndedMigrating() {
+		return TaskEndedMigrating;
+	}
+
+
 
 
 	/**
@@ -97,6 +113,30 @@ public class BaseCommon {
 	 *
 	 */
 	public class TaskGeneratedEvent extends Observable{
+		public synchronized void setChanged(){
+			super.setChanged();
+		}
+	}
+	
+	/***
+	 * Event which gets fired when a tasks starts migrating to another server
+	 * ( to pause the timer )
+	 * @author Vlad
+	 *
+	 */
+	public class TaskStartedMigrationEvent extends Observable{
+		public synchronized void setChanged(){
+			super.setChanged();
+		}
+	}
+	
+	/***
+	 * Event which gets fired when a tasks ends migrating to another server
+	 * ( to resume the timer )
+	 * @author Vlad
+	 *
+	 */
+	public class TaskEndedMigrationEvent extends Observable{
 		public synchronized void setChanged(){
 			super.setChanged();
 		}

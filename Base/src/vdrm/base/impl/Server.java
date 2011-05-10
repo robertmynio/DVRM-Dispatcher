@@ -385,13 +385,13 @@ public class Server implements IServer {
 	@Override
 	public boolean compareAvailableResources(ITask t) {
 		
-		if((this.getMaxCpu() - this.getUsedCpu()) >= t.getCpu() - t.getCpu() * BaseCommon.PERCENT 
+		if((this.getMaxCpu() - this.getUsedCpu()) >= t.getCpu() + t.getCpu() * BaseCommon.PERCENT 
 				//&& (this.getMaxCpu() - this.getUsedCpu()) <= t.getCpu() + t.getCpu() * BaseCommon.PERCENT){
 				){
-			if( (this.getMaxMem() - this.getUsedMem()) >= t.getMem() - t.getMem() * BaseCommon.PERCENT
+			if( (this.getMaxMem() - this.getUsedMem()) >= t.getMem() + t.getMem() * BaseCommon.PERCENT
 					//&& (this.getMaxMem() - this.getUsedMem()) <= t.getMem() + t.getMem() * BaseCommon.PERCENT){
 					){
-				if((this.getMaxHdd() - this.getUsedHdd()) >= t.getHdd() - t.getHdd() * BaseCommon.PERCENT
+				if((this.getMaxHdd() - this.getUsedHdd()) >= t.getHdd() + t.getHdd() * BaseCommon.PERCENT
 						//&& (this.getMaxHdd() - this.getUsedHdd()) <= t.getHdd() + t.getHdd() * BaseCommon.PERCENT){
 						){
 					return true;
@@ -449,6 +449,11 @@ public class Server implements IServer {
 	public String getIPAddress() {
 		return ipAddress;
 	}
+	
+	@Override
+	public void setIPAddress(String ip) {
+		this.ipAddress = ip;
+	}
 
 	@Override
 	public int getNumberOfCores() {
@@ -467,9 +472,12 @@ public class Server implements IServer {
 		return macAddress;
 	}
 
+	@Override
 	public void setMacAddress(String macAddress) {
 		this.macAddress = macAddress;
 	}
+
+
 	
 	
 

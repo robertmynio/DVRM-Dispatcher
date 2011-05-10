@@ -14,6 +14,7 @@ import vdrm.base.impl.Sorter;
 import vdrm.disp.util.VDRMLogger;
 import vdrm.onservice.IOpenNebulaService;
 import vdrm.onservice.OpenNebulaService;
+import vdrm.powerservice.PowerService;
 import vdrm.pred.pred.Predictor;
 
 /***
@@ -37,6 +38,7 @@ public class Algorithm1 implements IAlgorithm{
 	private VDRMLogger logger;
 	
 	private IOpenNebulaService onService;
+	private PowerService powerService;
 	
 	private Boolean waitingTasksInQueue;
 	
@@ -69,6 +71,8 @@ public class Algorithm1 implements IAlgorithm{
 		
 		//initialize OpenNebula
 		onService = new OpenNebulaService();
+		
+		powerService = new PowerService();
 		
 		logger.logInfo("System initialized successfully, waiting for tasks.\n\n");
 	}
@@ -104,6 +108,8 @@ public class Algorithm1 implements IAlgorithm{
 		
 		//initialize OpenNebula
 		onService = new OpenNebulaService();
+		
+		powerService = new PowerService();
 		
 		logger.logInfo("System initialized successfully, waiting for tasks.\n\n");
 		
@@ -158,8 +164,10 @@ public class Algorithm1 implements IAlgorithm{
 					if(fullServers.contains(tempServ)) {
 						if(!tempServ.isFull()) {
 							fullServers.remove(tempServ);
-							if(tempServ.isEmpty()) 
+							if(tempServ.isEmpty()){ 
 								emptyServers.add(tempServ);
+								powerService.sendServerToSleep(tempServ);
+							}
 							else
 								inUseServers.add(tempServ);
 						}
@@ -169,6 +177,7 @@ public class Algorithm1 implements IAlgorithm{
 						if(tempServ.isEmpty()) {
 							inUseServers.remove(tempServ);
 							emptyServers.add(tempServ);
+							powerService.sendServerToSleep(tempServ);
 						}
 					}
 				}
@@ -346,6 +355,7 @@ public class Algorithm1 implements IAlgorithm{
 						IServer newServer = emptyServers.get(0);
 						newServers.add(newServer);
 						emptyServers.remove(0);
+						powerService.wakeUpServer(newServer);
 						
 						tempTask.setServer(newServer);
 						newServer.addTask(tempTask);
@@ -369,6 +379,7 @@ public class Algorithm1 implements IAlgorithm{
 			if(emptyServers.contains(auxServer)) {
 				if(!auxServer.isEmpty()) {
 					emptyServers.remove(auxServer);
+					powerService.wakeUpServer(auxServer);
 					if(auxServer.isFull())
 						fullServers.add(auxServer);
 					else
@@ -421,6 +432,7 @@ public class Algorithm1 implements IAlgorithm{
 	 */
 	@Override
 	public synchronized void endTask(ITask t){
+		//System.out.println("Ended one task");
 		logger.logInfo("\n\n*** Starting end tasks.");
 		IServer server = t.getServer();
 		if(server != null){
@@ -465,6 +477,7 @@ public class Algorithm1 implements IAlgorithm{
 						server.OrderStandBy();
 						inUseServers.remove(server);
 						emptyServers.add(server);
+						powerService.sendServerToSleep(server);
 					}
 				}
 			}else{
@@ -474,6 +487,7 @@ public class Algorithm1 implements IAlgorithm{
 					server.OrderStandBy();
 					inUseServers.remove(server);
 					emptyServers.add(server);
+					powerService.sendServerToSleep(server);
 				}
 				else{
 					logger.logInfo("FT: Server has great load, so try to fill it.(2)");
@@ -514,7 +528,7 @@ public class Algorithm1 implements IAlgorithm{
 			if(nrTasks1 <= nrTasks2){
 				logger.logInfo("FT: Last server has the least nr of tasks");
 				for(ITask t:lastServer.getTasks()){
-					if(!t.isPredicted() && server.compareAvailableResources(t) && !server.isFull()){
+					if(server.compareAvailableResources(t) && !server.isFull()){
 						logger.logInfo("FT: Added task "+ t.getTaskHandle() +" to server "+ server.getServerID()+ ".(1)");
 						//remove task from current server
 						lastServer.removeTask(t);
@@ -523,14 +537,17 @@ public class Algorithm1 implements IAlgorithm{
 						
 						// add task to new server
 						server.addTask(t);
-						onService.MigrateTask(t, server);
+						if(!t.isPredicted())
+							MigrateTask(t, server);
+							
+							//onService.MigrateTask(t, server);
 						
 						if(server.isFull()){
 							logger.logInfo("FT: Server is full. Adding it to the full servers list.(2)");
 							fullServers.add(server);
 							break;
 						}
-						onService.MigrateTask(t, server);
+						//onService.MigrateTask(t, server);
 					}
 				}
 				
@@ -538,6 +555,7 @@ public class Algorithm1 implements IAlgorithm{
 					logger.logInfo("FT: Last server is empty. Assigning it to the empty servers list...");
 					inUseServers.remove(inUseServers.indexOf(lastServer));
 					emptyServers.add(lastServer);
+					powerService.sendServerToSleep(lastServer);
 				}
 				
 				// server is not full. start with second to last server
@@ -547,11 +565,13 @@ public class Algorithm1 implements IAlgorithm{
 					ITask t;
 					while(( t = secondToLastServer.GetNextLowestDemandingTask())!=null && (!server.isFull()) 
 							&& timesTried < (secondToLastServer.getTotalNumberOfTasks() + secondToLastServer.getNumberOfPredictedTasks() )){
-						if( !t.isPredicted() && server.compareAvailableResources(t) && !server.isFull()){
+						if(server.compareAvailableResources(t) && !server.isFull()){
 							secondToLastServer.removeTask(t);
 							t.setServer(server);
 							server.addTask(t);
-							onService.MigrateTask(t, server);
+							if(!t.isPredicted())
+								MigrateTask(t, server);
+								//onService.MigrateTask(t, server);	
 							logger.logInfo("FT: Added task "+ t.getTaskHandle() +" to server "+ server.getServerID()+ ".(2)");
 							if(server.isFull()){
 								logger.logInfo("FT: Server is full. Adding it to the full servers list.(2)");
@@ -567,10 +587,11 @@ public class Algorithm1 implements IAlgorithm{
 					logger.logInfo("FT: Second to last server is empty. Assigning it to the empty servers list...");
 					inUseServers.remove(inUseServers.indexOf(secondToLastServer));
 					emptyServers.add(secondToLastServer);
+					powerService.sendServerToSleep(secondToLastServer);
 				}
 			}else{
 				for(ITask t:secondToLastServer.getTasks()){
-					if( !t.isPredicted() && server.compareAvailableResources(t) && !server.isFull()){
+					if(server.compareAvailableResources(t) && !server.isFull()){
 						//remove task from current server
 						secondToLastServer.removeTask(t);
 						// set the new server
@@ -578,18 +599,22 @@ public class Algorithm1 implements IAlgorithm{
 						
 						// add task to new server
 						server.addTask(t);
-						onService.MigrateTask(t, server);
+						if(!t.isPredicted())
+							MigrateTask(t, server);
+							
+							//onService.MigrateTask(t, server);
 						if(server.isFull()){
 							fullServers.add(server);
 							break;
 						}
-						onService.MigrateTask(t, server);
+						//onService.MigrateTask(t, server);
 					}
 				}
 				
 				if(secondToLastServer.isEmpty()){
 					inUseServers.remove(inUseServers.indexOf(secondToLastServer));
 					emptyServers.add(secondToLastServer);
+					powerService.sendServerToSleep(secondToLastServer);
 				}
 				
 				// server is not full. start with second to last server
@@ -598,11 +623,15 @@ public class Algorithm1 implements IAlgorithm{
 					ITask t;
 					while(( t = lastServer.GetNextLowestDemandingTask())!=null && (!server.isFull())
 							&& timesTried < (secondToLastServer.getTotalNumberOfTasks() + secondToLastServer.getNumberOfPredictedTasks() )){
-						if(!t.isPredicted() && server.compareAvailableResources(t) && !server.isFull()){
+						if(server.compareAvailableResources(t) && !server.isFull()){
 							lastServer.removeTask(t);
 							t.setServer(server);
 							server.addTask(t);
-							onService.MigrateTask(t, server);
+							if(!t.isPredicted())
+								MigrateTask(t, server);
+								
+								//onService.MigrateTask(t, server);
+							
 							if(server.isFull()){
 								fullServers.add(server);
 								break;
@@ -615,6 +644,7 @@ public class Algorithm1 implements IAlgorithm{
 				if(lastServer.isEmpty()){
 					inUseServers.remove(inUseServers.indexOf(lastServer));
 					emptyServers.add(lastServer);
+					powerService.sendServerToSleep(secondToLastServer);
 				}
 			}
 			logger.logInfo("*** Finished findMaximumUtilizationPlacement.");
@@ -634,14 +664,16 @@ public class Algorithm1 implements IAlgorithm{
 			found = false;
 			ITask t = server.GetNextLowestDemandingTask();
 			// if the task is predicted, don't move it
-			if(!t.isPredicted()){
+			
 				for(IServer s:inUseServers){
 					if(s != server){
 						if(s.compareAvailableResources(t)){
 							
 							// TODO migrate_to_new_host(s); -- OpenNebula
-							onService.MigrateTask(t, s);
-							
+							if(!t.isPredicted()){
+								//onService.MigrateTask(t, s);
+								MigrateTask(t, s);
+							}
 							// move the task to the new server
 							server.removeTask(t);
 							s.addTask(t);
@@ -659,9 +691,6 @@ public class Algorithm1 implements IAlgorithm{
 						}
 					}
 				}
-			}else{
-				noPlaceFound++;
-			}
 				if(!found){
 					noPlaceFound++;
 					t.setUnsuccessfulPlacement(true);
@@ -681,6 +710,7 @@ public class Algorithm1 implements IAlgorithm{
 			if(server.isEmpty()){
 				inUseServers.remove(server);
 				emptyServers.add(server);
+				powerService.sendServerToSleep(server);
 			}
 			return true;
 		}
@@ -725,10 +755,12 @@ public class Algorithm1 implements IAlgorithm{
 		
 		ITask bingoTask = lastServer.GetTaskWithResources(availableResources);
 		
-		if(bingoTask != null && bingoTask.isPredicted() == false){
+		if(bingoTask != null){
 			logger.logInfo(" Perfect task found. Server will be full.");
 			// OPEN NEBULA
-			onService.MigrateTask(bingoTask, server);
+			if(bingoTask.isPredicted() == false)
+				MigrateTask(bingoTask, server);
+				//onService.MigrateTask(bingoTask, server);
 			
 			fullServers.add(server);
 			inUseServers.remove(server);
@@ -751,6 +783,12 @@ public class Algorithm1 implements IAlgorithm{
 			}
 		}
 		logger.logInfo("*** Finished trying to fill server.");
+	}
+	
+	private void MigrateTask(ITask task, IServer server){
+		//BaseCommon.Instance().getTaskStartedMigrating().setChanged();
+		//BaseCommon.Instance().getTaskStartedMigrating().notifyObservers();
+		onService.MigrateTask(task, server);
 	}
 	
 	// GETTERS FOR TESTING PURPOSES

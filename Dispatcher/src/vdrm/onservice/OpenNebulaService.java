@@ -2,6 +2,7 @@ package vdrm.onservice;
 
 import org.opennebula.client.vm.VirtualMachine;
 import org.opennebula.client.*;
+
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
 import vdrm.base.impl.BaseCommon;
@@ -54,11 +55,22 @@ public class OpenNebulaService implements IOpenNebulaService {
 						t.SerVirtualMachine(vm);
 						
 						// Step4: deploy the VM to the desired server
-						vm.deploy( Integer.parseInt( ((Task)t).getServerId().toString() ) );
+						rc = vm.deploy( Integer.parseInt( ((Task)t).getServerId().toString() ) );
 						
-						// Step5: notify that the VM started
-						//BaseCommon.Instance().getVMStarted().setChanged();
-						//BaseCommon.Instance().getVMStarted().notifyObservers(t);
+						// Step5: wait until the VM actually starts
+						rc = vm.info();
+						int timer = 5000;
+						while(vm.status() != "started"){
+							Thread.sleep(timer);
+							rc = vm.info();
+							
+							if(timer > 300)
+								timer -= 200;
+						}
+						
+						// Step6: notify that the VM started
+						BaseCommon.Instance().getVMStarted().setChanged();
+						BaseCommon.Instance().getVMStarted().notifyObservers(t);
 						
 						return true;
 					}else{
@@ -132,8 +144,17 @@ public class OpenNebulaService implements IOpenNebulaService {
 			VirtualMachine vm = task.GetVirtualMachine();
 			if(vm != null){
 				//The Only Step: migrate to server ID
-				vm.migrate(Integer.parseInt(s.getServerID().toString()), true);
-				return true;
+				OneResponse status = vm.migrate(Integer.parseInt(s.getServerID().toString()), true);
+				if(!status.isError()){
+					//BaseCommon.Instance().TaskEndedMigrating.setChanged();
+					//BaseCommon.Instance().TaskEndedMigrating.notifyObservers(t);
+					return true;
+				}
+				else{
+					//BaseCommon.Instance().TaskEndedMigrating.setChanged();
+					//BaseCommon.Instance().TaskEndedMigrating.notifyObservers(t);
+					return false;
+				}
 			}
 			return false;
 		}

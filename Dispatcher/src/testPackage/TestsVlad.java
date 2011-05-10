@@ -56,72 +56,73 @@ public class TestsVlad {
 		//alg.initialize(servers);
 		
 		
-		//TaskDao dao = new TaskDao();
-		ArrayList<ITask> tasks = new ArrayList<ITask>();
-		task = new Task(500,2500,25000);
-		tasks.add(task);
-		task = new Task(1750,600,6000);
-		tasks.add(task);
-		task = new Task(700,600,6000);
-		tasks.add(task);
-		task = new Task(700,752,10000);
-		tasks.add(task);
-		task = new Task(1100,500,5000);
-		tasks.add(task);
-		task = new Task(1350,800,8000);
-		tasks.add(task);
 		
-		ArrayList<ITask> taskHistory = new ArrayList<ITask>();
-		taskHistory.add(tasks.get(0));
-		taskHistory.add(tasks.get(1));
-		taskHistory.add(tasks.get(2));
-		taskHistory.add(tasks.get(3));
-		taskHistory.add(tasks.get(5));
-		taskHistory.add(tasks.get(4));
-		taskHistory.add(tasks.get(0));
-		taskHistory.add(tasks.get(1));
-		taskHistory.add(tasks.get(2));
-		taskHistory.add(tasks.get(3));
-		taskHistory.add(tasks.get(1));
-		taskHistory.add(tasks.get(2));
-		taskHistory.add(tasks.get(3));
-		taskHistory.add(tasks.get(4));
-		taskHistory.add(tasks.get(1));
-		taskHistory.add(tasks.get(2));
-		taskHistory.add(tasks.get(3));
-		taskHistory.add(tasks.get(5));
-		taskHistory.add(tasks.get(4));
+//		ArrayList<ITask> tasks = new ArrayList<ITask>();
+//		task = new Task(500,2500,25000);
+//		tasks.add(task);
+//		task = new Task(1750,600,6000);
+//		tasks.add(task);
+//		task = new Task(700,600,6000);
+//		tasks.add(task);
+//		task = new Task(700,752,10000);
+//		tasks.add(task);
+//		task = new Task(1100,500,5000);
+//		tasks.add(task);
+//		task = new Task(1350,800,8000);
+//		tasks.add(task);
 		
-		taskHistory.add(tasks.get(5));	//remove this line and the following 5 to make (5,4) and (1,2,3) credibility 100%
-		taskHistory.add(tasks.get(4));
-		taskHistory.add(tasks.get(5));
-		taskHistory.add(tasks.get(4));
-		taskHistory.add(tasks.get(5));
-		taskHistory.add(tasks.get(4));
-		taskHistory.add(tasks.get(5));
-		taskHistory.add(tasks.get(1));
+//		ArrayList<ITask> taskHistory = new ArrayList<ITask>();
+//		taskHistory.add(tasks.get(0));
+//		taskHistory.add(tasks.get(1));
+//		taskHistory.add(tasks.get(2));
+//		taskHistory.add(tasks.get(3));
+//		taskHistory.add(tasks.get(5));
+//		taskHistory.add(tasks.get(4));
+//		taskHistory.add(tasks.get(0));
+//		taskHistory.add(tasks.get(1));
+//		taskHistory.add(tasks.get(2));
+//		taskHistory.add(tasks.get(3));
+//		taskHistory.add(tasks.get(1));
+//		taskHistory.add(tasks.get(2));
+//		taskHistory.add(tasks.get(3));
+//		taskHistory.add(tasks.get(4));
+//		taskHistory.add(tasks.get(1));
+//		taskHistory.add(tasks.get(2));
+//		taskHistory.add(tasks.get(3));
+//		taskHistory.add(tasks.get(5));
+//		taskHistory.add(tasks.get(4));
+//		
+//		taskHistory.add(tasks.get(5));	//remove this line and the following 5 to make (5,4) and (1,2,3) credibility 100%
+//		taskHistory.add(tasks.get(4));
+//		taskHistory.add(tasks.get(5));
+//		taskHistory.add(tasks.get(4));
+//		taskHistory.add(tasks.get(5));
+//		taskHistory.add(tasks.get(4));
+//		taskHistory.add(tasks.get(5));
+//		taskHistory.add(tasks.get(1));
 		
-//		ArrayList<ITask> tasks = dao.getAllTasks();
-//		ArrayList<ITask> taskHistory = dao.getTaskHistory();
+		TaskDao dao = new TaskDao();
+		ArrayList<ITask> tasks = dao.getAllTasks();
+		ArrayList<ITask> taskHistory = dao.getTaskHistory();
 		rs.worker.initialize(servers, tasks, taskHistory);
-		
-		WorkloadSchedulerAgent wagent = new WorkloadSchedulerAgent();
-		wagent.run();
+//		rs.ParseWorkloadXML("generated_schedule_.xml");
+//		WorkloadSchedulerAgent wagent = new WorkloadSchedulerAgent();
+//		wagent.run();
 //		task = (Task) tasks.get(5);
 //		task.setTaskHandle(UUID.randomUUID());
 //		rs.TaskArrived(task,1800);
 //		task = (Task) tasks.get(4);
 //		task.setTaskHandle(UUID.randomUUID());
-//		rs.TaskArrived(task,1800);
-//		task = (Task) tasks.get(2);
+//		rs.TaskArrived(task,2600);
+//		task = (Task) tasks.get(1);
 //		task.setTaskHandle(UUID.randomUUID());
-//		rs.TaskArrived(task,2800);
+//		rs.TaskArrived(task,3900);
 //		task = (Task) tasks.get(3);
 //		task.setTaskHandle(UUID.randomUUID());
 //		rs.TaskArrived(task,1800);
-//		task = (Task) tasks.get(2);
+//		task = (Task) tasks.get(0);
 //		task.setTaskHandle(UUID.randomUUID());
-//		rs.TaskArrived(task,2800);
+//		rs.TaskArrived(task,5700);
 //		task = (Task) tasks.get(3);
 //		task.setTaskHandle(UUID.randomUUID());
 //		rs.TaskArrived(task,1800);
@@ -134,7 +135,7 @@ public class TestsVlad {
 		//rs.TaskArrived(tasks.get(1),1800);
 
 		
-//		System.out.println("DONE ");
+		System.out.println("DONE ");
 		
 	}
 	

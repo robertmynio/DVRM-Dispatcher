@@ -1,7 +1,11 @@
 package vdrm.rootservice;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -14,10 +18,13 @@ import java.util.Timer;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import javax.xml.bind.JAXB;
+
 import datacenterInterface.dtos.jaxbBindingClasses.ActivityDescription;
 import datacenterInterface.dtos.jaxbBindingClasses.ActivityService;
 import datacenterInterface.dtos.jaxbBindingClasses.ApplicationDescription;
 import datacenterInterface.dtos.jaxbBindingClasses.JaxbPair;
+import datacenterInterface.dtos.jaxbBindingClasses.WorkloadSchedule;
 
 import vdrm.base.common.IAlgorithm;
 import vdrm.base.data.ITask;
@@ -95,8 +102,31 @@ public class RootService {
 					
 				}
 		);
+		
+		BaseCommon.Instance().getTaskStartedMigrating().addObserver(
+				new Observer(){
+
+					@Override
+					public void update(Observable arg0, Object arg1) {
+						if(arg1 != null)
+							PauseTimerForTask(arg1);
+					}
+					
+				});
+		BaseCommon.Instance().getTaskEndedMigrating().addObserver(
+				new Observer(){
+
+					@Override
+					public void update(Observable arg0, Object arg1) {
+						if(arg1 != null)
+							ResumeTimerForTask(arg1);
+					}
+					
+				});
 	}
 	
+	
+
 	public static RootService Instance(){
 		if(instance == null){
 			instance = new RootService();
@@ -276,5 +306,82 @@ public class RootService {
 //			BaseCommon.Instance().ResourcesAvailable = true;
 //			
 //		}
+	}
+	
+	public void ParseWorkloadXML(String path){
+		FileInputStream fin = null;
+		WorkloadSchedule workloadSchedule;
+		TimedGeneratedTaskWrapper tt;
+		try{
+			 fin = new FileInputStream(path);
+		}catch(FileNotFoundException e){
+			System.out.println("Aww shit");
+		}
+		
+		if(fin != null){
+			workloadSchedule = JAXB.unmarshal(fin, WorkloadSchedule.class);
+			if(workloadSchedule != null){
+				JaxbPair[] tasks = workloadSchedule.getApplications();
+				for(JaxbPair pair:tasks){
+					long startDelay = pair.getStartDelay();
+					tt = new TimedGeneratedTaskWrapper(pair);
+					
+					// compute the start delay, starting from now
+					Calendar cal = Calendar.getInstance();
+					cal.add(Calendar.SECOND, (int)startDelay);
+					
+					// schedule the timer
+					Timer timer = new Timer();
+					timer.schedule(tt, cal.getTime());
+				}
+			}
+		}
+	}
+	
+	protected synchronized void PauseTimerForTask(Object t) {
+		synchronized (currentDeployedTasks) {
+			// stop the timer thread
+			Set set = currentDeployedTasks.entrySet();
+		    Iterator i = set.iterator();
+		    
+		    while(i.hasNext()){
+		        Map.Entry me = (Map.Entry)i.next();
+		        if(me.getValue().equals((ITask)t)){
+		        	Timer time = (Timer)me.getKey();
+//		        	try {
+//						time.wait();
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+		        	break;
+		        }
+		    }
+			currentDeployedTasks.remove(t);
+		}
+	}
+	
+	protected synchronized void ResumeTimerForTask(Object t) {
+		synchronized (currentDeployedTasks) {
+			// stop the timer thread
+			Set set = currentDeployedTasks.entrySet();
+		    Iterator i = set.iterator();
+		    
+		    while(i.hasNext()){
+		        Map.Entry me = (Map.Entry)i.next();
+		        if(me.getValue().equals((ITask)t)){
+		        	Timer time = (Timer)me.getKey();
+//		        	try {
+//						// time start
+//		        		
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+		        	break;
+		        }
+		    }
+			currentDeployedTasks.remove(t);
+		}
 	}
 }

@@ -9,6 +9,5 @@ public interface IOpenNebulaService {
 	public void Initialize();
 	public boolean DeployTask(ITask t);
 	public boolean FinishTask(ITask t);
-	
 	public boolean MigrateTask(ITask t, IServer s);
 }
