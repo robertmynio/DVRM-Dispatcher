@@ -1,5 +1,8 @@
 package vdrm.onservice;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.opennebula.client.vm.VirtualMachine;
 import org.opennebula.client.*;
 
@@ -29,12 +32,13 @@ public class OpenNebulaService implements IOpenNebulaService {
 	@Override
 	public boolean DeployTask(ITask t) {
 		if(BaseCommon.ONEnabled){
+			//if(((Task)t).isDeployedOrdered()==false){
 			//TODO: make sure hdd path is integrated into ITask (maybe put linux/windows image paths")
 			// Step1: create the VM template
 			int nrCores = t.getServer().getNumberOfCores();
 			int serverCPUFreq = ((Server)t.getServer()).getCoreFreq();
-			
-			int taskFreq = (t.getCpu()*100)/serverCPUFreq;
+			int tFreq = t.getCpu();
+			int taskFreq = (int)(((double)tFreq/(double)serverCPUFreq) *100);
 //			String vmTemplate = ONConfigurationService.GetConfiguration(t.getCpu(), t.getMem(), t.getHdd(), "hddPath");
 			String vmTemplate = ONConfigurationService.GetConfiguration(taskFreq, t.getMem(), t.getHdd(), "hddPath");
 			OneResponse rc;
@@ -54,23 +58,28 @@ public class OpenNebulaService implements IOpenNebulaService {
 						//assign the vm to the task also
 						t.SerVirtualMachine(vm);
 						
-						// Step4: deploy the VM to the desired server
-						rc = vm.deploy( Integer.parseInt( ((Task)t).getServerId().toString() ) );
+						ExecutorService threadService = Executors.newSingleThreadExecutor();
+						VMDeployer vmd = new VMDeployer(t, openClient, vmID);
+						threadService.execute(vmd);
+						threadService.shutdown();
+//						// Step4: deploy the VM to the desired server
+//						rc = vm.deploy( Integer.parseInt( ((Task)t).getServerId().toString() ) );
+//						
+//						// Step5: wait until the VM actually starts
+//						rc = vm.info();
+//						int timer = 5000;
+//						while(vm.lcmState() != 3 &&
+//								vm.lcmState() != 0 && vm.lcmState() != 14){
+//							Thread.sleep(timer);
+//							rc = vm.info();
+//							
+//							if(timer > 300)
+//								timer -= 200;
+//						}
 						
-						// Step5: wait until the VM actually starts
-						rc = vm.info();
-						int timer = 5000;
-						while(vm.status() != "started"){
-							Thread.sleep(timer);
-							rc = vm.info();
-							
-							if(timer > 300)
-								timer -= 200;
-						}
-						
-						// Step6: notify that the VM started
-						BaseCommon.Instance().getVMStarted().setChanged();
-						BaseCommon.Instance().getVMStarted().notifyObservers(t);
+//						// Step6: notify that the VM started
+//						BaseCommon.Instance().getVMStarted().setChanged();
+//						BaseCommon.Instance().getVMStarted().notifyObservers(t);
 						
 						return true;
 					}else{
@@ -83,8 +92,15 @@ public class OpenNebulaService implements IOpenNebulaService {
 			return false;
 		}else{
 			// for testing purposes only
-			BaseCommon.Instance().getVMStarted().setChanged();
-			BaseCommon.Instance().getVMStarted().notifyObservers(t);
+			int nrCores = t.getServer().getNumberOfCores();
+			int serverCPUFreq = ((Server)t.getServer()).getCoreFreq();
+			int tFreq = t.getCpu();
+			int taskFreq = (int)(((double)tFreq/(double)serverCPUFreq) *100);
+			
+			ExecutorService threadService = Executors.newSingleThreadExecutor();
+			VMDeployer vmd = new VMDeployer(t);
+			threadService.execute(vmd);
+			threadService.shutdown();
 			return true;
 		}
 	}
@@ -164,4 +180,66 @@ public class OpenNebulaService implements IOpenNebulaService {
 		}
 	}
 
+	public class VMDeployer implements Runnable{
+		private ITask task;
+		private int vmID;
+		private Client on_Client;
+		
+		public VMDeployer(ITask t, Client onClient, int vmID){
+			this.task = t;
+			this.vmID = vmID;
+			this.on_Client = onClient;
+		}
+		
+		public VMDeployer(ITask t){
+			this.task = t;
+		}
+		
+		@Override
+		public void run() {
+			if(BaseCommon.Instance().ONEnabled){
+				OneResponse rc;
+				// Step3: create the VM
+				VirtualMachine vm = new VirtualMachine(vmID, openClient);
+				if(vm != null){
+					//assign the vm to the task also
+					task.SerVirtualMachine(vm);
+					
+					// Step4: deploy the VM to the desired server
+					rc = vm.deploy( Integer.parseInt( ((Task)task).getServerId().toString() ) );
+					
+					// Step5: wait until the VM actually starts
+					rc = vm.info();
+					
+					
+						int timer = 5000;
+						while(vm.lcmState() != 3 &&
+								vm.lcmState() != 0 && vm.lcmState() != 14){
+							try {
+								Thread.sleep(timer);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							rc = vm.info();
+							
+							if(timer > 300)
+								timer -= 200;
+						}
+				}
+			}else{
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			// Step6: notify that the VM started
+			BaseCommon.Instance().getVMStarted().setChanged();
+			BaseCommon.Instance().getVMStarted().notifyObservers(task);
+		}
+		
+	}
 }

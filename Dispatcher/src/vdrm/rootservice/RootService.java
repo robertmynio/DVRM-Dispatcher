@@ -53,7 +53,7 @@ import vdrm.disp.alg.Algorithm1;
  */
 public class RootService {
 	private Map<Timer, TimedTaskWrapper> currentDeployedTasks;
-	
+	private Map<Timer, TimedGeneratedTaskWrapper> currentTimedTasks;
 	// maybe put a tree map <task.uuid,task> to speed up search :)
 	private List<TimedTaskWrapper> readyTasks;
 	public IAlgorithm worker;
@@ -62,6 +62,7 @@ public class RootService {
 	
 	private RootService(){
 		currentDeployedTasks = Collections.synchronizedMap(new HashMap<Timer, TimedTaskWrapper>());
+		currentTimedTasks = Collections.synchronizedMap(new HashMap<Timer, TimedGeneratedTaskWrapper>());
 		readyTasks = new Vector<TimedTaskWrapper>();
 		worker = new Algorithm1();
 		
@@ -72,6 +73,7 @@ public class RootService {
 				new Observer(){
 					public void update(Observable o, Object arg) {
 						if(arg != null){
+							System.out.println("*** Deployed for task with UUID: " + ((ITask) arg).getTaskHandle().toString());
 							StartTask((ITask)arg);
 						}
 					}
@@ -97,6 +99,36 @@ public class RootService {
 					public void update(Observable arg0, Object arg1) {
 						if(arg1 != null){
 							ParseGeneratedTask(arg1);
+						}
+					}
+					
+				}
+		);
+		
+		BaseCommon.Instance().getXMLTaskGenerated().addObserver(
+				new Observer(){
+
+					@Override
+					public void update(Observable arg0, Object arg1) {
+						
+						if(arg1 != null){
+							// remove the timedTaskWrapper
+							synchronized (currentTimedTasks) {
+								// stop the timer thread
+								Set set = currentTimedTasks.entrySet();
+							    Iterator i = set.iterator();
+							    
+							    while(i.hasNext()){
+							        Map.Entry me = (Map.Entry)i.next();
+							        if(me.getValue().equals((TimedGeneratedTaskWrapper)arg1)){
+							        	Timer time = (Timer)me.getKey();
+							        	time.cancel();
+							        	break;
+							        }
+							    }
+							    currentTimedTasks.remove((TimedGeneratedTaskWrapper)arg1);
+							}
+							ParseGeneratedTask(((TimedGeneratedTaskWrapper)arg1).getTask());
 						}
 					}
 					
@@ -150,7 +182,7 @@ public class RootService {
 				taskDescription = appDescription.getActivities()[0].getServices()[0];
 				
 				// set task duration
-				duration = appDescription.getActivities()[0].getDuration() * 1000;
+				duration = appDescription.getActivities()[0].getDuration() * 100;
 				
 				// set task requirements
 				int cpu, mem, hdd;
@@ -194,6 +226,7 @@ public class RootService {
 				newTask = new Task(cpu,mem,hdd);
 				
 				TaskArrived(newTask, duration);
+				System.out.println("Newtask has arrived with UUID: " + newTask.getTaskHandle().toString());
 			}
 			
 		}
@@ -213,8 +246,19 @@ public class RootService {
 		
 		if(BaseCommon.Instance().ResourcesAvailable){
 				//StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
-			SendTaskCommand(readyTasks.get(0).getTask());
+			//SendTaskCommand(readyTasks.get(0).getTask());
+			SendTaskCommand(GetFirstUndeployedTask());
 		}
+	}
+	
+	private ITask GetFirstUndeployedTask(){
+		for (TimedTaskWrapper item:readyTasks){
+			if( !((Task)item.getTask()).isDeployedOrdered() ){
+				((Task)item.getTask()).setDeployedOrdered(true);
+				return item.getTask();
+			}
+		}
+		return null;
 	}
 	
 	/***
@@ -230,7 +274,7 @@ public class RootService {
 			
 			if(item.getTask().getTaskHandle().toString().compareTo(t.getTaskHandle().toString()) == 0){
 				index =  readyTasks.indexOf(item);
-                found = true;
+				found = true;
 				break;
 			}
 //			if( item.getTask().equals(t) ){
@@ -242,6 +286,7 @@ public class RootService {
 		
 		TimedTaskWrapper tt = null;
         if(found){
+        	System.out.println("Newtask has started with UUID: " + t.getTaskHandle().toString());
             if(readyTasks.size()>0){
                 synchronized (readyTasks) {
                     tt =  readyTasks.get(index);
@@ -258,6 +303,8 @@ public class RootService {
             }else{
                 return;
             }
+        }else{
+        	System.out.println("Newtask has NOT started with UUID: " + t.getTaskHandle().toString());
         }
 
 		// have fun :)
@@ -265,7 +312,10 @@ public class RootService {
 	}
 	
 	public void SendTaskCommand(ITask t){
-		worker.newTask(t);
+		if(t != null){
+			((Task)t).setDeployedOrdered(true);
+			worker.newTask(t);
+		}
 	}
 	
 	/***
@@ -273,6 +323,7 @@ public class RootService {
 	 * @param t
 	 */
 	public synchronized void TaskIsDone(TimedTaskWrapper t){
+		System.out.println("Newtask has ended with UUID: " + t.getTask().getTaskHandle().toString() + "    ***");
 		worker.endTask(t.getTask());
 
         if(!BaseCommon.Instance().ResourcesAvailable){
@@ -293,7 +344,14 @@ public class RootService {
 		        }
 		    }
 			currentDeployedTasks.remove(t);
+			
+			if(readyTasks.size() > 0){
+				SendTaskCommand(GetFirstUndeployedTask());
+				//SendTaskCommand(readyTasks.get(0).getTask());
+				
+			}
 		}
+		
 		
 		
 
@@ -332,6 +390,7 @@ public class RootService {
 					
 					// schedule the timer
 					Timer timer = new Timer();
+					currentTimedTasks.put(timer, tt);
 					timer.schedule(tt, cal.getTime());
 				}
 			}

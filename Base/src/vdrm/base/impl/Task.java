@@ -18,6 +18,7 @@ public class Task implements ITask{
 	
 	private boolean unsuccessfulPlacement;
 	private boolean isPredicted;
+	private boolean deployedOrdered;
 	
 	private IServer serverHost;
 	private VirtualMachine virtualMachine;
@@ -28,6 +29,7 @@ public class Task implements ITask{
 		unsuccessfulPlacement = false;
 		isPredicted = false;
 		serverHost = null;
+		deployedOrdered = false;
 	}
 	
 	public Task(int cpu, int mem, int hdd){
@@ -221,5 +223,14 @@ public class Task implements ITask{
 		this.virtualMachine = vm;
 	}
 
+	public boolean isDeployedOrdered() {
+		return deployedOrdered;
+	}
+
+	public void setDeployedOrdered(boolean deployedOrdered) {
+		this.deployedOrdered = deployedOrdered;
+	}
+
+	
 
 }

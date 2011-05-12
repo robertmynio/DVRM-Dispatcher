@@ -3,6 +3,7 @@ package vdrm.disp.alg;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.UUID;
 
 import vdrm.base.common.IAlgorithm;
 import vdrm.base.common.IPredictor;
@@ -125,11 +126,18 @@ public class Algorithm1 implements IAlgorithm{
 		if(predictedTasks.size()>0) {
 			if(newTask.equals(predictedTasks.get(0))) { 
 					//prediction is correct
+				
+					// First magic line , these do the trick :)
+					UUID taskUUID = newTask.getTaskHandle();
 					newTask = predictedTasks.get(0);
 					newTask.setPredicted(false);
 					
+					// Second magic line
+					newTask.setTaskHandle(taskUUID);
+					
 					// OpenNebula
 					if(newTask.getServerId() != null){
+						System.out.println("VM will be Deployed for task with UUID (1): " + newTask.getTaskHandle().toString());
 						onService.DeployTask(newTask);
 						logger.logInfo("Predicted task " + newTask.getTaskHandle() + " deployed on server.");
 					}
@@ -235,6 +243,7 @@ public class Algorithm1 implements IAlgorithm{
 					
 					// OpenNebula
 					if(tempTask.getServerId() != null) {
+						System.out.println("VM will be Deployed for task with UUID (2): " + tempTask.getTaskHandle().toString());
 						onService.DeployTask(tempTask);
 						logger.logInfo("Task " + newTask.getTaskHandle() + " (normal) deployed on server.");
 					}

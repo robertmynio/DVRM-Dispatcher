@@ -2,6 +2,7 @@ package vdrm.base.data;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.Vector;
 
 public interface IServer {
 	public int getMaxCpu();
@@ -18,7 +19,7 @@ public interface IServer {
 	public int getNumberOfCores();
 	
 	public String getServerID();
-	public ArrayList<ITask> getTasks();
+	public Vector<ITask> getTasks();
 	
 	//avem nevoie de o metoda getThreshhold()? In caz ca fiecare server are un alt threshold la care e optim si sa nu trecem de el ?
 	public boolean addTask(ITask task);

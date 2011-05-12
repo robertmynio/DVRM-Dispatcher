@@ -1,5 +1,8 @@
 package rootservice;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,19 +14,25 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.Vector;
 
+import javax.xml.bind.JAXB;
+
 import datacenterInterface.dtos.jaxbBindingClasses.ActivityService;
 import datacenterInterface.dtos.jaxbBindingClasses.ApplicationDescription;
 import datacenterInterface.dtos.jaxbBindingClasses.JaxbPair;
+import datacenterInterface.dtos.jaxbBindingClasses.WorkloadSchedule;
 
 import vdrm.base.data.ITask;
 import vdrm.base.impl.BaseCommon;
 import vdrm.base.impl.Task;
 import vdrm.onservice.IOpenNebulaService;
 import vdrm.onservice.OpenNebulaService;
+import vdrm.rootservice.TimedGeneratedTaskWrapper;
+import vdrm.rootservice.TimedTaskWrapper;
 
 
 public class ON_RootService {
 	private Map<Timer, ON_TimedTaskWrapper> currentDeployedTasks;
+	private Map<Timer, ON_TimedGeneratedTaskWrapper> currentTimedTasks;
 	// maybe put a tree map <task.uuid,task> to speed up search :)
 	private List<ON_TimedTaskWrapper> readyTasks;
 	private static ON_RootService instance;
@@ -31,6 +40,7 @@ public class ON_RootService {
 	
 	private ON_RootService(){
 		currentDeployedTasks = Collections.synchronizedMap(new HashMap<Timer, ON_TimedTaskWrapper>());
+		currentTimedTasks = Collections.synchronizedMap(new HashMap<Timer, ON_TimedGeneratedTaskWrapper>());
 		readyTasks = new Vector<ON_TimedTaskWrapper>();
 		BaseCommon.Instance().ResourcesAvailable = true;
 		//initialize OpenNebula
@@ -66,6 +76,36 @@ public class ON_RootService {
 					public void update(Observable arg0, Object arg1) {
 						if(arg1 != null){
 							ParseGeneratedTask(arg1);
+						}
+					}
+					
+				}
+		);
+		
+		BaseCommon.Instance().getXMLTaskGenerated().addObserver(
+				new Observer(){
+
+					@Override
+					public void update(Observable arg0, Object arg1) {
+						
+						if(arg1 != null){
+							// remove the timedTaskWrapper
+							synchronized (currentTimedTasks) {
+								// stop the timer thread
+								Set set = currentTimedTasks.entrySet();
+							    Iterator i = set.iterator();
+							    
+							    while(i.hasNext()){
+							        Map.Entry me = (Map.Entry)i.next();
+							        if(me.getValue().equals((TimedGeneratedTaskWrapper)arg1)){
+							        	Timer time = (Timer)me.getKey();
+							        	time.cancel();
+							        	break;
+							        }
+							    }
+							    currentTimedTasks.remove((TimedGeneratedTaskWrapper)arg1);
+							}
+							ParseGeneratedTask(((TimedGeneratedTaskWrapper)arg1).getTask());
 						}
 					}
 					
@@ -148,14 +188,27 @@ public class ON_RootService {
 		}
 		
 		if(BaseCommon.Instance().ResourcesAvailable){
-				//StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
-			SendTaskCommand(readyTasks.get(0).getTask());
+			//StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
+		//SendTaskCommand(readyTasks.get(0).getTask());
+		SendTaskCommand(GetFirstUndeployedTask());
 		}
 	}
 
+	private ITask GetFirstUndeployedTask(){
+		for (ON_TimedTaskWrapper item:readyTasks){
+			if( !((Task)item.getTask()).isDeployedOrdered() ){
+				((Task)item.getTask()).setDeployedOrdered(true);
+				return item.getTask();
+			}
+		}
+		return null;
+	}
+
 	private void SendTaskCommand(ITask task) {
-		// TODO Auto-generated method stub
-		onService.DeployTask(task);
+		if(task != null){
+			((Task)task).setDeployedOrdered(true);
+			onService.DeployTask(task);
+		}
 	}
 
 	protected void StartTask(ITask t) {
@@ -220,7 +273,43 @@ public class ON_RootService {
 		        }
 		    }
 			currentDeployedTasks.remove(t);
+			
+			if(readyTasks.size() > 0){
+				//SendTaskCommand(readyTasks.get(0).getTask());
+				SendTaskCommand(GetFirstUndeployedTask());
+			}
 		}
 		
+	}
+	
+	public void ParseWorkloadXML(String path){
+		FileInputStream fin = null;
+		WorkloadSchedule workloadSchedule;
+		ON_TimedGeneratedTaskWrapper tt;
+		try{
+			 fin = new FileInputStream(path);
+		}catch(FileNotFoundException e){
+			System.out.println("Aww shit");
+		}
+		
+		if(fin != null){
+			workloadSchedule = JAXB.unmarshal(fin, WorkloadSchedule.class);
+			if(workloadSchedule != null){
+				JaxbPair[] tasks = workloadSchedule.getApplications();
+				for(JaxbPair pair:tasks){
+					long startDelay = pair.getStartDelay();
+					tt = new ON_TimedGeneratedTaskWrapper(pair);
+					
+					// compute the start delay, starting from now
+					Calendar cal = Calendar.getInstance();
+					cal.add(Calendar.SECOND, (int)startDelay);
+					
+					// schedule the timer
+					Timer timer = new Timer();
+					currentTimedTasks.put(timer, tt);
+					timer.schedule(tt, cal.getTime());
+				}
+			}
+		}
 	}
 }

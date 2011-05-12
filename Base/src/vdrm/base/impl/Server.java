@@ -2,6 +2,7 @@ package vdrm.base.impl;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.Vector;
 
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
@@ -34,7 +35,7 @@ public class Server implements IServer {
 	
 	
 	// TASKS REPRESENTATION
-	private ArrayList<ITask> taskList;
+	private Vector<ITask> taskList;
 	private int nrOfTasks;
 	private int nrOfPredictedTasks;
 	
@@ -50,7 +51,7 @@ public class Server implements IServer {
 		usedHDD = 0;
 		isFull = false;
 		isEmpty = true;
-		taskList = new ArrayList<ITask>();
+		taskList = new Vector<ITask>();
 		nrOfTasks = 0;
 		nrOfPredictedTasks = 0;
 		lowestDemandingTask = null;
@@ -403,7 +404,7 @@ public class Server implements IServer {
 
 
 	@Override
-	public ArrayList<ITask> getTasks() {
+	public Vector<ITask> getTasks() {
 		return taskList;
 	}
 
