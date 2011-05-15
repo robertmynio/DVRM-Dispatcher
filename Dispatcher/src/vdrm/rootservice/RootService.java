@@ -73,7 +73,7 @@ public class RootService {
 				new Observer(){
 					public void update(Observable o, Object arg) {
 						if(arg != null){
-							System.out.println("*** Deployed for task with UUID: " + ((ITask) arg).getTaskHandle().toString());
+							//System.out.println("*** Deployed for task with UUID: " + ((ITask) arg).getTaskHandle().toString());
 							StartTask((ITask)arg);
 						}
 					}
@@ -141,6 +141,7 @@ public class RootService {
 					@Override
 					public void update(Observable arg0, Object arg1) {
 						if(arg1 != null)
+							System.out.println("### Pause task event arrived.");
 							PauseTimerForTask(arg1);
 					}
 					
@@ -150,8 +151,10 @@ public class RootService {
 
 					@Override
 					public void update(Observable arg0, Object arg1) {
-						if(arg1 != null)
+						if(arg1 != null){
+							System.out.println("### Resume task event arrived.");
 							ResumeTimerForTask(arg1);
+						}
 					}
 					
 				});
@@ -182,7 +185,7 @@ public class RootService {
 				taskDescription = appDescription.getActivities()[0].getServices()[0];
 				
 				// set task duration
-				duration = appDescription.getActivities()[0].getDuration() * 100;
+				duration = appDescription.getActivities()[0].getDuration() * 1000;
 				
 				// set task requirements
 				int cpu, mem, hdd;
@@ -210,7 +213,7 @@ public class RootService {
 					//mem = taskDescription.getRequestedMemoryMin();
 				}
 				
-				if(taskDescription.getRequestedMemoryMax() < 1000
+				if(taskDescription.getRequestedMemoryMax() <= 1000
 						|| ((taskDescription.getRequestedMemoryMax() + taskDescription.getRequestedMemoryMin())/2) < 1000){
 					hdd = taskDescription.getRequestedMemoryMax()*10;
 				}else{
@@ -286,13 +289,15 @@ public class RootService {
 		
 		TimedTaskWrapper tt = null;
         if(found){
-        	System.out.println("Newtask has started with UUID: " + t.getTaskHandle().toString());
+        	//System.out.println("Newtask has started with UUID: " + t.getTaskHandle().toString());
             if(readyTasks.size()>0){
                 synchronized (readyTasks) {
                     tt =  readyTasks.get(index);
                     readyTasks.remove(tt);
                  }
                 // Step2: schedule the task to run until it expires
+                tt.setStartTime(System.currentTimeMillis());
+                //System.out.println("Current time: " + tt.getStartTime() + " and estimated time: " + tt.getEstimatedDuration());
                 timer.schedule(tt, tt.getEstimatedDuration());
 
 
@@ -306,7 +311,12 @@ public class RootService {
         }else{
         	System.out.println("Newtask has NOT started with UUID: " + t.getTaskHandle().toString());
         }
-
+        
+        if(readyTasks.size() > 0){
+			SendTaskCommand(GetFirstUndeployedTask());
+			//SendTaskCommand(readyTasks.get(0).getTask());
+			
+		}
 		// have fun :)
 		//SendTaskCommand(t);
 	}
@@ -334,16 +344,20 @@ public class RootService {
 			// stop the timer thread
 			Set set = currentDeployedTasks.entrySet();
 		    Iterator i = set.iterator();
-		    
+		    Timer time = null;
 		    while(i.hasNext()){
 		        Map.Entry me = (Map.Entry)i.next();
 		        if(me.getValue().equals(t)){
-		        	Timer time = (Timer)me.getKey();
+		        	time = (Timer)me.getKey();
 		        	time.cancel();
 		        	break;
 		        }
 		    }
-			currentDeployedTasks.remove(t);
+		    if(time != null){
+		    	currentDeployedTasks.remove(time);
+		    }else{
+		    	currentDeployedTasks.remove(t);
+		    }
 			
 			if(readyTasks.size() > 0){
 				SendTaskCommand(GetFirstUndeployedTask());
@@ -398,49 +412,102 @@ public class RootService {
 	}
 	
 	protected synchronized void PauseTimerForTask(Object t) {
+		TimedTaskWrapper tt = null;
+		Timer time = null;
 		synchronized (currentDeployedTasks) {
+			ITask pausedTask = (ITask)t;
 			// stop the timer thread
 			Set set = currentDeployedTasks.entrySet();
 		    Iterator i = set.iterator();
 		    
 		    while(i.hasNext()){
 		        Map.Entry me = (Map.Entry)i.next();
-		        if(me.getValue().equals((ITask)t)){
-		        	Timer time = (Timer)me.getKey();
-//		        	try {
-//						time.wait();
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+		        tt = (TimedTaskWrapper)me.getValue();
+		        if( tt.getTask().getTaskHandle().toString().compareTo(pausedTask.getTaskHandle().toString())==0){
+		        	time = (Timer)me.getKey();
+		        	
+		        	System.out.println("@@@ Task will be paused, migration STARTED " + tt.getTask().getTaskHandle().toString());
+		        	try {
+		        		// cancel the timer
+		        		time.cancel();
+		        		// set the actual run time (until now)
+		        		tt.setActualRunTime(System.currentTimeMillis() - tt.getStartTime());
+		        		
+		        		// set the remaining running time
+		        		if((tt.getEstimatedDuration()) - tt.getActualRunTime() > 0)
+		        			tt.setRemainingRunTime( (tt.getEstimatedDuration()) - tt.getActualRunTime());
+		        		else{
+		        			tt.setRemainingRunTime(0);
+		        			tt.setResume(false);
+		        		}
+		        		System.out.println("@@@ Remaining time: " + tt.getRemainingRunTime() + ", with actual run time of " + tt.getActualRunTime() + "and original estimated time of " + tt.getEstimatedDuration() );
+		    		}catch(Exception e){
+		    			e.printStackTrace();
+		    		}
 		        	break;
 		        }
 		    }
-			currentDeployedTasks.remove(t);
+		    //WaitForTaskMigration(tt, time);
+			//currentDeployedTasks.remove(t);
 		}
 	}
 	
 	protected synchronized void ResumeTimerForTask(Object t) {
+		TimedTaskWrapper tt = null;
+		Timer time = null;
 		synchronized (currentDeployedTasks) {
+			ITask pausedTask = (ITask)t;
 			// stop the timer thread
 			Set set = currentDeployedTasks.entrySet();
 		    Iterator i = set.iterator();
 		    
 		    while(i.hasNext()){
 		        Map.Entry me = (Map.Entry)i.next();
-		        if(me.getValue().equals((ITask)t)){
-		        	Timer time = (Timer)me.getKey();
-//		        	try {
-//						// time start
-//		        		
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+		        tt = (TimedTaskWrapper)me.getValue();
+		        if( tt.getTask().getTaskHandle().toString().compareTo(pausedTask.getTaskHandle().toString())==0){
+		        	
+		        	time = (Timer)me.getKey();
+		        	currentDeployedTasks.remove(time);
+        			
+        			// kill it!
+        			time.purge();
 		        	break;
 		        }
 		    }
-			currentDeployedTasks.remove(t);
+		    try{
+        		//System.out.println("@@@ Task resuming, migration FINISHED " + tt.getTask().getTaskHandle().toString());
+        		synchronized (currentDeployedTasks) {
+        			
+        			if(tt.canResume() && tt.getRemainingRunTime() > 0){
+        				// search for duplicates 
+        				i = set.iterator();
+        				boolean found = false;
+        				while(i.hasNext()){
+        					Map.Entry me = (Map.Entry)i.next();
+        			        tt = (TimedTaskWrapper)me.getValue();
+        			        if( tt.getTask().getTaskHandle().toString().compareTo(pausedTask.getTaskHandle().toString())==0){
+        			        	found = true;
+        			        	break;
+        			        }
+        				}
+        				if(!found){
+        					System.out.println("@@@ Task resuming, migration FINISHED (no duplicates)" + tt.getTask().getTaskHandle().toString());
+		        			Timer newtime = new Timer();
+		        			TimedTaskWrapper newTask = new TimedTaskWrapper(tt.getTask(), (int) tt.getRemainingRunTime());
+		        			newTask.setRemainingRunTime(tt.getRemainingRunTime());
+		        			newTask.setStartTime(tt.getStartTime());
+		        			newTask.setActualRunTime(tt.getActualRunTime());
+		        			newtime.schedule(newTask, newTask.getRemainingRunTime());
+		        			currentDeployedTasks.put(newtime, tt);
+        				}else{
+        					System.out.println("@@@ Task NOT resuming, migration FINISHED (duplicate found)" + tt.getTask().getTaskHandle().toString());
+        				}
+        			}
+        		}
+        	}catch(Exception ex){
+        		ex.printStackTrace();
+        	}
+		    
 		}
 	}
 }

@@ -15,6 +15,7 @@ import vdrm.base.impl.BaseCommon.VMStartedEvent;
 import vdrm.disp.util.VDRMLogger;
 import vdrm.onservice.ONConfigurationService;
 import vdrm.onservice.OpenNebulaService.VMDeployer;
+import vdrm.onservice.OpenNebulaService.VMMigrator;
 
 public class OpenNebulaService implements IOpenNebulaService {
 	private Client openClient;
@@ -36,10 +37,10 @@ public class OpenNebulaService implements IOpenNebulaService {
 		if(BaseCommon.ONEnabled){
 			//TODO: make sure hdd path is integrated into ITask (maybe put linux/windows image paths")
 			// Step1: create the VM template
-			int nrCores = t.getServer().getNumberOfCores();
-			int serverCPUFreq = ((Server)t.getServer()).getCoreFreq();
+			//int nrCores = t.getServer().getNumberOfCores();
+			//int serverCPUFreq = ((Server)t.getServer()).getCoreFreq();
 			int tFreq = t.getCpu();
-			int taskFreq = (int)(((double)tFreq/(double)serverCPUFreq) *100);
+			int taskFreq = (int)(((double)tFreq/(double)3000) *100);
 //			String vmTemplate = ONConfigurationService.GetConfiguration(t.getCpu(), t.getMem(), t.getHdd(), "hddPath");
 			String vmTemplate = ONConfigurationService.GetConfiguration(taskFreq, t.getMem(), t.getHdd(), "hddPath");
 			OneResponse rc;
@@ -63,25 +64,6 @@ public class OpenNebulaService implements IOpenNebulaService {
 						VMDeployer vmd = new VMDeployer(t, openClient, vmID);
 						threadService.execute(vmd);
 						threadService.shutdown();
-//						// Step4: deploy the VM to the desired server
-//						rc = vm.deploy( Integer.parseInt( ((Task)t).getServerId().toString() ) );
-//						
-//						// Step5: wait until the VM actually starts
-//						rc = vm.info();
-//						int timer = 5000;
-//						while(vm.lcmState() != 3 &&
-//								vm.lcmState() != 0 && vm.lcmState() != 14){
-//							Thread.sleep(timer);
-//							rc = vm.info();
-//							
-//							if(timer > 300)
-//								timer -= 200;
-//						}
-						
-//						// Step6: notify that the VM started
-//						BaseCommon.Instance().getVMStarted().setChanged();
-//						BaseCommon.Instance().getVMStarted().notifyObservers(t);
-						
 						return true;
 					}else{
 						logger.logWarning("ON: Could not create Virtual Machine for task "+t.getTaskHandle().toString());
@@ -153,17 +135,71 @@ public class OpenNebulaService implements IOpenNebulaService {
 	public boolean MigrateTask(ITask t, IServer s) {
 		if(BaseCommon.ONEnabled){
 			Task task = (Task)t;
-			VirtualMachine vm = task.GetVirtualMachine();
-			if(vm != null){
-				//The Only Step: migrate to server ID
-				vm.migrate(Integer.parseInt(s.getServerID().toString()), true);
-				return true;
-			}
-			return false;
+			ExecutorService threadService = Executors.newSingleThreadExecutor();
+			VMMigrator vmd = new VMMigrator(t,s);
+			threadService.execute(vmd);
+			threadService.shutdown();
+			return true;
 		}
 		else{
 			// for testing purposes only
+			ExecutorService threadService = Executors.newSingleThreadExecutor();
+			VMMigrator vmd = new VMMigrator(t,s);
+			threadService.execute(vmd);
+			threadService.shutdown();
 			return true;
+		}
+	}
+
+	public class VMMigrator implements Runnable{
+		private ITask task;
+		private IServer destinationServer;
+		
+		public VMMigrator(ITask t, IServer s){
+			this.task = t;
+			this.destinationServer = s;
+		}
+		
+		@Override
+		public void run() {
+			
+			// fire the event
+			BaseCommon.Instance().TaskStartedMigrating.setChanged();
+			BaseCommon.Instance().TaskStartedMigrating.notifyObservers(task);
+			
+			if(BaseCommon.ONEnabled){
+				VirtualMachine vm = task.GetVirtualMachine();
+				if(vm != null){
+					//The Only Step: migrate to server ID
+					OneResponse status = vm.migrate(Integer.parseInt(destinationServer.getServerID().toString()), false);
+					status = vm.info();
+					int timer = 5000;
+					while (vm.lcmState() != 3 && vm.lcmState() != 0 && vm.lcmState() != 14) {
+			            //  System.out.println(machine.lcmState()+machine.lcmStateStr());
+			            try {
+			                Thread.sleep(timer);
+			            } catch (InterruptedException e) {
+			                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			            }
+			            if(timer > 300)
+							timer -= 200;
+			            vm.info();
+			        }
+					BaseCommon.Instance().TaskEndedMigrating.setChanged();
+					BaseCommon.Instance().TaskEndedMigrating.notifyObservers(task);
+				}
+			}
+			else{
+				try {
+					Thread.sleep(20000);
+					BaseCommon.Instance().TaskEndedMigrating.setChanged();
+					BaseCommon.Instance().TaskEndedMigrating.notifyObservers(task);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
 		}
 	}
 	

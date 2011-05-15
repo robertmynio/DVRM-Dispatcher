@@ -8,10 +8,15 @@ import vdrm.rootservice.RootService;
 public class ON_TimedTaskWrapper extends TimerTask {
 	private ITask task;
 	private int estimatedDuration;
+	private boolean resume;
+	private long startTime;
+	private long actualRunTime;
+	private long remainingRunTime;
 	
 	public ON_TimedTaskWrapper(ITask t, int duration){
 		this.task = t;
 		this.estimatedDuration = duration;
+		this.resume = true;
 	}
 	
 	/***
@@ -40,4 +45,35 @@ public class ON_TimedTaskWrapper extends TimerTask {
 		this.estimatedDuration = estimatedDuration;
 	}
 	
+	public long getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
+	}
+
+	public long getActualRunTime() {
+		return actualRunTime;
+	}
+
+	public void setActualRunTime(long actualRunTime) {
+		this.actualRunTime = actualRunTime;
+	}
+
+	public long getRemainingRunTime() {
+		return remainingRunTime;
+	}
+
+	public void setRemainingRunTime(long remainingRunTime) {
+		this.remainingRunTime = remainingRunTime;
+	}
+
+	public boolean canResume() {
+		return resume;
+	}
+
+	public void setResume(boolean resume) {
+		this.resume = resume;
+	}
 }

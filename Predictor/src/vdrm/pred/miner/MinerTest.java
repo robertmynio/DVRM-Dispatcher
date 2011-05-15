@@ -68,11 +68,18 @@ public class MinerTest {
 		
 		ArrayList<ITask> prediction = null;
 		
-		for(int i = 0 ; i<tasks.size(); i++) {
-			prediction = pred.predict(tasks.get(i));
-			if(prediction!=null)
-				System.out.println("Prediction length for "+i+" = " + prediction.size());
-		}
+		prediction = pred.predict(tasks.get(4));
+		taskHistory.add(tasks.get(4));
+		prediction = pred.predict(tasks.get(3));
+		taskHistory.add(tasks.get(3));
+		prediction = pred.predict(tasks.get(0));
+		taskHistory.add(tasks.get(0));
+		prediction = pred.predict(tasks.get(1));
+		taskHistory.add(tasks.get(1));
+		prediction = pred.predict(tasks.get(2));
+		taskHistory.add(tasks.get(2));
+		prediction = pred.predict(tasks.get(3));
+		taskHistory.add(tasks.get(3));
 	}
 
 }

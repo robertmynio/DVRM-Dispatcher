@@ -7,10 +7,12 @@ import datacenterInterface.dtos.jaxbBindingClasses.JaxbPair;
 
 public class ON_TimedGeneratedTaskWrapper extends TimerTask{
 private JaxbPair task;
+
 	
 	public ON_TimedGeneratedTaskWrapper(JaxbPair task) {
 		super();
 		this.task = task;
+		
 	}
 	
 	
@@ -27,4 +29,6 @@ private JaxbPair task;
         BaseCommon.Instance().getXMLTaskGenerated().setChanged();
         BaseCommon.Instance().getXMLTaskGenerated().notifyObservers(this);
 	}
+	
+	
 }

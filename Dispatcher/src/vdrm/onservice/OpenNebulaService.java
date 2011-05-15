@@ -157,29 +157,90 @@ public class OpenNebulaService implements IOpenNebulaService {
 	public boolean MigrateTask(ITask t, IServer s) {
 		if(BaseCommon.ONEnabled){
 			Task task = (Task)t;
-			VirtualMachine vm = task.GetVirtualMachine();
-			if(vm != null){
-				//The Only Step: migrate to server ID
-				OneResponse status = vm.migrate(Integer.parseInt(s.getServerID().toString()), true);
-				if(!status.isError()){
-					//BaseCommon.Instance().TaskEndedMigrating.setChanged();
-					//BaseCommon.Instance().TaskEndedMigrating.notifyObservers(t);
-					return true;
-				}
-				else{
-					//BaseCommon.Instance().TaskEndedMigrating.setChanged();
-					//BaseCommon.Instance().TaskEndedMigrating.notifyObservers(t);
-					return false;
-				}
-			}
-			return false;
+			ExecutorService threadService = Executors.newSingleThreadExecutor();
+			VMMigrator vmd = new VMMigrator(t,s);
+			threadService.execute(vmd);
+			threadService.shutdown();
+			return true;
+//			VirtualMachine vm = task.GetVirtualMachine();
+//			if(vm != null){
+//				//The Only Step: migrate to server ID
+//				OneResponse status = vm.migrate(Integer.parseInt(s.getServerID().toString()), false);
+//				if(!status.isError()){
+//					//BaseCommon.Instance().TaskEndedMigrating.setChanged();
+//					//BaseCommon.Instance().TaskEndedMigrating.notifyObservers(t);
+//					return true;
+//				}
+//				else{
+//					//BaseCommon.Instance().TaskEndedMigrating.setChanged();
+//					//BaseCommon.Instance().TaskEndedMigrating.notifyObservers(t);
+//					return false;
+//				}
+//			}
+//			return false;
 		}
 		else{
 			// for testing purposes only
+			ExecutorService threadService = Executors.newSingleThreadExecutor();
+			VMMigrator vmd = new VMMigrator(t,s);
+			threadService.execute(vmd);
+			threadService.shutdown();
 			return true;
 		}
 	}
 
+	public class VMMigrator implements Runnable{
+		private ITask task;
+		private IServer destinationServer;
+		
+		public VMMigrator(ITask t, IServer s){
+			this.task = t;
+			this.destinationServer = s;
+		}
+		
+		@Override
+		public void run() {
+			
+			// fire the event
+			BaseCommon.Instance().TaskStartedMigrating.setChanged();
+			BaseCommon.Instance().TaskStartedMigrating.notifyObservers(task);
+			
+			if(BaseCommon.ONEnabled){
+				VirtualMachine vm = task.GetVirtualMachine();
+				if(vm != null){
+					//The Only Step: migrate to server ID
+					OneResponse status = vm.migrate(Integer.parseInt(destinationServer.getServerID().toString()), false);
+					status = vm.info();
+					int timer = 5000;
+					while (vm.lcmState() != 3 && vm.lcmState() != 0 && vm.lcmState() != 14) {
+			            //  System.out.println(machine.lcmState()+machine.lcmStateStr());
+			            try {
+			                Thread.sleep(timer);
+			            } catch (InterruptedException e) {
+			                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			            }
+			            if(timer > 300)
+							timer -= 200;
+			            vm.info();
+			        }
+					BaseCommon.Instance().TaskEndedMigrating.setChanged();
+					BaseCommon.Instance().TaskEndedMigrating.notifyObservers(task);
+				}
+			}
+			else{
+				try {
+					Thread.sleep(20000);
+					BaseCommon.Instance().TaskEndedMigrating.setChanged();
+					BaseCommon.Instance().TaskEndedMigrating.notifyObservers(task);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+		}
+	}
+	
 	public class VMDeployer implements Runnable{
 		private ITask task;
 		private int vmID;

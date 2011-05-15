@@ -66,7 +66,7 @@ public class TestsVlad {
 		
 		
 		ArrayList<ITask> tasks = new ArrayList<ITask>();
-		task = new Task(500,2500,25000);
+		task = new Task(500,2500,12500);
 		tasks.add(task);
 		task = new Task(1750,600,6000);
 		tasks.add(task);

@@ -111,7 +111,29 @@ public class ON_RootService {
 					
 				}
 		);
+		BaseCommon.Instance().getTaskStartedMigrating().addObserver(
+				new Observer(){
 
+					@Override
+					public void update(Observable arg0, Object arg1) {
+						if(arg1 != null)
+							System.out.println("### Pause task event arrived.");
+							PauseTimerForTask(arg1);
+					}
+					
+				});
+		BaseCommon.Instance().getTaskEndedMigrating().addObserver(
+				new Observer(){
+
+					@Override
+					public void update(Observable arg0, Object arg1) {
+						if(arg1 != null){
+							System.out.println("### Resume task event arrived.");
+							ResumeTimerForTask(arg1);
+						}
+					}
+					
+				});
 	}
 	
 	public static ON_RootService Instance(){
@@ -159,7 +181,7 @@ public class ON_RootService {
 					//mem = taskDescription.getRequestedMemoryMin();
 				}
 				
-				if(taskDescription.getRequestedMemoryMax() < 1000
+				if(taskDescription.getRequestedMemoryMax() <= 1000
 						|| ((taskDescription.getRequestedMemoryMax() + taskDescription.getRequestedMemoryMin())/2) < 1000){
 					hdd = taskDescription.getRequestedMemoryMax()*10;
 				}else{
@@ -310,6 +332,106 @@ public class ON_RootService {
 					timer.schedule(tt, cal.getTime());
 				}
 			}
+		}
+	}
+	
+	protected synchronized void PauseTimerForTask(Object t) {
+		ON_TimedTaskWrapper tt = null;
+		Timer time = null;
+		synchronized (currentDeployedTasks) {
+			ITask pausedTask = (ITask)t;
+			// stop the timer thread
+			Set set = currentDeployedTasks.entrySet();
+		    Iterator i = set.iterator();
+		    
+		    while(i.hasNext()){
+		        Map.Entry me = (Map.Entry)i.next();
+		        tt = (ON_TimedTaskWrapper)me.getValue();
+		        if( tt.getTask().getTaskHandle().toString().compareTo(pausedTask.getTaskHandle().toString())==0){
+		        	time = (Timer)me.getKey();
+		        	
+		        	System.out.println("@@@ Task will be paused, migration STARTED " + tt.getTask().getTaskHandle().toString());
+		        	try {
+		        		// cancel the timer
+		        		time.cancel();
+		        		// set the actual run time (until now)
+		        		tt.setActualRunTime(System.currentTimeMillis() - tt.getStartTime());
+		        		
+		        		// set the remaining running time
+		        		if((tt.getEstimatedDuration()) - tt.getActualRunTime() > 0)
+		        			tt.setRemainingRunTime( (tt.getEstimatedDuration()) - tt.getActualRunTime());
+		        		else{
+		        			tt.setRemainingRunTime(0);
+		        			tt.setResume(false);
+		        		}
+		        		System.out.println("@@@ Remaining time: " + tt.getRemainingRunTime() + ", with actual run time of " + tt.getActualRunTime() + "and original estimated time of " + tt.getEstimatedDuration() );
+		    		}catch(Exception e){
+		    			e.printStackTrace();
+		    		}
+		        	break;
+		        }
+		    }
+		    //WaitForTaskMigration(tt, time);
+			//currentDeployedTasks.remove(t);
+		}
+	}
+	
+	protected synchronized void ResumeTimerForTask(Object t) {
+		ON_TimedTaskWrapper tt = null;
+		Timer time = null;
+		synchronized (currentDeployedTasks) {
+			ITask pausedTask = (ITask)t;
+			// stop the timer thread
+			Set set = currentDeployedTasks.entrySet();
+		    Iterator i = set.iterator();
+		    
+		    while(i.hasNext()){
+		        Map.Entry me = (Map.Entry)i.next();
+		        tt = (ON_TimedTaskWrapper)me.getValue();
+		        if( tt.getTask().getTaskHandle().toString().compareTo(pausedTask.getTaskHandle().toString())==0){
+		        	
+		        	time = (Timer)me.getKey();
+		        	currentDeployedTasks.remove(time);
+        			
+        			// kill it!
+        			time.purge();
+		        	break;
+		        }
+		    }
+		    try{
+        		//System.out.println("@@@ Task resuming, migration FINISHED " + tt.getTask().getTaskHandle().toString());
+        		synchronized (currentDeployedTasks) {
+        			
+        			if(tt.canResume() && tt.getRemainingRunTime() > 0){
+        				// search for duplicates 
+        				i = set.iterator();
+        				boolean found = false;
+        				while(i.hasNext()){
+        					Map.Entry me = (Map.Entry)i.next();
+        			        tt = (ON_TimedTaskWrapper)me.getValue();
+        			        if( tt.getTask().getTaskHandle().toString().compareTo(pausedTask.getTaskHandle().toString())==0){
+        			        	found = true;
+        			        	break;
+        			        }
+        				}
+        				if(!found){
+        					System.out.println("@@@ Task resuming, migration FINISHED (no duplicates)" + tt.getTask().getTaskHandle().toString());
+		        			Timer newtime = new Timer();
+		        			ON_TimedTaskWrapper newTask = new ON_TimedTaskWrapper(tt.getTask(), (int) tt.getRemainingRunTime());
+		        			newTask.setRemainingRunTime(tt.getRemainingRunTime());
+		        			newTask.setStartTime(tt.getStartTime());
+		        			newTask.setActualRunTime(tt.getActualRunTime());
+		        			newtime.schedule(newTask, newTask.getRemainingRunTime());
+		        			currentDeployedTasks.put(newtime, tt);
+        				}else{
+        					System.out.println("@@@ Task NOT resuming, migration FINISHED (duplicate found)" + tt.getTask().getTaskHandle().toString());
+        				}
+        			}
+        		}
+        	}catch(Exception ex){
+        		ex.printStackTrace();
+        	}
+		    
 		}
 	}
 }

@@ -151,6 +151,7 @@ public class Algorithm1 implements IAlgorithm{
 				}
 			else { 	
 				//prediction was not correct
+				System.out.println("Prediction miss for task with UUID (3): " + newTask.getTaskHandle().toString());
 				
 				//since we used an optimistic approach, we have to remove the tasks from the servers
 				IServer tempServer;
