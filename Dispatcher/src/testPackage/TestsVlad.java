@@ -113,7 +113,7 @@ public class TestsVlad {
 		//ArrayList<ITask> tasks = dao.getAllTasks();
 		//ArrayList<ITask> taskHistory = dao.getTaskHistory();
 		rs.worker.initialize(servers, tasks, taskHistory);
-		rs.ParseWorkloadXML("workload1.xml");
+		rs.ParseWorkloadXML("workload2.xml");
 //		WorkloadSchedulerAgent wagent = new WorkloadSchedulerAgent();
 //		wagent.run();
 //		task = (Task) tasks.get(5);

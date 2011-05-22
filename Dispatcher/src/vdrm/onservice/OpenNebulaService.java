@@ -157,10 +157,11 @@ public class OpenNebulaService implements IOpenNebulaService {
 	public boolean MigrateTask(ITask t, IServer s) {
 		if(BaseCommon.ONEnabled){
 			Task task = (Task)t;
-			ExecutorService threadService = Executors.newSingleThreadExecutor();
-			VMMigrator vmd = new VMMigrator(t,s);
-			threadService.execute(vmd);
-			threadService.shutdown();
+//			ExecutorService threadService = Executors.newSingleThreadExecutor();
+//			VMMigrator vmd = new VMMigrator(t,s);
+//			threadService.execute(vmd);
+//			threadService.shutdown();
+			
 			return true;
 //			VirtualMachine vm = task.GetVirtualMachine();
 //			if(vm != null){
@@ -225,11 +226,13 @@ public class OpenNebulaService implements IOpenNebulaService {
 			        }
 					BaseCommon.Instance().TaskEndedMigrating.setChanged();
 					BaseCommon.Instance().TaskEndedMigrating.notifyObservers(task);
+				}else{
+					
 				}
 			}
 			else{
 				try {
-					Thread.sleep(20000);
+					Thread.sleep(10000);
 					BaseCommon.Instance().TaskEndedMigrating.setChanged();
 					BaseCommon.Instance().TaskEndedMigrating.notifyObservers(task);
 				} catch (InterruptedException e) {

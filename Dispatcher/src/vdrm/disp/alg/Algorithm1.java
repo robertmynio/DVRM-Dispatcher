@@ -12,6 +12,7 @@ import vdrm.base.data.ITask;
 import vdrm.base.impl.BaseCommon;
 import vdrm.base.impl.Server;
 import vdrm.base.impl.Sorter;
+import vdrm.base.impl.Task;
 import vdrm.disp.util.VDRMLogger;
 import vdrm.onservice.IOpenNebulaService;
 import vdrm.onservice.OpenNebulaService;
@@ -137,7 +138,7 @@ public class Algorithm1 implements IAlgorithm{
 					
 					// OpenNebula
 					if(newTask.getServerId() != null){
-						System.out.println("VM will be Deployed for task with UUID (1): " + newTask.getTaskHandle().toString());
+						//System.out.println("VM will be Deployed for task with UUID (1): " + newTask.getTaskHandle().toString());
 						onService.DeployTask(newTask);
 						logger.logInfo("Predicted task " + newTask.getTaskHandle() + " deployed on server.");
 					}
@@ -244,7 +245,7 @@ public class Algorithm1 implements IAlgorithm{
 					
 					// OpenNebula
 					if(tempTask.getServerId() != null) {
-						System.out.println("VM will be Deployed for task with UUID (2): " + tempTask.getTaskHandle().toString());
+						//System.out.println("VM will be Deployed for task with UUID (2): " + tempTask.getTaskHandle().toString());
 						onService.DeployTask(tempTask);
 						logger.logInfo("Task " + newTask.getTaskHandle() + " (normal) deployed on server.");
 					}
@@ -494,7 +495,7 @@ public class Algorithm1 implements IAlgorithm{
 				
 				if((server.getTotalNumberOfTasks() + server.getNumberOfPredictedTasks()) == 0){
 					logger.logInfo("FT: Server is now empty. Order it to sleep. (2)");
-					server.OrderStandBy();
+					//server.OrderStandBy();
 					inUseServers.remove(server);
 					emptyServers.add(server);
 					powerService.sendServerToSleep(server);
@@ -538,7 +539,8 @@ public class Algorithm1 implements IAlgorithm{
 			if(nrTasks1 <= nrTasks2){
 				logger.logInfo("FT: Last server has the least nr of tasks");
 				for(ITask t:lastServer.getTasks()){
-					if(server.compareAvailableResources(t) && !server.isFull()){
+					if(server.compareAvailableResources(t) && !server.isFull()
+							&& ((Task)t).getCanMigrate()){
 						logger.logInfo("FT: Added task "+ t.getTaskHandle() +" to server "+ server.getServerID()+ ".(1)");
 						//remove task from current server
 						lastServer.removeTask(t);
@@ -547,6 +549,7 @@ public class Algorithm1 implements IAlgorithm{
 						
 						// add task to new server
 						server.addTask(t);
+						((Task)t).setCanMigrate(false);
 						if(!t.isPredicted())
 							MigrateTask(t, server);
 							
@@ -575,10 +578,12 @@ public class Algorithm1 implements IAlgorithm{
 					ITask t;
 					while(( t = secondToLastServer.GetNextLowestDemandingTask())!=null && (!server.isFull()) 
 							&& timesTried < (secondToLastServer.getTotalNumberOfTasks() + secondToLastServer.getNumberOfPredictedTasks() )){
-						if(server.compareAvailableResources(t) && !server.isFull()){
+						if(server.compareAvailableResources(t) && !server.isFull()
+								&& ((Task)t).getCanMigrate()){
 							secondToLastServer.removeTask(t);
 							t.setServer(server);
 							server.addTask(t);
+							((Task)t).setCanMigrate(false);
 							if(!t.isPredicted())
 								MigrateTask(t, server);
 								//onService.MigrateTask(t, server);	
@@ -588,8 +593,9 @@ public class Algorithm1 implements IAlgorithm{
 								fullServers.add(server);
 								break;
 							}
-							timesTried++;
+							
 						}
+						timesTried++;
 					}
 				}
 				
@@ -601,7 +607,8 @@ public class Algorithm1 implements IAlgorithm{
 				}
 			}else{
 				for(ITask t:secondToLastServer.getTasks()){
-					if(server.compareAvailableResources(t) && !server.isFull()){
+					if(server.compareAvailableResources(t) && !server.isFull()
+							&& ((Task)t).getCanMigrate()){
 						//remove task from current server
 						secondToLastServer.removeTask(t);
 						// set the new server
@@ -609,6 +616,7 @@ public class Algorithm1 implements IAlgorithm{
 						
 						// add task to new server
 						server.addTask(t);
+						((Task)t).setCanMigrate(false);
 						if(!t.isPredicted())
 							MigrateTask(t, server);
 							
@@ -633,10 +641,12 @@ public class Algorithm1 implements IAlgorithm{
 					ITask t;
 					while(( t = lastServer.GetNextLowestDemandingTask())!=null && (!server.isFull())
 							&& timesTried < (secondToLastServer.getTotalNumberOfTasks() + secondToLastServer.getNumberOfPredictedTasks() )){
-						if(server.compareAvailableResources(t) && !server.isFull()){
+						if(server.compareAvailableResources(t) && !server.isFull()
+								&& ((Task)t).getCanMigrate()){
 							lastServer.removeTask(t);
 							t.setServer(server);
 							server.addTask(t);
+							((Task)t).setCanMigrate(false);
 							if(!t.isPredicted())
 								MigrateTask(t, server);
 								
@@ -646,9 +656,9 @@ public class Algorithm1 implements IAlgorithm{
 								fullServers.add(server);
 								break;
 							}
-							timesTried++;
+							
 						}
-						
+						timesTried++;
 					}
 				}
 				if(lastServer.isEmpty()){
@@ -674,11 +684,11 @@ public class Algorithm1 implements IAlgorithm{
 			found = false;
 			ITask t = server.GetNextLowestDemandingTask();
 			// if the task is predicted, don't move it
-			
+			if( ((Task)t).getCanMigrate()){
 				for(IServer s:inUseServers){
 					if(s != server){
 						if(s.compareAvailableResources(t)){
-							
+							((Task)t).setCanMigrate(false);
 							// TODO migrate_to_new_host(s); -- OpenNebula
 							if(!t.isPredicted()){
 								//onService.MigrateTask(t, s);
@@ -701,6 +711,7 @@ public class Algorithm1 implements IAlgorithm{
 						}
 					}
 				}
+			}
 				if(!found){
 					noPlaceFound++;
 					t.setUnsuccessfulPlacement(true);
@@ -765,9 +776,10 @@ public class Algorithm1 implements IAlgorithm{
 		
 		ITask bingoTask = lastServer.GetTaskWithResources(availableResources);
 		
-		if(bingoTask != null){
+		if(bingoTask != null && ((Task)bingoTask).getCanMigrate()){
 			logger.logInfo(" Perfect task found. Server will be full.");
 			// OPEN NEBULA
+			((Task)bingoTask).setCanMigrate(false);
 			if(bingoTask.isPredicted() == false)
 				MigrateTask(bingoTask, server);
 				//onService.MigrateTask(bingoTask, server);

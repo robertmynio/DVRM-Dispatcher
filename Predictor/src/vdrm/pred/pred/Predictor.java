@@ -63,7 +63,6 @@ public class Predictor implements IPredictor{
 		return tasks;
 	}
 
-	@Override
 	public synchronized void addEntry(ITask task) {
 		
 		//add task to tree and dynamically update the tree
