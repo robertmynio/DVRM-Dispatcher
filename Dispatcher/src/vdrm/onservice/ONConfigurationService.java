@@ -1,7 +1,7 @@
 package vdrm.onservice;
 
 public class ONConfigurationService {
-	public static String GetConfiguration(int cpu, int mem, int hdd,
+	public static String GetConfiguration(double cpu, int mem, int hdd,
 			String hddPath){
 //		 String vmTemplate =
 //             "NAME     = vm_from_java    CPU ="+ cpu +"    MEMORY = "+mem+"" +

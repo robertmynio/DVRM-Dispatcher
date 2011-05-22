@@ -105,6 +105,61 @@ public class OpenNebulaService implements IOpenNebulaService {
 		}
 	}
 
+	public boolean DeployTask(ITask t, boolean isMigration){
+		if(BaseCommon.ONEnabled){
+			//if(((Task)t).isDeployedOrdered()==false){
+			//TODO: make sure hdd path is integrated into ITask (maybe put linux/windows image paths")
+			// Step1: create the VM template
+			int nrCores = t.getServer().getNumberOfCores();
+			int serverCPUFreq = ((Server)t.getServer()).getCoreFreq();
+			int tFreq = t.getCpu();
+			double taskFreq = (((double)tFreq/(double)serverCPUFreq) *100);
+//			String vmTemplate = ONConfigurationService.GetConfiguration(t.getCpu(), t.getMem(), t.getHdd(), "hddPath");
+			String vmTemplate = ONConfigurationService.GetConfiguration(taskFreq, t.getMem(), t.getHdd(), "hddPath");
+			OneResponse rc;
+			int vmID;
+			try{
+				// Step2: try to allocate the VM 
+				rc = VirtualMachine.allocate(openClient, vmTemplate);
+				if(rc.isError()){
+					logger.logWarning("ONDeployTask: "+rc.getErrorMessage());
+				}else{
+					vmID = Integer.parseInt(rc.getMessage());
+					//TODO: add VirtualMachineID to a task also! -- not necessary. can be obtained from vm.
+					
+					// Step3: create the VM
+					VirtualMachine vm = new VirtualMachine(vmID, openClient);
+					if(vm != null){
+						//assign the vm to the task also
+						t.SerVirtualMachine(vm);
+						
+						ExecutorService threadService = Executors.newSingleThreadExecutor();
+						VMDeployer vmd = new VMDeployer(t, openClient, vmID, isMigration);
+						threadService.execute(vmd);
+						threadService.shutdown();
+						return true;
+					}else{
+						logger.logWarning("ON: Could not create Virtual Machine for task "+t.getTaskHandle().toString());
+					}
+				}
+			}catch(Exception ex){
+				logger.logWarning("Cannot deploy new task."+ex.getMessage());
+			}
+			return false;
+		}else{
+			// for testing purposes only
+			int nrCores = t.getServer().getNumberOfCores();
+			int serverCPUFreq = ((Server)t.getServer()).getCoreFreq();
+			int tFreq = t.getCpu();
+			int taskFreq = (int)(((double)tFreq/(double)serverCPUFreq) *100);
+			
+			ExecutorService threadService = Executors.newSingleThreadExecutor();
+			VMDeployer vmd = new VMDeployer(t,isMigration);
+			threadService.execute(vmd);
+			threadService.shutdown();
+			return true;
+		}
+	}
 	/***
 	 * Finish Task
 	 * 
@@ -157,6 +212,18 @@ public class OpenNebulaService implements IOpenNebulaService {
 	public boolean MigrateTask(ITask t, IServer s) {
 		if(BaseCommon.ONEnabled){
 			Task task = (Task)t;
+			// fire the event
+			BaseCommon.Instance().TaskStartedMigrating.setChanged();
+			BaseCommon.Instance().TaskStartedMigrating.notifyObservers(task);
+			
+			
+			FinishTask(task);
+			task.setServer(s);
+			DeployTask(task, true);
+			
+			
+			BaseCommon.Instance().TaskEndedMigrating.setChanged();
+			BaseCommon.Instance().TaskEndedMigrating.notifyObservers(task);
 //			ExecutorService threadService = Executors.newSingleThreadExecutor();
 //			VMMigrator vmd = new VMMigrator(t,s);
 //			threadService.execute(vmd);
@@ -248,6 +315,7 @@ public class OpenNebulaService implements IOpenNebulaService {
 		private ITask task;
 		private int vmID;
 		private Client on_Client;
+		private boolean isMigrate;
 		
 		public VMDeployer(ITask t, Client onClient, int vmID){
 			this.task = t;
@@ -255,8 +323,20 @@ public class OpenNebulaService implements IOpenNebulaService {
 			this.on_Client = onClient;
 		}
 		
+		public VMDeployer(ITask t, Client onClient, int vmID, boolean isM){
+			this.task = t;
+			this.vmID = vmID;
+			this.on_Client = onClient;
+			this.isMigrate = isM;
+		}
+		
 		public VMDeployer(ITask t){
 			this.task = t;
+		}
+		
+		public VMDeployer(ITask t, boolean isM){
+			this.task = t;
+			this.isMigrate = isM;
 		}
 		
 		@Override
@@ -299,10 +379,13 @@ public class OpenNebulaService implements IOpenNebulaService {
 					e.printStackTrace();
 				}
 			}
-			
-			// Step6: notify that the VM started
-			BaseCommon.Instance().getVMStarted().setChanged();
-			BaseCommon.Instance().getVMStarted().notifyObservers(task);
+			if(!isMigrate){
+				// Step6: notify that the VM started
+				BaseCommon.Instance().getVMStarted().setChanged();
+				BaseCommon.Instance().getVMStarted().notifyObservers(task);
+			}else{
+				// maybe notify here the migrationEnded Event? - NO, it's clearer in the migrate method
+			}
 		}
 		
 	}
