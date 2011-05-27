@@ -1,8 +1,0 @@
-1. factory method / abstract factory ? -> EU SI VLAD
-2. IPrediction + prediction
-3. Algorithm (ArrayList)
-
-
-6. some user interface for admin or load from config file (alg,servers...)
-7. WEKA ?
-8. GIT?

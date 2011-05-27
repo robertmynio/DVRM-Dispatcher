@@ -24,10 +24,10 @@ import datacenterInterface.dtos.jaxbBindingClasses.WorkloadSchedule;
 import vdrm.base.data.ITask;
 import vdrm.base.impl.BaseCommon;
 import vdrm.base.impl.Task;
-import vdrm.onservice.IOpenNebulaService;
-import vdrm.onservice.OpenNebulaService;
-import vdrm.rootservice.TimedGeneratedTaskWrapper;
-import vdrm.rootservice.TimedTaskWrapper;
+import vdrm.disp.dispatcher.TimedGeneratedTaskWrapper;
+import vdrm.disp.dispatcher.TimedTaskWrapper;
+import vdrm.disp.onservice.IOpenNebulaService;
+import vdrm.disp.onservice.OpenNebulaService;
 
 
 public class ON_RootService {

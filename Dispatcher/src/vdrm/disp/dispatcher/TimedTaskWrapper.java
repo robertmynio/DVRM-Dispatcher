@@ -1,4 +1,4 @@
-package vdrm.rootservice;
+package vdrm.disp.dispatcher;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,7 +27,7 @@ public class TimedTaskWrapper extends TimerTask {
 	 */
 	@Override
 	public void run() {
-		RootService.Instance().TaskIsDone(this);
+		Dispatcher.Instance().TaskIsDone(this);
 	}
 
 	///////////////////////////////////////////////////////////////////////

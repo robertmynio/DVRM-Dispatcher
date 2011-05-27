@@ -5,8 +5,6 @@ import java.util.HashMap;
 import vdrm.base.common.IPredictor;
 import vdrm.base.data.ITask;
 import vdrm.base.impl.Task;
-import vdrm.pred.dao.ITaskDao;
-import vdrm.pred.dao.TaskDao;
 import vdrm.pred.miner.IPatternMiner;
 import vdrm.pred.miner.TreePatternMiner;
 
@@ -87,16 +85,5 @@ public class Predictor implements IPredictor{
 				id = idMap.get(tsk);
 		}
 		return id;
-	}
-	
-	/**
-	 * NOT NEEDED FOR NOW
-	 */
-	private void databaseInit() {
-		ITaskDao dao = new TaskDao();
-		ArrayList<ITask> history = dao.getTaskHistory();
-		for(ITask tsk : history) {
-			addEntry(tsk);
-		}
 	}
 }

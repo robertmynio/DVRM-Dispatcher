@@ -1,4 +1,4 @@
-package vdrm.rootservice;
+package vdrm.disp.dispatcher;
 
 import java.util.TimerTask;
 

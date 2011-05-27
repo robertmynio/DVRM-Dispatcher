@@ -11,12 +11,12 @@ import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
 import vdrm.base.impl.BaseCommon;
 import vdrm.base.impl.Server;
-import vdrm.base.impl.Sorter;
 import vdrm.base.impl.Task;
-import vdrm.disp.util.VDRMLogger;
-import vdrm.onservice.IOpenNebulaService;
-import vdrm.onservice.OpenNebulaService;
-import vdrm.powerservice.PowerService;
+import vdrm.base.util.Sorter;
+import vdrm.base.util.VDRMLogger;
+import vdrm.disp.onservice.IOpenNebulaService;
+import vdrm.disp.onservice.OpenNebulaService;
+import vdrm.disp.powerservice.PowerService;
 import vdrm.pred.pred.Predictor;
 
 /***
@@ -27,7 +27,7 @@ import vdrm.pred.pred.Predictor;
  * @author Vlad & Robi
  *
  */
-public class Algorithm1 implements IAlgorithm{
+public class Algorithm implements IAlgorithm{
 
 	private ArrayList<IServer> emptyServers;
 	private ArrayList<IServer> inUseServers;
@@ -210,16 +210,18 @@ public class Algorithm1 implements IAlgorithm{
 			logger.logInfo("Task " + newTask.getTaskHandle() + " (normal) added to unassigned tasks list.");
 		}
 
-		//run prediction and add predicted tasks to unassignedTasks list
-		ArrayList<ITask> prediction;
-		prediction = predictor.predict(newTask);
-		predictor.addEntry(newTask);
-		
-		if(prediction!=null) {
-			logger.logInfo("Prediction made on future task following task " + newTask.getTaskHandle() + ".");
-			int predSize = prediction.size();
-			for(i=0;i<predSize;i++)
-				unassignedTasks.add(prediction.get(i));
+		if(BaseCommon.PredictionEnabled) {
+			//run prediction and add predicted tasks to unassignedTasks list
+			ArrayList<ITask> prediction;
+			prediction = predictor.predict(newTask);
+			predictor.addEntry(newTask);
+			
+			if(prediction!=null) {
+				logger.logInfo("Prediction made on future task following task " + newTask.getTaskHandle() + ".");
+				int predSize = prediction.size();
+				for(i=0;i<predSize;i++)
+					unassignedTasks.add(prediction.get(i));
+			}
 		}
 		
 		//run consolidation algorithm (distribute tasks from unassignedTasks list to servers

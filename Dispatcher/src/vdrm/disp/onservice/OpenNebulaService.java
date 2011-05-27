@@ -1,4 +1,4 @@
-package vdrm.onservice;
+package vdrm.disp.onservice;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,7 +12,7 @@ import vdrm.base.impl.BaseCommon;
 import vdrm.base.impl.Server;
 import vdrm.base.impl.Task;
 import vdrm.base.impl.BaseCommon.VMStartedEvent;
-import vdrm.disp.util.VDRMLogger;
+import vdrm.base.util.VDRMLogger;
 
 public class OpenNebulaService implements IOpenNebulaService {
 	private Client openClient;

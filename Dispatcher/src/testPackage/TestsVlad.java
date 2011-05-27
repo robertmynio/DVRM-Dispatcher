@@ -6,20 +6,19 @@ import java.util.UUID;
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
 import vdrm.base.impl.Server;
-import vdrm.base.impl.Sorter;
 import vdrm.base.impl.Task;
-import vdrm.disp.alg.Algorithm1;
-import vdrm.pred.dao.TaskDao;
-import vdrm.rootservice.RootService;
+import vdrm.base.util.Sorter;
+import vdrm.disp.alg.Algorithm;
+import vdrm.disp.dispatcher.Dispatcher;
 import workloadScheduler.WorkloadSchedulerAgent;
 
 public class TestsVlad {
-	private Algorithm1 alg;
-	private RootService rs;
+	private Algorithm alg;
+	private Dispatcher rs;
 	
 	public TestsVlad() {
-		alg = new Algorithm1();
-		rs = RootService.Instance();
+		alg = new Algorithm();
+		rs = Dispatcher.Instance();
 	}
 	
 	public void runAllTests() {
@@ -173,9 +172,9 @@ public class TestsVlad {
 		
 		
 		//alg.initialize(servers);
-		RootService.Instance().worker.initialize(servers);
+		Dispatcher.Instance().worker.initialize(servers);
 		//servers = alg.getEmptyServers();
-		servers = ((Algorithm1)RootService.Instance().worker).getEmptyServers();
+		servers = ((Algorithm)Dispatcher.Instance().worker).getEmptyServers();
 		if(servers.size()==3)
 			return true;
 

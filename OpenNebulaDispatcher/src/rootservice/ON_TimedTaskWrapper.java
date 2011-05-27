@@ -3,7 +3,7 @@ package rootservice;
 import java.util.TimerTask;
 
 import vdrm.base.data.ITask;
-import vdrm.rootservice.RootService;
+import vdrm.disp.dispatcher.Dispatcher;
 
 public class ON_TimedTaskWrapper extends TimerTask {
 	private ITask task;

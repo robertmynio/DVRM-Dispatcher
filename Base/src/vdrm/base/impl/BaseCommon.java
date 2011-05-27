@@ -21,10 +21,10 @@ public class BaseCommon {
 	
 	public static final boolean ONEnabled = false;
 	public static final boolean PSEnabled = false;
+	public static final boolean PredictionEnabled = true;
+	public static final boolean logEnabled = false;
 	
 	private int nrOfTasksThreshold;
-	
-	public static Boolean logEnabled = false;
 
     public boolean ResourcesAvailable;
 	

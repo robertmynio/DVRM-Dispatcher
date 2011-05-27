@@ -1,6 +1,8 @@
-Prediction is :
-
-0 1 2 3 -> 100%
-1 2 3 -> 80%
-2 3 -> 100%
-5 4 -> 83,33%
+- new VDRMLogger() e chemat in mai multe locuri. Si ma gandesc ca de fiecare data creeaza un logfile nou.
+	Is this the desired behavior? N-ar trebui sa primeasca nume simbolice ? "AlgorithmLog,ONServiceLog, etc" ?
+- dependinte (in caz ca nu se face update pe git la dependinte):
+	- La Predictor -> NO REFERENCED LIBRARIES
+	- La Base -> Reference Libraries : org.opennebula.client (doar atat)
+	- La restu -> te ocupi tu sa scoti dependintele ca stii mai bine (si sa ma anunti si pe mine de varianta finala)?
+- fa modificari la BaseCommon, Task, Server, Algorithm, etc.... (scoate ce nu trebe, sa nu ai chestii publice, etc)
+- ar fi bine sa nu avem warning-uri :D

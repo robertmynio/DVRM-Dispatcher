@@ -1,4 +1,4 @@
-package vdrm.rootservice;
+package vdrm.disp.dispatcher;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,7 +31,7 @@ import vdrm.base.data.ITask;
 import vdrm.base.impl.BaseCommon;
 import vdrm.base.impl.Task;
 import vdrm.base.impl.BaseCommon.VMStartedEvent;
-import vdrm.disp.alg.Algorithm1;
+import vdrm.disp.alg.Algorithm;
 
 /***
  * Root Service class.
@@ -51,7 +51,7 @@ import vdrm.disp.alg.Algorithm1;
  * @author Vlad & Robi
  *
  */
-public class RootService {
+public class Dispatcher {
 	private Map<Timer, TimedTaskWrapper> currentDeployedTasks;
 	private Map<Timer, TimedGeneratedTaskWrapper> currentTimedTasks;
 	// maybe put a tree map <task.uuid,task> to speed up search :)
@@ -59,15 +59,15 @@ public class RootService {
 	private List<TimedTaskWrapper> pausedTasks;
 	public IAlgorithm worker;
 //	private boolean ResourcesAvailable;
-	private static RootService instance;
+	private static Dispatcher instance;
 	
-	private RootService(){
+	private Dispatcher(){
 		currentDeployedTasks = Collections.synchronizedMap(new HashMap<Timer, TimedTaskWrapper>());
 		currentTimedTasks = Collections.synchronizedMap(new HashMap<Timer, TimedGeneratedTaskWrapper>());
 		
 		readyTasks = new Vector<TimedTaskWrapper>();
 		pausedTasks = new Vector<TimedTaskWrapper>();
-		worker = new Algorithm1();
+		worker = new Algorithm();
 		
 		BaseCommon.Instance().ResourcesAvailable = true;
 		
@@ -165,9 +165,9 @@ public class RootService {
 	
 	
 
-	public static RootService Instance(){
+	public static Dispatcher Instance(){
 		if(instance == null){
-			instance = new RootService();
+			instance = new Dispatcher();
 		}
 		return instance;
 	}

@@ -1,4 +1,4 @@
-package vdrm.base.impl;
+package vdrm.base.util;
 
 import java.util.ArrayList;
 

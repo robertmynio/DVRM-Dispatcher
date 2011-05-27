@@ -1,6 +1,6 @@
 package testPackage;
 
-import vdrm.disp.util.VDRMLogger;
+import vdrm.base.util.VDRMLogger;
 
 
 public class DispatcherTestClass {

@@ -12,10 +12,10 @@ import vdrm.base.impl.BaseCommon;
 import vdrm.base.impl.Server;
 import vdrm.base.impl.Task;
 import vdrm.base.impl.BaseCommon.VMStartedEvent;
-import vdrm.disp.util.VDRMLogger;
-import vdrm.onservice.ONConfigurationService;
-import vdrm.onservice.OpenNebulaService.VMDeployer;
-import vdrm.onservice.OpenNebulaService.VMMigrator;
+import vdrm.base.util.VDRMLogger;
+import vdrm.disp.onservice.ONConfigurationService;
+import vdrm.disp.onservice.OpenNebulaService.VMDeployer;
+import vdrm.disp.onservice.OpenNebulaService.VMMigrator;
 
 public class OpenNebulaService implements IOpenNebulaService {
 	private Client openClient;

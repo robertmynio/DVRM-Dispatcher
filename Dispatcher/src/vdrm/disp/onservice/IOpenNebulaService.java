@@ -1,4 +1,4 @@
-package vdrm.onservice;
+package vdrm.disp.onservice;
 
 import org.opennebula.client.vm.VirtualMachine;
 import vdrm.base.data.IServer;

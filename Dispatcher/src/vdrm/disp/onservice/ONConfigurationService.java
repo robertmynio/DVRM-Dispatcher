@@ -1,4 +1,4 @@
-package vdrm.onservice;
+package vdrm.disp.onservice;
 
 public class ONConfigurationService {
 	public static String GetConfiguration(double cpu, int mem, int hdd,

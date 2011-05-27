@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import vdrm.base.data.IServer;
 import vdrm.base.impl.Server;
 import vdrm.base.impl.Task;
-import vdrm.disp.alg.Algorithm1;
+import vdrm.disp.alg.Algorithm;
 
 public class TestsRobi {
 	
-	private Algorithm1 alg;
+	private Algorithm alg;
 	
 	public TestsRobi() {
-		alg = new Algorithm1();
+		alg = new Algorithm();
 	}
 	
 	public void runAllTests() {

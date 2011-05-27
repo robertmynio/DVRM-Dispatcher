@@ -1,9 +1,0 @@
-- poti implementa tu sort-ul ? In prima faza as recomanda un insertion sort. Daca stii vreun algoritm mai bun, suna-ma si discutam :) 
-- trebuie implementata metoda pe Server : boolean meetsRequirments(ITask task) -> true daca task-ul ar incapea, false otherwise... (fara sa pui task-ul efectiv)
-- trebuie implementata metoda de setServer la un Task!
-- trebuie implementata metoda de compareTo a unui Server. Se verifica prima oara cpu; daca is egale, se verifica mem; etc..
-		return 0 daca is perfect egale; return un int > 0 daca primu e mai mare;
-		
-!!!!! Mai are rost sa facem equals? (compareTo nu ajunge???)	
-- task.equals se foloseste in compararea unui task predicted cu unu real (se compara memorie, hdd si cpu); nu uuid!!!
-- intrebare : ar trebui facut si un al doilea equals care compara 2 taskuri dar permite si deviatii ? (ex: cpu1 = cpu2 +/ 5% ?

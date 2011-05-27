@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.opennebula.client.vm.VirtualMachine;
 
 import vdrm.base.data.*;
-import vdrm.base.util.UniqueIdGenerator;
 
 public class Task implements ITask{
 	
@@ -26,7 +25,7 @@ public class Task implements ITask{
 	
 	
 	public Task(){
-		taskHandle = UniqueIdGenerator.getUID();
+		taskHandle = UUID.randomUUID();
 		unsuccessfulPlacement = false;
 		isPredicted = false;
 		serverHost = null;

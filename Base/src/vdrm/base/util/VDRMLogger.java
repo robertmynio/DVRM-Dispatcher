@@ -1,4 +1,4 @@
-package vdrm.disp.util;
+package vdrm.base.util;
 
 import java.io.IOException;
 import java.util.logging.FileHandler;
@@ -6,7 +6,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import vdrm.base.impl.BaseCommon;
-import vdrm.base.util.ILogger;
 
 public class VDRMLogger implements ILogger {
 	public FileHandler logFileHandler;
@@ -14,8 +13,8 @@ public class VDRMLogger implements ILogger {
 	
 	public VDRMLogger(){
 		try{
-			logFileHandler = new FileHandler("baselog.log.xml");
-			log = Logger.getLogger("vdrm.disp.util");
+			logFileHandler = new FileHandler("..\\Logs\\baselog.log.xml");
+			log = Logger.getLogger("vdrm.base.util");
 			log.addHandler(logFileHandler);
 		}catch(SecurityException ex){
 			ex.printStackTrace();
@@ -26,8 +25,8 @@ public class VDRMLogger implements ILogger {
 	
 	public VDRMLogger(String logFile){
 		try{
-			logFileHandler = new FileHandler(logFile);
-			log = Logger.getLogger("vdrm.disp.util");
+			logFileHandler = new FileHandler("..\\Logs\\" + logFile);
+			log = Logger.getLogger("vdrm.base.util");
 			log.addHandler(logFileHandler);
 		}catch(SecurityException ex){
 			ex.printStackTrace();

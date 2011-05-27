@@ -1,4 +1,4 @@
-package vdrm.powerservice;
+package vdrm.disp.powerservice;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
