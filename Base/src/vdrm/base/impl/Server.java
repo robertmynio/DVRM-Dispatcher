@@ -4,8 +4,16 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.Vector;
 
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlElement;
+
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
+
+@XmlRootElement(name = "server")
+
+@XmlType(propOrder = { "serverID", "cpuFreq", "coreFreq", "memoryAmount", "hddSize", "ipAddress", "macAddress" })
 /***
  * TODO: Add logger to each catch clause
  * @author Gygabite
@@ -18,7 +26,7 @@ public class Server implements IServer {
 	private int memoryAmount;
 	private int hddSize;
 	private int cores;
-	public int coreFreq;
+	private int coreFreq;
 	
 	private int usedCPU;
 	private int usedRAM;
@@ -67,10 +75,7 @@ public class Server implements IServer {
 	}
 	
 	public Server(int cpu, int mem, int hdd, int cores, String ip) {
-		this();
-		cpuFreq = cpu;
-		memoryAmount = mem;
-		hddSize = hdd;
+		this(cpu,mem,hdd);
 		this.cores = cores;
 		this.ipAddress = ip;
 	}
@@ -446,12 +451,12 @@ public class Server implements IServer {
 	}
 
 	@Override
-	public String getIPAddress() {
+	public String getIpAddress() {
 		return ipAddress;
 	}
 	
 	@Override
-	public void setIPAddress(String ip) {
+	public void setIpAddress(String ip) {
 		this.ipAddress = ip;
 	}
 
@@ -475,6 +480,18 @@ public class Server implements IServer {
 	@Override
 	public void setMacAddress(String macAddress) {
 		this.macAddress = macAddress;
+	}
+	
+	public int getCpuFreq() {
+		return cpuFreq;
+	}
+
+	public int getMemoryAmount() {
+		return memoryAmount;
+	}
+
+	public int getHddSize() {
+		return hddSize;
 	}
 
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jaxbTasks>
+    <tasksList>
+        <task>
+            <cpuReq>500</cpuReq>
+            <memReq>2500</memReq>
+            <hddReq>12500</hddReq>
+        </task>
+        <task>
+            <cpuReq>1750</cpuReq>
+            <memReq>600</memReq>
+            <hddReq>6000</hddReq>
+        </task>
+        <task>
+            <cpuReq>700</cpuReq>
+            <memReq>600</memReq>
+            <hddReq>6000</hddReq>
+        </task>
+    </tasksList>
+</jaxbTasks>

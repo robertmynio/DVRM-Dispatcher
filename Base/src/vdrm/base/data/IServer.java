@@ -12,8 +12,8 @@ public interface IServer {
 	public int getUsedMem();
 	public int getUsedHdd();
 	public int getLoad();
-	public String getIPAddress();
-	public void setIPAddress(String ip);
+	public String getIpAddress();
+	public void setIpAddress(String ip);
 	public String getMacAddress();
 	public void setMacAddress(String mac);
 	public int getNumberOfCores();

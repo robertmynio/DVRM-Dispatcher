@@ -30,8 +30,8 @@ public class PowerService {
 	 
 	                proc.destroy();
 	            }
-	            waitUntilTargetIsAlive(s.getIPAddress()); // Hostname = the IP
-	            waitUntilSSHAvailable(s.getIPAddress());
+	            waitUntilTargetIsAlive(s.getIpAddress()); // Hostname = the IP
+	            waitUntilSSHAvailable(s.getIpAddress());
 	            System.err.println("Wait ended");
 	        } catch (Exception ex) {
 	            System.err.println("Error:" + ex.getMessage());
@@ -113,7 +113,7 @@ public class PowerService {
 	            InputStream stdin = proc.getInputStream();
 	            InputStreamReader isr = new InputStreamReader(stdin);
 	            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
-	            bufferedWriter.write("/usr/bin/ssh " + s.getIPAddress() + " \"echo \"disk\" > /sys/power/state\"");
+	            bufferedWriter.write("/usr/bin/ssh " + s.getIpAddress() + " \"echo \"disk\" > /sys/power/state\"");
 	            bufferedWriter.newLine();
 	            bufferedWriter.flush();
 	            bufferedWriter.close();

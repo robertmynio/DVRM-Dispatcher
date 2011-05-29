@@ -3,15 +3,29 @@ package vdrm.base.impl;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
 import org.opennebula.client.vm.VirtualMachine;
 
 import vdrm.base.data.*;
 
+@XmlRootElement(name = "server")
+
+@XmlAccessorType( XmlAccessType.NONE )
+
+@XmlType(propOrder = { "cpuReq", "memReq", "hddReq"})
 public class Task implements ITask{
 	
 	private UUID taskHandle;
+	@XmlElement( required = true )
 	private int cpuReq;
+	@XmlElement( required = true )
 	private int memReq;
+	@XmlElement( required = true )
 	private int hddReq;
 	private double requirements;
 	
@@ -238,6 +252,30 @@ public class Task implements ITask{
 
 	public void setCanMigrate(boolean canMigrate) {
 		this.canMigrate = canMigrate;
+	}
+
+	public int getCpuReq() {
+		return cpuReq;
+	}
+
+	public void setCpuReq(int cpuReq) {
+		this.cpuReq = cpuReq;
+	}
+
+	public int getMemReq() {
+		return memReq;
+	}
+
+	public void setMemReq(int memReq) {
+		this.memReq = memReq;
+	}
+
+	public int getHddReq() {
+		return hddReq;
+	}
+
+	public void setHddReq(int hddReq) {
+		this.hddReq = hddReq;
 	}
 
 	
