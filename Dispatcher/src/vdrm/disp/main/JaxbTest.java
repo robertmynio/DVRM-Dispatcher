@@ -1,6 +1,5 @@
 package vdrm.disp.main;
 
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -10,9 +9,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
-import javax.xml.bind.Unmarshaller;
 
-import vdrm.base.data.ITask;
 import vdrm.base.impl.Server;
 import vdrm.base.impl.Task;
 
@@ -131,7 +128,6 @@ public class JaxbTest {
 		JaxbHistory history = new JaxbHistory();
 		history.setTasksHistory(hist);
 		
-		Unmarshaller um=null;
 		JAXBContext context =null;
 		try {
 			context = JAXBContext.newInstance(JaxbTasks.class);

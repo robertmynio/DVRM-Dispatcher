@@ -10,7 +10,6 @@ import javax.xml.bind.Unmarshaller;
 
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
-import vdrm.base.impl.Task;
 import vdrm.disp.dispatcher.Dispatcher;
 
 public class Main {
@@ -29,6 +28,7 @@ public class Main {
 		
 		Unmarshaller um;
 		JAXBContext context;
+		boolean ioException = false;
 		
 		Dispatcher dispatcher = null;
 		
@@ -38,7 +38,7 @@ public class Main {
 			um = context.createUnmarshaller();
 			configuration = (JaxbConfig) um.unmarshal(new FileReader(CONFIG_FILE_XML));
 		} catch (IOException e1) {
-			//TODO : handle IO !
+			ioException = true;
 		} catch (JAXBException ee2) {
 			
 		} 
@@ -51,7 +51,7 @@ public class Main {
 			um = context.createUnmarshaller();
 			tempServers = (JaxbServers) um.unmarshal(new FileReader(configuration.getServersPath()));
 		} catch (IOException e1) {
-			//TODO : handle IO !
+			ioException = true;
 		} catch (JAXBException ee2) {
 			
 		}
@@ -62,7 +62,7 @@ public class Main {
 			um = context.createUnmarshaller();
 			tempTasks = (JaxbTasks) um.unmarshal(new FileReader(configuration.getTasksPath()));
 		} catch (IOException e1) {
-			//TODO : handle IO !
+			ioException = true;
 		} catch (JAXBException ee2) {
 			
 		}
@@ -73,9 +73,15 @@ public class Main {
 			um = context.createUnmarshaller();
 			tempHistory = (JaxbHistory) um.unmarshal(new FileReader(configuration.getHistoryPath()));
 		} catch (IOException e1) {
-			//TODO : handle IO !
+			ioException = true;
 		} catch (JAXBException ee2) {
 			
+		}
+		
+		if (ioException == true) {
+			// TODO: We had an IOException (an XML was missing...)
+			
+			// Do something about it! (display a message...and exit(0) here!)
 		}
 		
 		//3. conversions

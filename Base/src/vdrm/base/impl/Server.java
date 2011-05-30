@@ -6,7 +6,6 @@ import java.util.Vector;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlElement;
 
 import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
