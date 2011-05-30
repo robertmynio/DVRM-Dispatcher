@@ -250,7 +250,7 @@ public class Dispatcher {
 			readyTasks.add(tt);	
 		}
 		
-		if(BaseCommon.Instance().ResourcesAvailable){
+		if(BaseCommon.Instance().ResourcesAvailable && !BaseCommon.Instance().ServerStarting){
 				//StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
 			//SendTaskCommand(readyTasks.get(0).getTask());
 			SendTaskCommand(GetFirstUndeployedTask());
@@ -315,7 +315,7 @@ public class Dispatcher {
         	System.out.println("Newtask has NOT started with UUID: " + t.getTaskHandle().toString());
         }
         
-        if(readyTasks.size() > 0){
+        if(readyTasks.size() > 0&& !BaseCommon.Instance().ServerStarting){
 			SendTaskCommand(GetFirstUndeployedTask());
 			//SendTaskCommand(readyTasks.get(0).getTask());
 			
@@ -365,7 +365,7 @@ public class Dispatcher {
 		    	currentDeployedTasks.remove(t);
 		    }
 			
-			if(readyTasks.size() > 0){
+			if(readyTasks.size() > 0 && !BaseCommon.Instance().ServerStarting){
 				SendTaskCommand(GetFirstUndeployedTask());
 				//SendTaskCommand(readyTasks.get(0).getTask());
 				
@@ -426,37 +426,39 @@ public class Dispatcher {
 			// stop the timer thread
 			Set set = currentDeployedTasks.entrySet();
 		    Iterator i = set.iterator();
-		    
-		    while(i.hasNext()){
-		        Map.Entry me = (Map.Entry)i.next();
-		        tt = (TimedTaskWrapper)me.getValue();
-		        if( tt.getTask().getTaskHandle().toString().compareTo(pausedTask.getTaskHandle().toString())==0){
-		        	time = (Timer)me.getKey();
-		        	found = true;
-		        	System.out.println("@@@ Task will be paused, migration STARTED " + tt.getTask().getTaskHandle().toString() + ", " + tt.getTask().getServerId());
-		        	try {
-		        		// cancel the timer
-		        		time.cancel();
-		        		time.purge();
-		        		// set the actual run time (until now)
-		        		tt.setActualRunTime(System.currentTimeMillis() - tt.getStartTime());
-		        		
-		        		// set the remaining running time
-		        		if((tt.getEstimatedDuration()) - tt.getActualRunTime() > 0)
-		        			tt.setRemainingRunTime( (tt.getEstimatedDuration()) - tt.getActualRunTime());
-		        		else{
-		        			tt.setRemainingRunTime(0);
-		        			tt.setResume(false);
-		        		}
-		        		System.out.println("@@@ Remaining time: " + tt.getRemainingRunTime() + ", with actual run time of " + tt.getActualRunTime() + "and original estimated time of " + tt.getEstimatedDuration() );
-		    		}catch(Exception e){
-		    			e.printStackTrace();
-		    		}
-		        	break;
-		        }
-		    }
-		    if(!found){
-					System.out.println("@@@ Task NOT paused, migration FAILED (task not found)" + tt.getTask().getTaskHandle().toString()+ ", " + tt.getTask().getServerId());
+		    if(pausedTask.getServerId() != null){
+			    while(i.hasNext()){
+			        Map.Entry me = (Map.Entry)i.next();
+			        tt = (TimedTaskWrapper)me.getValue();
+			        if( tt.getTask().getTaskHandle().toString().compareTo(pausedTask.getTaskHandle().toString())==0
+			        		&& tt.getTask().getServerId() != null){
+			        	time = (Timer)me.getKey();
+			        	found = true;
+			        	System.out.println("@@@ Task will be paused, migration STARTED " + tt.getTask().getTaskHandle().toString() + ", " + tt.getTask().getServerId());
+			        	try {
+			        		// cancel the timer
+			        		time.cancel();
+			        		time.purge();
+			        		// set the actual run time (until now)
+			        		tt.setActualRunTime(System.currentTimeMillis() - tt.getStartTime());
+			        		
+			        		// set the remaining running time
+			        		if((tt.getEstimatedDuration()) - tt.getActualRunTime() > 0)
+			        			tt.setRemainingRunTime( (tt.getEstimatedDuration()) - tt.getActualRunTime());
+			        		else{
+			        			tt.setRemainingRunTime(0);
+			        			tt.setResume(false);
+			        		}
+			        		System.out.println("@@@ Remaining time: " + tt.getRemainingRunTime() + ", with actual run time of " + tt.getActualRunTime() + "and original estimated time of " + tt.getEstimatedDuration() );
+			    		}catch(Exception e){
+			    			e.printStackTrace();
+			    		}
+			        	break;
+			        }
+			    }
+			    if(!found){
+						System.out.println("@@@ Task NOT paused, migration FAILED (task not found)" + pausedTask.getTaskHandle().toString()+ ", " + pausedTask.getServerId());
+			    }
 		    }
 		    //WaitForTaskMigration(tt, time);
 			//currentDeployedTasks.remove(t);
@@ -482,7 +484,7 @@ public class Dispatcher {
 		        id2 = tt.getTask().getTaskHandle().toString();
 		        
 		        if( tt.getTask().getTaskHandle().toString().compareTo(pausedTask.getTaskHandle().toString())==0){
-		        	System.out.println("@@@ " + id1 + " " + id2); 
+		        	//System.out.println("@@@ " + id1 + " " + id2); 
 		        	time = (Timer)me.getKey();
 		        	currentDeployedTasks.remove(time);
 		        	resumeTask = tt;
