@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="windows-1252" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2011-05-31T10:52:56</date>
+  <millis>1306828376552</millis>
+  <sequence>0</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>10</thread>
+  <message>System initialized successfully, waiting for tasks.
+
+</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:10</date>
+  <millis>1306828390832</millis>
+  <sequence>1</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>11</thread>
+  <message>
+*** Starting one iteration for newTask.</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:10</date>
+  <millis>1306828390834</millis>
+  <sequence>2</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>11</thread>
+  <message>Task f9880bb4-05a1-4c19-b058-085b79615390 (normal) added to unassigned tasks list.</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:10</date>
+  <millis>1306828390835</millis>
+  <sequence>3</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>11</thread>
+  <message>
+
+*** Starting to consolidate tasks.</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:10</date>
+  <millis>1306828390837</millis>
+  <sequence>4</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>11</thread>
+  <message>Sorted some tasks...</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:10</date>
+  <millis>1306828390839</millis>
+  <sequence>5</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>11</thread>
+  <message>Found a place for task f9880bb4-05a1-4c19-b058-085b79615390, on server 3.(3)</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:10</date>
+  <millis>1306828390840</millis>
+  <sequence>6</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>11</thread>
+  <message>Consolidation was a success -&gt; now reordering server lists</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:10</date>
+  <millis>1306828390842</millis>
+  <sequence>7</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>11</thread>
+  <message>*** Finished consolidateTask.</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:10</date>
+  <millis>1306828390844</millis>
+  <sequence>8</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>11</thread>
+  <message>Consolidation algorithm ran.</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:10</date>
+  <millis>1306828390858</millis>
+  <sequence>9</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>11</thread>
+  <message>Task f9880bb4-05a1-4c19-b058-085b79615390 (normal) deployed on server.</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:10</date>
+  <millis>1306828390860</millis>
+  <sequence>10</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>11</thread>
+  <message>*** Finished one iteration for newTask.</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:49</date>
+  <millis>1306828429831</millis>
+  <sequence>11</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>12</thread>
+  <message>
+*** Starting one iteration for newTask.</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:49</date>
+  <millis>1306828429832</millis>
+  <sequence>12</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>12</thread>
+  <message>Task c3aaa8c9-a2df-42e3-869c-054ce2fc35fd (normal) added to unassigned tasks list.</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:49</date>
+  <millis>1306828429833</millis>
+  <sequence>13</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>12</thread>
+  <message>
+
+*** Starting to consolidate tasks.</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:49</date>
+  <millis>1306828429834</millis>
+  <sequence>14</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>12</thread>
+  <message>Sorted some tasks...</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:49</date>
+  <millis>1306828429836</millis>
+  <sequence>15</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>12</thread>
+  <message>Found a place for task c3aaa8c9-a2df-42e3-869c-054ce2fc35fd, on server 3.(1)</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:49</date>
+  <millis>1306828429837</millis>
+  <sequence>16</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>12</thread>
+  <message>Consolidation was a success -&gt; now reordering server lists</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:49</date>
+  <millis>1306828429839</millis>
+  <sequence>17</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>12</thread>
+  <message>*** Finished consolidateTask.</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:49</date>
+  <millis>1306828429840</millis>
+  <sequence>18</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>12</thread>
+  <message>Consolidation algorithm ran.</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:49</date>
+  <millis>1306828429841</millis>
+  <sequence>19</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>12</thread>
+  <message>Task c3aaa8c9-a2df-42e3-869c-054ce2fc35fd (normal) deployed on server.</message>
+</record>
+<record>
+  <date>2011-05-31T10:53:49</date>
+  <millis>1306828429843</millis>
+  <sequence>20</sequence>
+  <logger>vdrm.base.util</logger>
+  <level>INFO</level>
+  <class>vdrm.base.util.VDRMLogger</class>
+  <method>logInfo</method>
+  <thread>12</thread>
+  <message>*** Finished one iteration for newTask.</message>
+</record>
