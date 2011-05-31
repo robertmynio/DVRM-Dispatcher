@@ -27,6 +27,7 @@ public class BaseCommon {
 	private int nrOfTasksThreshold;
 
     public boolean ResourcesAvailable;
+    public boolean ServerStarting;
 	
 	private static BaseCommon instance;
 	
@@ -57,6 +58,7 @@ public class BaseCommon {
 		XMLTaskGenerated = new XMLTaskGeneratedEvent();
 		
 		ResourcesAvailable = true;
+		ServerStarting = false;
 	}
 
 	public int getNrOfTasksThreshold() {
@@ -83,15 +85,9 @@ public class BaseCommon {
 		return TaskEndedMigrating;
 	}
 
-	
-
-
 	public XMLTaskGeneratedEvent getXMLTaskGenerated() {
 		return XMLTaskGenerated;
 	}
-
-
-
 
 	/**
 	 * New style event :)

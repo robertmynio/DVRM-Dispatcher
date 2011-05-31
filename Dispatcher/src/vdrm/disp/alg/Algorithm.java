@@ -368,7 +368,10 @@ public class Algorithm implements IAlgorithm{
 						IServer newServer = emptyServers.get(0);
 						newServers.add(newServer);
 						emptyServers.remove(0);
+						
+						BaseCommon.Instance().ServerStarting = true;
 						powerService.wakeUpServer(newServer);
+						BaseCommon.Instance().ServerStarting = false;
 						
 						tempTask.setServer(newServer);
 						newServer.addTask(tempTask);
@@ -392,7 +395,10 @@ public class Algorithm implements IAlgorithm{
 			if(emptyServers.contains(auxServer)) {
 				if(!auxServer.isEmpty()) {
 					emptyServers.remove(auxServer);
+					
+					BaseCommon.Instance().ServerStarting = true;
 					powerService.wakeUpServer(auxServer);
+					BaseCommon.Instance().ServerStarting = false;
 					if(auxServer.isFull())
 						fullServers.add(auxServer);
 					else
@@ -809,7 +815,7 @@ public class Algorithm implements IAlgorithm{
 		logger.logInfo("*** Finished trying to fill server.");
 	}
 	
-	private void MigrateTask(ITask task, IServer server){
+	private synchronized void MigrateTask(ITask task, IServer server){
 		//BaseCommon.Instance().getTaskStartedMigrating().setChanged();
 		//BaseCommon.Instance().getTaskStartedMigrating().notifyObservers();
 		onService.MigrateTask(task, server);

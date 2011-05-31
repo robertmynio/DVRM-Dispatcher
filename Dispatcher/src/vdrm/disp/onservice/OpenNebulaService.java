@@ -19,7 +19,8 @@ public class OpenNebulaService implements IOpenNebulaService {
 	private VDRMLogger logger;
 	private final String NEBULA_RCP_ADDRESS = "http://192.168.1.10:2633/RPC2";
     private final String NEBULA_CREDENTIALS = "oneadmin:oneadmin";
-	public OpenNebulaService(){
+	
+    public OpenNebulaService(){
 		logger = new VDRMLogger();
 		Initialize();
 	}
@@ -38,7 +39,7 @@ public class OpenNebulaService implements IOpenNebulaService {
 			int nrCores = t.getServer().getNumberOfCores();
 			int serverCPUFreq = ((Server)t.getServer()).getCoreFreq();
 			int tFreq = t.getCpu();
-			int taskFreq = (int)(((double)tFreq/(double)serverCPUFreq) *100);
+			double taskFreq = (double)(((double)tFreq/(double)serverCPUFreq));
 //			String vmTemplate = ONConfigurationService.GetConfiguration(t.getCpu(), t.getMem(), t.getHdd(), "hddPath");
 			String vmTemplate = ONConfigurationService.GetConfiguration(taskFreq, t.getMem(), t.getHdd(), "hddPath");
 			OneResponse rc;
@@ -105,7 +106,7 @@ public class OpenNebulaService implements IOpenNebulaService {
 		}
 	}
 
-	public boolean DeployTask(ITask t, boolean isMigration){
+	public boolean DeployTask(ITask t, boolean isMigration, IServer newServ){
 		if(BaseCommon.ONEnabled){
 			//if(((Task)t).isDeployedOrdered()==false){
 			//TODO: make sure hdd path is integrated into ITask (maybe put linux/windows image paths")
@@ -113,7 +114,7 @@ public class OpenNebulaService implements IOpenNebulaService {
 			int nrCores = t.getServer().getNumberOfCores();
 			int serverCPUFreq = ((Server)t.getServer()).getCoreFreq();
 			int tFreq = t.getCpu();
-			double taskFreq = (((double)tFreq/(double)serverCPUFreq) *100);
+			double taskFreq = (((double)tFreq/(double)serverCPUFreq));
 //			String vmTemplate = ONConfigurationService.GetConfiguration(t.getCpu(), t.getMem(), t.getHdd(), "hddPath");
 			String vmTemplate = ONConfigurationService.GetConfiguration(taskFreq, t.getMem(), t.getHdd(), "hddPath");
 			OneResponse rc;
@@ -134,7 +135,7 @@ public class OpenNebulaService implements IOpenNebulaService {
 						t.SerVirtualMachine(vm);
 						
 						ExecutorService threadService = Executors.newSingleThreadExecutor();
-						VMDeployer vmd = new VMDeployer(t, openClient, vmID, isMigration);
+						VMDeployer vmd = new VMDeployer(t, openClient, vmID, isMigration,newServ);
 						threadService.execute(vmd);
 						threadService.shutdown();
 						return true;
@@ -154,7 +155,7 @@ public class OpenNebulaService implements IOpenNebulaService {
 			int taskFreq = (int)(((double)tFreq/(double)serverCPUFreq) *100);
 			
 			ExecutorService threadService = Executors.newSingleThreadExecutor();
-			VMDeployer vmd = new VMDeployer(t,isMigration);
+			VMDeployer vmd = new VMDeployer(t,isMigration,newServ);
 			threadService.execute(vmd);
 			threadService.shutdown();
 			return true;
@@ -212,18 +213,13 @@ public class OpenNebulaService implements IOpenNebulaService {
 	public boolean MigrateTask(ITask t, IServer s) {
 		if(BaseCommon.ONEnabled){
 			Task task = (Task)t;
-			// fire the event
-			BaseCommon.Instance().TaskStartedMigrating.setChanged();
-			BaseCommon.Instance().TaskStartedMigrating.notifyObservers(task);
+			
+
+			DeployTask(task, true, s);
 			
 			
-			FinishTask(task);
-			task.setServer(s);
-			DeployTask(task, true);
-			
-			
-			BaseCommon.Instance().TaskEndedMigrating.setChanged();
-			BaseCommon.Instance().TaskEndedMigrating.notifyObservers(task);
+//			BaseCommon.Instance().TaskEndedMigrating.setChanged();
+//			BaseCommon.Instance().TaskEndedMigrating.notifyObservers(task);
 //			ExecutorService threadService = Executors.newSingleThreadExecutor();
 //			VMMigrator vmd = new VMMigrator(t,s);
 //			threadService.execute(vmd);
@@ -316,6 +312,7 @@ public class OpenNebulaService implements IOpenNebulaService {
 		private int vmID;
 		private Client on_Client;
 		private boolean isMigrate;
+		private IServer newServer;
 		
 		public VMDeployer(ITask t, Client onClient, int vmID){
 			this.task = t;
@@ -323,25 +320,36 @@ public class OpenNebulaService implements IOpenNebulaService {
 			this.on_Client = onClient;
 		}
 		
-		public VMDeployer(ITask t, Client onClient, int vmID, boolean isM){
+		public VMDeployer(ITask t, Client onClient, int vmID, boolean isM, IServer newServer){
 			this.task = t;
 			this.vmID = vmID;
 			this.on_Client = onClient;
 			this.isMigrate = isM;
+			this.newServer = newServer;
 		}
 		
 		public VMDeployer(ITask t){
 			this.task = t;
 		}
 		
-		public VMDeployer(ITask t, boolean isM){
+		public VMDeployer(ITask t, boolean isM, IServer newServer){
 			this.task = t;
 			this.isMigrate = isM;
+			this.newServer = newServer;
 		}
 		
 		@Override
 		public void run() {
 			if(BaseCommon.Instance().ONEnabled){
+				if(isMigrate){
+					// fire the event
+					if(task.getServerId() != null && newServer != null){
+						BaseCommon.Instance().TaskStartedMigrating.setChanged();
+						BaseCommon.Instance().TaskStartedMigrating.notifyObservers(task);
+						FinishTask(task);
+						task.setServer(newServer);
+					}
+				}
 				OneResponse rc;
 				// Step3: create the VM
 				VirtualMachine vm = new VirtualMachine(vmID, openClient);
@@ -373,6 +381,14 @@ public class OpenNebulaService implements IOpenNebulaService {
 				}
 			}else{
 				try {
+					if(isMigrate){
+						if(task.getServerId() != null && newServer != null){
+							// fire the event
+							BaseCommon.Instance().TaskStartedMigrating.setChanged();
+							BaseCommon.Instance().TaskStartedMigrating.notifyObservers(task);
+							task.setServer(newServer);
+						}
+					}
 					Thread.sleep(10000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -384,7 +400,10 @@ public class OpenNebulaService implements IOpenNebulaService {
 				BaseCommon.Instance().getVMStarted().setChanged();
 				BaseCommon.Instance().getVMStarted().notifyObservers(task);
 			}else{
-				// maybe notify here the migrationEnded Event? - NO, it's clearer in the migrate method
+				if(task.getServerId() != null && newServer != null){
+					BaseCommon.Instance().TaskEndedMigrating.setChanged();
+					BaseCommon.Instance().TaskEndedMigrating.notifyObservers(task);
+				}
 			}
 		}
 		
