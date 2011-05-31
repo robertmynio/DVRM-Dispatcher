@@ -33,6 +33,7 @@ public class Task implements ITask{
 	private boolean isPredicted;
 	private boolean deployedOrdered;
 	private boolean canMigrate;
+	private boolean isDeployed;
 	
 	private IServer serverHost;
 	private VirtualMachine virtualMachine;
@@ -41,6 +42,7 @@ public class Task implements ITask{
 	public Task(){
 		taskHandle = UUID.randomUUID();
 		unsuccessfulPlacement = false;
+		isDeployed = false;
 		isPredicted = false;
 		serverHost = null;
 		deployedOrdered = false;
@@ -276,6 +278,14 @@ public class Task implements ITask{
 
 	public void setHddReq(int hddReq) {
 		this.hddReq = hddReq;
+	}
+
+	public boolean isDeployed() {
+		return isDeployed;
+	}
+
+	public void setDeployed(boolean isDeployed) {
+		this.isDeployed = isDeployed;
 	}
 
 	

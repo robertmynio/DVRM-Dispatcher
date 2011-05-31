@@ -300,6 +300,7 @@ public class Dispatcher {
                  }
                 // Step2: schedule the task to run until it expires
                 tt.setStartTime(System.currentTimeMillis());
+                ((Task)(tt.getTask())).setDeployed(true);
                 //System.out.println("Current time: " + tt.getStartTime() + " and estimated time: " + tt.getEstimatedDuration());
                 timer.schedule(tt, tt.getEstimatedDuration());
 
@@ -520,6 +521,7 @@ public class Dispatcher {
 			        			newTask.setActualRunTime(resumeTask.getActualRunTime());
 			        			newTask.setResume(true);
 			        			((Task)newTask.getTask()).setCanMigrate(true);
+			        			((Task)(tt.getTask())).setDeployed(true);
 			        			newtime.schedule(newTask, newTask.getRemainingRunTime());
 			        			currentDeployedTasks.put(newtime, resumeTask);
 	        				}else{

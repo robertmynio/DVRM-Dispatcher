@@ -139,7 +139,8 @@ public class Algorithm implements IAlgorithm{
 					// OpenNebula
 					if(newTask.getServerId() != null){
 						//System.out.println("VM will be Deployed for task with UUID (1): " + newTask.getTaskHandle().toString());
-						onService.DeployTask(newTask);
+						IServer serv = new Server();
+						onService.DeployTask(newTask, false, serv);
 						logger.logInfo("Predicted task " + newTask.getTaskHandle() + " deployed on server.");
 					}
 					
@@ -247,8 +248,9 @@ public class Algorithm implements IAlgorithm{
 					
 					// OpenNebula
 					if(tempTask.getServerId() != null) {
+						IServer serv = new Server();
 						//System.out.println("VM will be Deployed for task with UUID (2): " + tempTask.getTaskHandle().toString());
-						onService.DeployTask(tempTask);
+						onService.DeployTask(tempTask,false,serv);
 						logger.logInfo("Task " + newTask.getTaskHandle() + " (normal) deployed on server.");
 					}
 				}		
@@ -548,7 +550,7 @@ public class Algorithm implements IAlgorithm{
 				logger.logInfo("FT: Last server has the least nr of tasks");
 				for(ITask t:lastServer.getTasks()){
 					if(server.compareAvailableResources(t) && !server.isFull()
-							&& ((Task)t).getCanMigrate()){
+							&& ((Task)t).getCanMigrate() && ((Task)t).isDeployed()){
 						logger.logInfo("FT: Added task "+ t.getTaskHandle() +" to server "+ server.getServerID()+ ".(1)");
 						//remove task from current server
 						lastServer.removeTask(t);
@@ -587,7 +589,7 @@ public class Algorithm implements IAlgorithm{
 					while(( t = secondToLastServer.GetNextLowestDemandingTask())!=null && (!server.isFull()) 
 							&& timesTried < (secondToLastServer.getTotalNumberOfTasks() + secondToLastServer.getNumberOfPredictedTasks() )){
 						if(server.compareAvailableResources(t) && !server.isFull()
-								&& ((Task)t).getCanMigrate()){
+								&& ((Task)t).getCanMigrate() && ((Task)t).isDeployed()){
 							secondToLastServer.removeTask(t);
 							t.setServer(server);
 							server.addTask(t);
@@ -616,7 +618,7 @@ public class Algorithm implements IAlgorithm{
 			}else{
 				for(ITask t:secondToLastServer.getTasks()){
 					if(server.compareAvailableResources(t) && !server.isFull()
-							&& ((Task)t).getCanMigrate()){
+							&& ((Task)t).getCanMigrate() && ((Task)t).isDeployed()){
 						//remove task from current server
 						secondToLastServer.removeTask(t);
 						// set the new server
@@ -650,7 +652,7 @@ public class Algorithm implements IAlgorithm{
 					while(( t = lastServer.GetNextLowestDemandingTask())!=null && (!server.isFull())
 							&& timesTried < (secondToLastServer.getTotalNumberOfTasks() + secondToLastServer.getNumberOfPredictedTasks() )){
 						if(server.compareAvailableResources(t) && !server.isFull()
-								&& ((Task)t).getCanMigrate()){
+								&& ((Task)t).getCanMigrate() && ((Task)t).isDeployed()){
 							lastServer.removeTask(t);
 							t.setServer(server);
 							server.addTask(t);
@@ -692,7 +694,7 @@ public class Algorithm implements IAlgorithm{
 			found = false;
 			ITask t = server.GetNextLowestDemandingTask();
 			// if the task is predicted, don't move it
-			if( ((Task)t).getCanMigrate()){
+			if( ((Task)t).getCanMigrate() && ((Task)t).isDeployed()){
 				for(IServer s:inUseServers){
 					if(s != server){
 						if(s.compareAvailableResources(t)){
@@ -784,7 +786,7 @@ public class Algorithm implements IAlgorithm{
 		
 		ITask bingoTask = lastServer.GetTaskWithResources(availableResources);
 		
-		if(bingoTask != null && ((Task)bingoTask).getCanMigrate()){
+		if(bingoTask != null && ((Task)bingoTask).getCanMigrate() && ((Task)bingoTask).isDeployed()){
 			logger.logInfo(" Perfect task found. Server will be full.");
 			// OPEN NEBULA
 			((Task)bingoTask).setCanMigrate(false);

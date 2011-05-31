@@ -21,8 +21,10 @@ import datacenterInterface.dtos.jaxbBindingClasses.ApplicationDescription;
 import datacenterInterface.dtos.jaxbBindingClasses.JaxbPair;
 import datacenterInterface.dtos.jaxbBindingClasses.WorkloadSchedule;
 
+import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
 import vdrm.base.impl.BaseCommon;
+import vdrm.base.impl.Server;
 import vdrm.base.impl.Task;
 import vdrm.disp.dispatcher.TimedGeneratedTaskWrapper;
 import vdrm.disp.dispatcher.TimedTaskWrapper;
@@ -229,7 +231,8 @@ public class ON_RootService {
 	private void SendTaskCommand(ITask task) {
 		if(task != null){
 			((Task)task).setDeployedOrdered(true);
-			onService.DeployTask(task);
+			IServer serv = new Server();
+			onService.DeployTask(task, false, serv);
 		}
 	}
 

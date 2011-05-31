@@ -30,119 +30,31 @@ public class OpenNebulaService implements IOpenNebulaService {
 	 * allocate the VM and then
 	 * deploy the VM to the desired host
 	 */
-	@Override
-	public boolean DeployTask(ITask t) {
-		if(BaseCommon.ONEnabled){
-			//if(((Task)t).isDeployedOrdered()==false){
-			//TODO: make sure hdd path is integrated into ITask (maybe put linux/windows image paths")
-			// Step1: create the VM template
-			int nrCores = t.getServer().getNumberOfCores();
-			int serverCPUFreq = ((Server)t.getServer()).getCoreFreq();
-			int tFreq = t.getCpu();
-			double taskFreq = (double)(((double)tFreq/(double)serverCPUFreq));
-//			String vmTemplate = ONConfigurationService.GetConfiguration(t.getCpu(), t.getMem(), t.getHdd(), "hddPath");
-			String vmTemplate = ONConfigurationService.GetConfiguration(taskFreq, t.getMem(), t.getHdd(), "hddPath");
-			OneResponse rc;
-			int vmID;
-			try{
-				// Step2: try to allocate the VM 
-				rc = VirtualMachine.allocate(openClient, vmTemplate);
-				if(rc.isError()){
-					logger.logWarning("ONDeployTask: "+rc.getErrorMessage());
-				}else{
-					vmID = Integer.parseInt(rc.getMessage());
-					//TODO: add VirtualMachineID to a task also! -- not necessary. can be obtained from vm.
-					
-					// Step3: create the VM
-					VirtualMachine vm = new VirtualMachine(vmID, openClient);
-					if(vm != null){
-						//assign the vm to the task also
-						t.SerVirtualMachine(vm);
-						
-						ExecutorService threadService = Executors.newSingleThreadExecutor();
-						VMDeployer vmd = new VMDeployer(t, openClient, vmID);
-						threadService.execute(vmd);
-						threadService.shutdown();
-//						// Step4: deploy the VM to the desired server
-//						rc = vm.deploy( Integer.parseInt( ((Task)t).getServerId().toString() ) );
-//						
-//						// Step5: wait until the VM actually starts
-//						rc = vm.info();
-//						int timer = 5000;
-//						while(vm.lcmState() != 3 &&
-//								vm.lcmState() != 0 && vm.lcmState() != 14){
-//							Thread.sleep(timer);
-//							rc = vm.info();
-//							
-//							if(timer > 300)
-//								timer -= 200;
-//						}
-						
-//						// Step6: notify that the VM started
-//						BaseCommon.Instance().getVMStarted().setChanged();
-//						BaseCommon.Instance().getVMStarted().notifyObservers(t);
-						
-						return true;
-					}else{
-						logger.logWarning("ON: Could not create Virtual Machine for task "+t.getTaskHandle().toString());
-					}
-				}
-			}catch(Exception ex){
-				logger.logWarning("Cannot deploy new task."+ex.getMessage());
-			}
-			return false;
-		}else{
-			// for testing purposes only
-			int nrCores = t.getServer().getNumberOfCores();
-			int serverCPUFreq = ((Server)t.getServer()).getCoreFreq();
-			int tFreq = t.getCpu();
-			int taskFreq = (int)(((double)tFreq/(double)serverCPUFreq) *100);
-			
-			ExecutorService threadService = Executors.newSingleThreadExecutor();
-			VMDeployer vmd = new VMDeployer(t);
-			threadService.execute(vmd);
-			threadService.shutdown();
-			return true;
-		}
-	}
-
 	public boolean DeployTask(ITask t, boolean isMigration, IServer newServ){
 		if(BaseCommon.ONEnabled){
 			//if(((Task)t).isDeployedOrdered()==false){
 			//TODO: make sure hdd path is integrated into ITask (maybe put linux/windows image paths")
-			// Step1: create the VM template
-			int nrCores = t.getServer().getNumberOfCores();
-			int serverCPUFreq = ((Server)t.getServer()).getCoreFreq();
-			int tFreq = t.getCpu();
-			double taskFreq = (((double)tFreq/(double)serverCPUFreq));
-//			String vmTemplate = ONConfigurationService.GetConfiguration(t.getCpu(), t.getMem(), t.getHdd(), "hddPath");
-			String vmTemplate = ONConfigurationService.GetConfiguration(taskFreq, t.getMem(), t.getHdd(), "hddPath");
-			OneResponse rc;
-			int vmID;
+
 			try{
 				// Step2: try to allocate the VM 
-				rc = VirtualMachine.allocate(openClient, vmTemplate);
-				if(rc.isError()){
-					logger.logWarning("ONDeployTask: "+rc.getErrorMessage());
-				}else{
-					vmID = Integer.parseInt(rc.getMessage());
+
 					//TODO: add VirtualMachineID to a task also! -- not necessary. can be obtained from vm.
 					
 					// Step3: create the VM
-					VirtualMachine vm = new VirtualMachine(vmID, openClient);
-					if(vm != null){
+					//VirtualMachine vm = new VirtualMachine(vmID, openClient);
+					//if(vm != null){
 						//assign the vm to the task also
-						t.SerVirtualMachine(vm);
+					//	t.SerVirtualMachine(vm);
 						
 						ExecutorService threadService = Executors.newSingleThreadExecutor();
-						VMDeployer vmd = new VMDeployer(t, openClient, vmID, isMigration,newServ);
+						VMDeployer vmd = new VMDeployer(t, openClient, 0, isMigration,newServ);
 						threadService.execute(vmd);
 						threadService.shutdown();
 						return true;
-					}else{
-						logger.logWarning("ON: Could not create Virtual Machine for task "+t.getTaskHandle().toString());
-					}
-				}
+					//}else{
+					//	logger.logWarning("ON: Could not create Virtual Machine for task "+t.getTaskHandle().toString());
+					//}
+				
 			}catch(Exception ex){
 				logger.logWarning("Cannot deploy new task."+ex.getMessage());
 			}
@@ -209,7 +121,6 @@ public class OpenNebulaService implements IOpenNebulaService {
 	 * ToDo later: check out if we can track status and return true only when task  
 	 * successfully migrated (check with vm.status())
 	 */
-	@Override
 	public boolean MigrateTask(ITask t, IServer s) {
 		if(BaseCommon.ONEnabled){
 			Task task = (Task)t;
@@ -346,38 +257,55 @@ public class OpenNebulaService implements IOpenNebulaService {
 					if(task.getServerId() != null && newServer != null){
 						BaseCommon.Instance().TaskStartedMigrating.setChanged();
 						BaseCommon.Instance().TaskStartedMigrating.notifyObservers(task);
+						((Task)(task)).setDeployed(false);
 						FinishTask(task);
 						task.setServer(newServer);
 					}
 				}
 				OneResponse rc;
-				// Step3: create the VM
-				VirtualMachine vm = new VirtualMachine(vmID, openClient);
-				if(vm != null){
-					//assign the vm to the task also
-					task.SerVirtualMachine(vm);
+				
+				
+				int nrCores = task.getServer().getNumberOfCores();
+				int serverCPUFreq = ((Server)task.getServer()).getCoreFreq();
+				int tFreq = task.getCpu();
+				double taskFreq = (((double)tFreq/(double)serverCPUFreq));
+				String vmTemplate = ONConfigurationService.GetConfiguration(taskFreq, task.getMem(), task.getHdd(), "hddPath");
+				rc = VirtualMachine.allocate(openClient, vmTemplate);
+				if(rc.isError()){
+					logger.logWarning("ONDeployTask: "+rc.getErrorMessage());
+				}else{
 					
-					// Step4: deploy the VM to the desired server
-					rc = vm.deploy( Integer.parseInt( ((Task)task).getServerId().toString() ) );
+					vmID = Integer.parseInt(rc.getMessage());
 					
-					// Step5: wait until the VM actually starts
-					rc = vm.info();
-					
-					
-						int timer = 5000;
-						while(vm.lcmState() != 3 &&
-								vm.lcmState() != 0 && vm.lcmState() != 14){
-							try {
-								Thread.sleep(timer);
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+				
+					// Step3: create the VM
+					VirtualMachine vm = new VirtualMachine(vmID, openClient);
+					if(vm != null){
+						//assign the vm to the task also
+						task.SerVirtualMachine(vm);
+						
+						// Step4: deploy the VM to the desired server
+						rc = vm.deploy( Integer.parseInt( ((Task)task).getServerId().toString() ) );
+						
+						// Step5: wait until the VM actually starts
+						rc = vm.info();
+						
+						
+							int timer = 5000;
+							while(vm.lcmState() != 3 &&
+									vm.lcmState() != 0 && vm.lcmState() != 14){
+								try {
+									Thread.sleep(timer);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								rc = vm.info();
+								
+								if(timer > 300)
+									timer -= 200;
 							}
-							rc = vm.info();
-							
-							if(timer > 300)
-								timer -= 200;
-						}
+					}
 				}
 			}else{
 				try {
