@@ -10,7 +10,6 @@ public interface IAlgorithm {
 
 	
 	public void endTask(ITask task);
-	public boolean redistributeTasks(IServer server);
 	public void initialize(ArrayList<IServer> servers, ArrayList<ITask> tasks,
 			ArrayList<ITask> taskHistory);
 	

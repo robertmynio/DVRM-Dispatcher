@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Configurations>
+    <serversPath>..\Config\ConfigVd\servers.xml</serversPath>
+    <tasksPath>..\Config\ConfigVd\tasks.xml</tasksPath>
+    <historyPath>..\Config\ConfigVd\history.xml</historyPath>
+    <workloadPath>..\Config\ConfigVd\workload.xml</workloadPath>
+</Configurations>
