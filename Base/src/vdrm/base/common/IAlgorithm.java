@@ -11,10 +11,8 @@ public interface IAlgorithm {
 	
 	public void endTask(ITask task);
 	public boolean redistributeTasks(IServer server);
-	public void reorderServerList(IServer server, int direction);
-	public void tryToFillServer(IServer server);
-	public ITask[] findMaximumUtilizationPlacement(IServer server,
-			IServer secondToLastServer, IServer lastServer);
 	public void initialize(ArrayList<IServer> servers, ArrayList<ITask> tasks,
 			ArrayList<ITask> taskHistory);
+	
+	public Object getVirtualizationService();
 }

@@ -27,11 +27,13 @@ import datacenterInterface.dtos.jaxbBindingClasses.JaxbPair;
 import datacenterInterface.dtos.jaxbBindingClasses.WorkloadSchedule;
 
 import vdrm.base.common.IAlgorithm;
+import vdrm.base.data.IServer;
 import vdrm.base.data.ITask;
 import vdrm.base.impl.BaseCommon;
 import vdrm.base.impl.Task;
 import vdrm.base.impl.BaseCommon.VMStartedEvent;
 import vdrm.disp.alg.Algorithm;
+import vdrm.disp.onservice.OpenNebulaService;
 
 /***
  * Root Service class.
@@ -232,7 +234,7 @@ public class Dispatcher {
 				newTask = new Task(cpu,mem,hdd);
 				
 				TaskArrived(newTask, duration);
-				System.out.println("Newtask has arrived with UUID: " + newTask.getTaskHandle().toString());
+				System.out.println("ARRIVE: Newtask has arrived with UUID: " + newTask.getTaskHandle().toString());
 			}
 			
 		}
@@ -283,25 +285,29 @@ public class Dispatcher {
 				found = true;
 				break;
 			}
-//			if( item.getTask().equals(t) ){
-//				index =  readyTasks.indexOf(item);
-//                found = true;
-//				break;
-//			}
 		}
 		
 		TimedTaskWrapper tt = null;
         if(found){
-        	//System.out.println("Newtask has started with UUID: " + t.getTaskHandle().toString());
+        	
             if(readyTasks.size()>0){
+            	//System.out.println("START:Newtask has started with UUID: " + t.getTaskHandle().toString());
                 synchronized (readyTasks) {
                     tt =  readyTasks.get(index);
                     readyTasks.remove(tt);
                  }
+                
+                // Magic line :)
+                if(t.getServer() != null)
+                	tt.getTask().setServer(t.getServer());
+                else
+                	System.out.println(":-\\ Server is null.");
                 // Step2: schedule the task to run until it expires
+                
                 tt.setStartTime(System.currentTimeMillis());
                 ((Task)(tt.getTask())).setDeployed(true);
-                //System.out.println("Current time: " + tt.getStartTime() + " and estimated time: " + tt.getEstimatedDuration());
+                System.out.println("START:Deployed " + ((Task)(tt.getTask())).isDeployed() + " for: " +tt.getTask().getTaskHandle().toString()
+                		+ " on server " + tt.getTask().getServer().getServerID());
                 timer.schedule(tt, tt.getEstimatedDuration());
 
 
@@ -318,11 +324,7 @@ public class Dispatcher {
         
         if(readyTasks.size() > 0&& !BaseCommon.Instance().ServerStarting){
 			SendTaskCommand(GetFirstUndeployedTask());
-			//SendTaskCommand(readyTasks.get(0).getTask());
-			
 		}
-		// have fun :)
-		//SendTaskCommand(t);
 	}
 	
 	public void SendTaskCommand(ITask t){
@@ -337,9 +339,10 @@ public class Dispatcher {
 	 * @param t
 	 */
 	public synchronized void TaskIsDone(TimedTaskWrapper t){
-		System.out.println("Newtask has ended with UUID: " + t.getTask().getTaskHandle().toString() + "    ***");
+		System.out.println("END:Newtask has ended with UUID: " + t.getTask().getTaskHandle().toString() + " on server " + t.getTask().getServer().getServerID() + "    ***");
+		PrintServerStatus();
 		worker.endTask(t.getTask());
-
+		PrintServerStatus();
         if(!BaseCommon.Instance().ResourcesAvailable){
             BaseCommon.Instance().ResourcesAvailable = true;
         }
@@ -368,23 +371,8 @@ public class Dispatcher {
 			
 			if(readyTasks.size() > 0 && !BaseCommon.Instance().ServerStarting){
 				SendTaskCommand(GetFirstUndeployedTask());
-				//SendTaskCommand(readyTasks.get(0).getTask());
-				
 			}
 		}
-		
-		
-		
-
-//		if(!BaseCommon.Instance().ResourcesAvailable){
-//			// TODO: Step1:iterate through the list of readyTasks and send them all to the worker
-//			while(!readyTasks.isEmpty() && BaseCommon.Instance().ResourcesAvailable == false){
-//				StartTask( ((TimedTaskWrapper)readyTasks.get(0)).getTask() );
-//			}
-//			// Step2: make it true!
-//			BaseCommon.Instance().ResourcesAvailable = true;
-//			
-//		}
 	}
 	
 	public void ParseWorkloadXML(String path){
@@ -419,34 +407,58 @@ public class Dispatcher {
 	}
 	
 	protected synchronized void PauseTimerForTask(Object t) {
+		
+		PrintServerStatus();
+		
 		TimedTaskWrapper tt = null;
 		Timer time = null;
 		boolean found = false;
 		synchronized (currentDeployedTasks) {
 			ITask pausedTask = (ITask)t;
+			
 			// stop the timer thread
 			Set set = currentDeployedTasks.entrySet();
 		    Iterator i = set.iterator();
-		    if(pausedTask.getServerId() != null){
+		    if(pausedTask.getServer().getServerID() != null){
 			    while(i.hasNext()){
 			        Map.Entry me = (Map.Entry)i.next();
 			        tt = (TimedTaskWrapper)me.getValue();
 			        if( tt.getTask().getTaskHandle().toString().compareTo(pausedTask.getTaskHandle().toString())==0
 			        		&& tt.getTask().getServerId() != null){
 			        	time = (Timer)me.getKey();
-			        	found = true;
-			        	System.out.println("@@@ Task will be paused, migration STARTED " + tt.getTask().getTaskHandle().toString() + ", " + tt.getTask().getServerId());
+			        	
+			        	
 			        	try {
-			        		// cancel the timer
-			        		time.cancel();
-			        		time.purge();
+			        		// Magic Lines : set all of the details...
+			        		((Task)tt.getTask()).setFutureHost(((Task)pausedTask).getFutureHost());
+			        		((Task)tt.getTask()).setServer(((Task)pausedTask).getServer());
+			        		
 			        		// set the actual run time (until now)
 			        		tt.setActualRunTime(System.currentTimeMillis() - tt.getStartTime());
 			        		
 			        		// set the remaining running time
-			        		if((tt.getEstimatedDuration()) - tt.getActualRunTime() > 0)
+			        		if((tt.getEstimatedDuration()) - tt.getActualRunTime() > 40000){
+			        			System.out.println("@@@ Task will be paused, migration STARTED " + tt.getTask().getTaskHandle().toString() + ", " + tt.getTask().getServerId());
 			        			tt.setRemainingRunTime( (tt.getEstimatedDuration()) - tt.getActualRunTime());
-			        		else{
+			        			// cancel the timer
+				        		time.cancel();
+				        		time.purge();
+				        		found = true;
+				        		
+				        		// get the future server
+				        		IServer futureServer = ((Task)tt.getTask()).getFutureHost();
+				        		if(futureServer != null){
+				        			// get the virtualization service
+				        			OpenNebulaService onService = (OpenNebulaService)worker.getVirtualizationService();
+				        			if(onService != null){
+				        				onService.MigrateTask(tt.getTask(),futureServer);
+				        			}else{
+				        				System.out.println("@@@ Virtualization service is not valid. Task will not be migrated");
+				        			}
+				        		}else{
+				        			System.out.println("@@@ Future server is not valid. Task will not be migrated");
+				        		}
+			        		}else{
 			        			tt.setRemainingRunTime(0);
 			        			tt.setResume(false);
 			        		}
@@ -458,15 +470,26 @@ public class Dispatcher {
 			        }
 			    }
 			    if(!found){
-						System.out.println("@@@ Task NOT paused, migration FAILED (task not found)" + pausedTask.getTaskHandle().toString()+ ", " + pausedTask.getServerId());
+						System.out.println("@@@ Task NOT paused, migration ABORTED" + pausedTask.getTaskHandle().toString()+ ", " + pausedTask.getServerId());
+						int index;
+						for (TimedTaskWrapper item:readyTasks){
+							
+							if(item.getTask().getTaskHandle().toString().compareTo(pausedTask.getTaskHandle().toString()) == 0){
+								index =  readyTasks.indexOf(item);
+								found = true;
+								break;
+							}
+						}
+						if(found){
+							System.out.println("task found in ready list");
+						}
 			    }
 		    }
-		    //WaitForTaskMigration(tt, time);
-			//currentDeployedTasks.remove(t);
 		}
 	}
 	
 	protected synchronized void ResumeTimerForTask(Object t) {
+
 		TimedTaskWrapper tt = null;
 		TimedTaskWrapper resumeTask = null;
 		Timer time = null;
@@ -532,8 +555,41 @@ public class Dispatcher {
 	        	}catch(Exception ex){
 	        		ex.printStackTrace();
 	        	}
+	        	
+	        	PrintServerStatus();
+	        	
 		    }
 		    
 		}
 	}
+
+	private void PrintServerStatus(){
+		List<IServer> servers;
+		servers = ((Algorithm)worker).getInUseServers();
+		
+		System.out.println("\t\tIn Use Servers");
+		for(IServer s : servers){
+			System.out.println("Server " + s.getServerID() + " status: ");
+			for(ITask t : s.getTasks()){
+				System.out.println("\t ~Task with CPU" + t.getCpu() + " server: " + t.getServer().getServerID() +  " is predicted "+ t.isPredicted()+" is deployed: " + ((Task)t).isDeployed() + " and ID " + t.getTaskHandle().toString());
+				if(t.getServer() == null){
+					System.out.println("\t\t Task " + t.getTaskHandle().toString() + " has an invalid server");
+				}
+			}
+		}
+		servers = ((Algorithm)worker).getFullServers();
+		
+		System.out.println("\t\tFull Servers");
+		for(IServer s : servers){
+			System.out.println("Server " + s.getServerID() + " status: ");
+			for(ITask t : s.getTasks()){
+				System.out.println("\t ~Task with CPU" + t.getCpu() + " server: " + t.getServer().getServerID() +  " is predicted "+ t.isPredicted()+" is deployed: " + ((Task)t).isDeployed() + " and ID " + t.getTaskHandle().toString());
+				if(t.getServer() == null){
+					System.out.println("\t\t Task " + t.getTaskHandle().toString() + " has an invalid server");
+				}
+			}
+		}
+		System.out.println("\t\tEND STATUS REPORT");
+	}
+	
 }

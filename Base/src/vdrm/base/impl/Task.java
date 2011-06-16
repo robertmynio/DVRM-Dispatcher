@@ -38,6 +38,8 @@ public class Task implements ITask{
 	private IServer serverHost;
 	private VirtualMachine virtualMachine;
 	
+	private String serverID;
+	private IServer futureHost;
 	
 	public Task(){
 		taskHandle = UUID.randomUUID();
@@ -206,7 +208,10 @@ public class Task implements ITask{
 		if(serverHost!=null)
 			return serverHost.getServerID();
 		else
-			return null;
+			if(serverID != ""){
+				return serverID;
+			}else
+				return null;
 	}
 
 	@Override
@@ -227,7 +232,10 @@ public class Task implements ITask{
 
 	@Override
 	public void setServer(IServer server) {
-		this.serverHost = server;
+		if(server != null){
+			this.serverHost = server;
+			this.serverID   = serverHost.getServerID();
+		}
 	}
 
 	@Override
@@ -286,6 +294,14 @@ public class Task implements ITask{
 
 	public void setDeployed(boolean isDeployed) {
 		this.isDeployed = isDeployed;
+	}
+
+	public IServer getFutureHost() {
+		return futureHost;
+	}
+
+	public void setFutureHost(IServer futureHost) {
+		this.futureHost = futureHost;
 	}
 
 	

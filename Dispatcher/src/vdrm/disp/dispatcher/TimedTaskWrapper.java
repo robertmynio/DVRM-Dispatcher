@@ -1,6 +1,5 @@
 package vdrm.disp.dispatcher;
 
-import java.util.Timer;
 import java.util.TimerTask;
 
 import vdrm.base.data.ITask;

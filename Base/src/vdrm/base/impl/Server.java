@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.Vector;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -206,7 +207,7 @@ public class Server implements IServer {
 
 	@Override
 	public int getTotalNumberOfTasks() {
-		return nrOfTasks - nrOfPredictedTasks;
+		return nrOfTasks;
 	}
 
 	@Override
@@ -229,12 +230,23 @@ public class Server implements IServer {
 		return isFull;
 	}
 
+	// do a linear search for the task and remove it by UUID
 	@Override
 	public boolean removeTask(ITask task) {
 		try{
 			if(taskList.isEmpty() != true){
-				if(taskList.contains(task)){
-					taskList.remove(task);
+				boolean found = false;
+				ITask foundTask = null;
+				for(ITask t : taskList){
+					if(t.getTaskHandle().toString().compareTo(task.getTaskHandle().toString()) == 0){
+						foundTask = t;
+						found = true;
+						break;
+					}
+				}
+				
+				if(found && foundTask != null){
+					taskList.remove(foundTask);
 					usedCPU -= task.getCpu();
 					usedRAM -= task.getMem();
 					usedHDD -= task.getHdd();
@@ -377,6 +389,8 @@ public class Server implements IServer {
 		
 		
 		return (int)((usedAmount*100)/fullPower);
+		//int highestLoad =  Math.max(Math.max(usedCPU, usedRAM), Math.max(usedRAM, usedHDD));
+		
 	}
 
 
