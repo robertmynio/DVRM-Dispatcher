@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Configurations>
+    <serversPath>..\Config\ConfigTest\servers1.xml</serversPath>
+    <tasksPath>..\Config\ConfigTest\tasks1.xml</tasksPath>
+    <historyPath>..\Config\ConfigTest\history1.xml</historyPath>
+    <workloadPath>..\Config\ConfigTest\workload1.xml</workloadPath>
+</Configurations>
