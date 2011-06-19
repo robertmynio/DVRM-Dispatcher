@@ -14,7 +14,7 @@ import vdrm.disp.dispatcher.Dispatcher;
 
 public class Main {
 
-	private static final String CONFIG_FILE_XML = "..\\Config\\ConfigVd\\config.xml";
+	private static final String CONFIG_FILE_XML = "..\\Config\\ConfigTest\\config1.xml";
 
 	public static void main(String[] args) {
 		
