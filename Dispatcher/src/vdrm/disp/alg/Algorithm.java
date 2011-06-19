@@ -20,12 +20,7 @@ import vdrm.disp.powerservice.PowerService;
 import vdrm.pred.pred.Predictor;
 
 /***
- * TODO: findNewPosition can use insertSortedServer method! May be the same as
- * 		reorder server list, but called when adding a new task. Might be able to
- * 		make a single method out of the 2.
- * TODO: 
  * @author Vlad & Robi
- *
  */
 public class Algorithm implements IAlgorithm{
 
@@ -520,7 +515,7 @@ public class Algorithm implements IAlgorithm{
 		}else{
 			// this is not right...why is the server null?
 		}
-		emptyServers = sortingService.insertSortServersDescending(emptyServers);
+		//emptyServers = sortingService.insertSortServersDescending(emptyServers);
 		logger.logInfo("*** Finished endTasks.");
 	}
 

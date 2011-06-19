@@ -157,30 +157,4 @@ public class BaseCommon {
 			super.setChanged();
 		}
 	}
-	
-	
-	/***
-	 * Event which is fired when the VirtualMachine is deployed and started
-	 * @author Vlad
-	 *
-	 */
-	public class VMDeployedEvent extends EventObject{
-
-		public VMDeployedEvent(Object arg0) {
-			super(arg0);
-		}
-	}
-	
-	
-	
-	/***
-	 * Event Listener for the VirtualMachine deploy event
-	 * @author Vlad
-	 *
-	 */
-	public interface VMDeployedEventListener extends EventListener{
-		public void vmDeployedOccured(VMDeployedEvent ev);
-	}
-	
-	
 }

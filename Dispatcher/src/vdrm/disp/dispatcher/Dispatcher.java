@@ -406,7 +406,7 @@ public class Dispatcher {
 		}
 	}
 	
-	protected synchronized void PauseTimerForTask(Object t) {
+	public synchronized void PauseTimerForTask(Object t) {
 		
 		PrintServerStatus();
 		
@@ -471,24 +471,12 @@ public class Dispatcher {
 			    }
 			    if(!found){
 						System.out.println("@@@ Task NOT paused, migration ABORTED" + pausedTask.getTaskHandle().toString()+ ", " + pausedTask.getServerId());
-						int index;
-						for (TimedTaskWrapper item:readyTasks){
-							
-							if(item.getTask().getTaskHandle().toString().compareTo(pausedTask.getTaskHandle().toString()) == 0){
-								index =  readyTasks.indexOf(item);
-								found = true;
-								break;
-							}
-						}
-						if(found){
-							System.out.println("task found in ready list");
-						}
 			    }
 		    }
 		}
 	}
 	
-	protected synchronized void ResumeTimerForTask(Object t) {
+	public synchronized void ResumeTimerForTask(Object t) {
 
 		TimedTaskWrapper tt = null;
 		TimedTaskWrapper resumeTask = null;
