@@ -288,7 +288,7 @@ public class Algorithm implements IAlgorithm{
 		
 		HashSet<IServer> modifiedServers = new HashSet<IServer>();
 		
-		//sort the array in an ascending order (according to cpu, then mem, then hdd)
+		//sort the array of tasks in an ascending order (according to cpu, then mem, then hdd)
 		sort(tempList);
 		
 		int i = 0;
@@ -310,6 +310,7 @@ public class Algorithm implements IAlgorithm{
 				tempList.remove(0);
 				if(!tempList.isEmpty())
 					tempTask = tempList.get(0);
+				i = 0;
 			}
 			else
 				i++;

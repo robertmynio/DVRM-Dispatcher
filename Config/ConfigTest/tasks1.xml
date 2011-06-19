@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jaxbTasks>
+    <tasksList>
+        <task>
+            <cpuReq>400</cpuReq>
+            <memReq>100</memReq>
+            <hddReq>1000</hddReq>
+        </task>
+		<task>
+            <cpuReq>250</cpuReq>
+            <memReq>100</memReq>
+            <hddReq>1000</hddReq>
+        </task>
+		<task>
+            <cpuReq>350</cpuReq>
+            <memReq>100</memReq>
+            <hddReq>1000</hddReq>
+        </task>
+		 <task>
+            <cpuReq>500</cpuReq>
+            <memReq>100</memReq>
+            <hddReq>1000</hddReq>
+        </task>
+    </tasksList>
+</jaxbTasks>

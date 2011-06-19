@@ -19,10 +19,10 @@ public class BaseCommon {
 	public static final double PERCENT = 0.1;
 	public static final double SERVER_THRESHOLD = 0.2;
 	
-	public static final boolean ONEnabled = false;
-	public static final boolean PSEnabled = false;
-	public static final boolean PredictionEnabled = true;
-	public static final boolean logEnabled = false;
+	public static boolean ONEnabled = false;
+	public static boolean PSEnabled = false;
+	public static boolean PredictionEnabled = true;
+	public static boolean logEnabled = false;
 	
 	private int nrOfTasksThreshold;
 
