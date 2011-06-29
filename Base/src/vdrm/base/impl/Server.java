@@ -507,6 +507,14 @@ public class Server implements IServer {
 		return hddSize;
 	}
 
+	public void setCores() {
+		cores = cpuFreq / coreFreq;
+	}
+
+	public void setNrOfPredictedTasks(int p) {
+		nrOfPredictedTasks = p;
+	}
+
 
 	
 	

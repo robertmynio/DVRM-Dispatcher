@@ -2,22 +2,22 @@
 <jaxbTasks>
     <tasksList>
         <task>
-            <cpuReq>10450</cpuReq>
+            <cpuReq>400</cpuReq>
             <memReq>100</memReq>
             <hddReq>1000</hddReq>
         </task>
 		<task>
-            <cpuReq>3800</cpuReq>
+            <cpuReq>250</cpuReq>
             <memReq>100</memReq>
             <hddReq>1000</hddReq>
         </task>
 		<task>
-            <cpuReq>6650</cpuReq>
+            <cpuReq>350</cpuReq>
             <memReq>100</memReq>
             <hddReq>1000</hddReq>
         </task>
 		 <task>
-            <cpuReq>13300</cpuReq>
+            <cpuReq>500</cpuReq>
             <memReq>100</memReq>
             <hddReq>1000</hddReq>
         </task>

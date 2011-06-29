@@ -2,16 +2,16 @@
 <jaxbServers>
     <serverList>
         <server>
-            <serverID>8</serverID>
-            <cpuFreq>24000</cpuFreq>
+            <serverID>3</serverID>
+            <cpuFreq>12000</cpuFreq>
             <coreFreq>3000</coreFreq>
-            <memoryAmount>6000</memoryAmount>
+            <memoryAmount>2000</memoryAmount>
             <hddSize>1000000</hddSize>
             <ipAddress>192.168.1.15</ipAddress>
             <macAddress>70:71:bc:b1:6f:e5</macAddress>
         </server>
         <server>
-            <serverID>5</serverID>
+            <serverID>0</serverID>
             <cpuFreq>24000</cpuFreq>
             <coreFreq>3000</coreFreq>
             <memoryAmount>6000</memoryAmount>
@@ -20,13 +20,22 @@
             <macAddress>00:27:0e:17:df:05</macAddress>
         </server>
         <server>
-            <serverID>7</serverID>
+            <serverID>2</serverID>
             <cpuFreq>24000</cpuFreq>
             <coreFreq>3000</coreFreq>
             <memoryAmount>6000</memoryAmount>
             <hddSize>1000000</hddSize>
             <ipAddress>192.168.1.14</ipAddress>
             <macAddress>20:cf:30:52:73:20</macAddress>
+        </server>
+        <server>
+            <serverID>4</serverID>
+            <cpuFreq>24000</cpuFreq>
+            <coreFreq>3000</coreFreq>
+            <memoryAmount>6000</memoryAmount>
+            <hddSize>1000000</hddSize>
+            <ipAddress>192.168.1.13</ipAddress>
+            <macAddress>00:27:0e:17:df:1f</macAddress>
         </server>
     </serverList>
 </jaxbServers>

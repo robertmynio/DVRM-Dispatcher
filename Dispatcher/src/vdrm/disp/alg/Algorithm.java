@@ -127,6 +127,7 @@ public class Algorithm implements IAlgorithm{
 					UUID taskUUID = newTask.getTaskHandle();
 					newTask = predictedTasks.get(0);
 					newTask.setPredicted(false);
+					newTask.getServer().setNrOfPredictedTasks(newTask.getServer().getNumberOfPredictedTasks()-1);
 					
 					// Second magic line
 					newTask.setTaskHandle(taskUUID);

@@ -5,7 +5,7 @@
         <application>
             <name>/Task_0Application</name>
             <ActivityDescription>
-                <duration>6000</duration>
+                <duration>121</duration>
                 <name>/Task_0Activity</name>
                 <ActivityServiceDescription>
                     <serviceName>Sort</serviceName>
@@ -13,8 +13,8 @@
                     <memWeight>0.3</memWeight>
                     <storageWeight>0.7</storageWeight>
                     <requestedCoresCount>1</requestedCoresCount>
-                    <requestedCPUMax>20900</requestedCPUMax>
-                    <requestedCPUMin>0</requestedCPUMin>
+                    <requestedCPUMax>400</requestedCPUMax>
+                    <requestedCPUMin>400</requestedCPUMin>
                     <requestedMemoryMax>100</requestedMemoryMax>
                     <requestedMemoryMin>100</requestedMemoryMin>
                     <requestedStorageMax>0</requestedStorageMax>
@@ -37,7 +37,7 @@
         <application>
             <name>/Task_1Application</name>
             <ActivityDescription>
-                <duration>6000</duration>
+                <duration>107</duration>
                 <name>/Task_1Activity</name>
                 <ActivityServiceDescription>
                     <serviceName>MatrixMultiplication</serviceName>
@@ -45,8 +45,8 @@
                     <memWeight>0.4</memWeight>
                     <storageWeight>0.6</storageWeight>
                     <requestedCoresCount>1</requestedCoresCount>
-                    <requestedCPUMax>7600</requestedCPUMax>
-                    <requestedCPUMin>0</requestedCPUMin>
+                    <requestedCPUMax>250</requestedCPUMax>
+                    <requestedCPUMin>250</requestedCPUMin>
                     <requestedMemoryMax>100</requestedMemoryMax>
                     <requestedMemoryMin>100</requestedMemoryMin>
                     <requestedStorageMax>0</requestedStorageMax>
@@ -69,7 +69,7 @@
         <application>
             <name>/Task_2Application</name>
             <ActivityDescription>
-                <duration>30</duration>
+                <duration>86</duration>
                 <name>/Task_2Activity</name>
                 <ActivityServiceDescription>
                     <serviceName>MemIntensive</serviceName>
@@ -77,8 +77,8 @@
                     <memWeight>0.8</memWeight>
                     <storageWeight>0.2</storageWeight>
                     <requestedCoresCount>1</requestedCoresCount>
-                    <requestedCPUMax>13300</requestedCPUMax>
-                    <requestedCPUMin>0</requestedCPUMin>
+                    <requestedCPUMax>350</requestedCPUMax>
+                    <requestedCPUMin>350</requestedCPUMin>
                     <requestedMemoryMax>100</requestedMemoryMax>
                     <requestedMemoryMin>100</requestedMemoryMin>
                     <requestedStorageMax>0</requestedStorageMax>
@@ -101,7 +101,7 @@
         <application>
             <name>/Task_3Application</name>
             <ActivityDescription>
-                <duration>50</duration>
+                <duration>70</duration>
                 <name>/Task_3Activity</name>
                 <ActivityServiceDescription>
                     <serviceName>CpuIntensive</serviceName>
@@ -109,8 +109,8 @@
                     <memWeight>0.2</memWeight>
                     <storageWeight>0.8</storageWeight>
                     <requestedCoresCount>1</requestedCoresCount>
-                    <requestedCPUMax>26600</requestedCPUMax>
-                    <requestedCPUMin>0</requestedCPUMin>
+                    <requestedCPUMax>500</requestedCPUMax>
+                    <requestedCPUMin>500</requestedCPUMin>
                     <requestedMemoryMax>100</requestedMemoryMax>
                     <requestedMemoryMin>100</requestedMemoryMin>
                     <requestedStorageMax>0</requestedStorageMax>

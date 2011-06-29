@@ -11,6 +11,8 @@ public interface IServer {
 	public int getUsedCpu();
 	public int getUsedMem();
 	public int getUsedHdd();
+	public void setCores();
+	public void setNrOfPredictedTasks(int p);
 	public int getLoad();
 	public String getIpAddress();
 	public void setIpAddress(String ip);

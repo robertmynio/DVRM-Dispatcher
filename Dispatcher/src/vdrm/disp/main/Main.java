@@ -342,6 +342,9 @@ public class Main extends JFrame implements ActionListener{
 		tasks.addAll(tempTasks.getTaskList());
 		servers = new ArrayList<IServer>();
 		servers.addAll(tempServers.getServerList());
+		for(IServer s : servers) {
+			s.setCores();
+		}
 		history = new ArrayList<ITask>();
 		for(Integer i : tempHistory.getTaskHistory()) {
 			history.add(tasks.get(i));
