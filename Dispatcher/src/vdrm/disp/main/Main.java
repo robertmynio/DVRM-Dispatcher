@@ -57,6 +57,7 @@ public class Main extends JFrame implements ActionListener{
 	private JButton jButton = null;
 	private JLabel jLabel = null;
 
+	
 	/**
 	 * This is the default constructor
 	 */
@@ -209,7 +210,7 @@ public class Main extends JFrame implements ActionListener{
 		if (jCheckBoxONService == null) {
 			jCheckBoxONService = new JCheckBox();
 			jCheckBoxONService.setBounds(new Rectangle(240, 125, 21, 21));
-			jCheckBoxONService.setSelected(true);
+			jCheckBoxONService.setSelected(false);
 		}
 		return jCheckBoxONService;
 	}
@@ -223,7 +224,7 @@ public class Main extends JFrame implements ActionListener{
 		if (jCheckBoxPower == null) {
 			jCheckBoxPower = new JCheckBox();
 			jCheckBoxPower.setBounds(new Rectangle(240, 160, 21, 21));
-			jCheckBoxPower.setSelected(true);
+			jCheckBoxPower.setSelected(false);
 		}
 		return jCheckBoxPower;
 	}
@@ -242,7 +243,7 @@ public class Main extends JFrame implements ActionListener{
 			jButtonEnd.setEnabled(false);
 		}
 		if(arg0.getSource() == jButtonStart) {
-			jButtonStart.setEnabled(false);
+			//jButtonStart.setEnabled(false);
 			jButtonEnd.setEnabled(true);
 			// CREATE A BOOLEAN FOR THIS!
 			boolean migration = jCheckBoxMigration.isSelected();
@@ -255,9 +256,14 @@ public class Main extends JFrame implements ActionListener{
 			String path = jTextField1.getText();
 			File f = new File(path);
 			boolean success = true;
-			if(f.exists())
-				success = startDispatcher(path);
-			else
+			if(f.exists()){
+				if(dispatcher == null)
+					success = startDispatcher(path);
+				else{
+					dispatcher.ParseWorkloadXML(path);
+					success = true;
+				}
+			}else
 				success = false;
 			if(!success) {
 				jErrorDialog = getJDialog();

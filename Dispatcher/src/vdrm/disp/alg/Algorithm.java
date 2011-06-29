@@ -516,6 +516,7 @@ public class Algorithm implements IAlgorithm{
 		}else{
 			// this is not right...why is the server null?
 		}
+		reorderServerList(server, -1);
 		//emptyServers = sortingService.insertSortServersDescending(emptyServers);
 		logger.logInfo("*** Finished endTasks.");
 	}
